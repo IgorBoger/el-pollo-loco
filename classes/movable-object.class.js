@@ -1,8 +1,8 @@
 class MovableObject {
-    x = 10;
-    y = 50;
-    height = 60;
-    width = 100;
+    x;
+    y;
+    height;
+    width;
     img;
 
 
@@ -13,11 +13,13 @@ class MovableObject {
 
 
     moveLeft() {
-        console.log('Moving left');
+        // this.x -= 10;
+        console.log('Moving left to', this.x);
     }
 
 
     moveRight() {
-        console.log('Moving right');
+        // this.x += 10;
+        console.log('Moving right to', this.x);
     }
 }
