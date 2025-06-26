@@ -14,7 +14,6 @@ class Character extends MovableObject {
         '../img/2_character_pepe/2_walk/W-25.png',
         '../img/2_character_pepe/2_walk/W-26.png'
     ];
-    currentImage = 0;
 
 
     constructor() {
@@ -40,7 +39,7 @@ class Character extends MovableObject {
             //     console.log(this.currentImage);
             //     this.currentImage = 0;
             // }
-        }, 100);
+        }, 300);
 
     }
 
