@@ -2,7 +2,7 @@ class Cloud extends MovableObject {
     // x = Math.random() * 500;
     y = 50;
     height = 300;
-    width = 460;    
+    width = 460;  
 
 
     constructor() {
@@ -17,9 +17,7 @@ class Cloud extends MovableObject {
 
 
     animate() {
-        setInterval( () => {
-            this.x -= 0.1;
-            // console.log(this.x);
-        }, 1000 / 60);
+        this.moveLeft();
+        console.log('cloud speed to lef is: ' + this.speed);
     }
 }
