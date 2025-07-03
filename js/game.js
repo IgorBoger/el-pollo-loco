@@ -19,19 +19,10 @@ document.addEventListener("keyup", function (event) {
     // console.log(event);
 
     if (event.key === "ArrowLeft") { // Left arrow
-        console.log('left');
         keyBaord.LEFT = false;
-        console.log('left is :' + keyBaord.LEFT);
-        console.log(keyBaord);
-        // console.log(event.key);
-        // character.moveLeft();
     }
     if (event.key === "ArrowRight") { // Right arrow
-        console.log('right');
-        // character.moveRight();
         keyBaord.RIGHT = false;
-        console.log('right is :' + keyBaord.RIGHT);
-        console.log(keyBaord);
     }
     // console.log(event.key);
     if (event.key === " ") { // Right arrow
@@ -59,24 +50,12 @@ document.addEventListener("keyup", function (event) {
 
 
 document.addEventListener("keydown", function (event) {
-    // console.log(event);
-
     if (event.key === "ArrowLeft") { // Left arrow
-        console.log('left');
         keyBaord.LEFT = true;
-        console.log('left is :' + keyBaord.LEFT);
-        console.log(keyBaord);
-        // console.log(event.key);
-        // character.moveLeft();
     }
     if (event.key === "ArrowRight") { // Right arrow
-        console.log('right');
-        // character.moveRight();
         keyBaord.RIGHT = true;
-        console.log('right is :' + keyBaord.RIGHT);
-        console.log(keyBaord);
     }
-    // console.log(event.key);
     if (event.key === " ") { // Right arrow
         console.log('Space');
         // character.moveRight();
