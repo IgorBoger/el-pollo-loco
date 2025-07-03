@@ -31,18 +31,21 @@ class Character extends MovableObject {
         setInterval(() => {
             if (this.world.keyBaord.RIGHT) {
                 this.x += this.speed;
+                this.otherDirection = false;
+                console.log('otherDirection. ' + this.otherDirection);
             }
 
             if (this.world.keyBaord.LEFT) {
                 this.x -= this.speed;
+                this.otherDirection = true;
+                console.log('otherDirection. ' + this.otherDirection);
+
             }
         }, 1000 / 60);
 
         setInterval(() => {
             // if (world.keyBaord.RIGHT) { hier geht es auch ohne "this."
             if (this.world.keyBaord.RIGHT || this.world.keyBaord.LEFT) {
-                console.log(this.speed);
-
                 let i = this.currentImage % this.IMAGES_WALKING.length; // let i = 7 % 6; => 1; Rest 1
                 // i = 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5,
                 // if (this.currentImage === 5) {
@@ -55,9 +58,6 @@ class Character extends MovableObject {
                 // console.log('mudulo is ' + i);
                 // console.log('currentImage ' + this.currentImage);
                 this.currentImage++;
-
-                // this.moveRight();
-
             } else {
                 // world.character.world.keyBaord.RIGHT = false;
             }

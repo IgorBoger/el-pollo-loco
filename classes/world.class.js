@@ -55,7 +55,71 @@ class World {
     }
 
 
-    addToMap(movableObject) {// oder kurz "mo"!!
-        this.ctx.drawImage(movableObject.img, movableObject.x, movableObject.y, movableObject.width, movableObject.height);// oder kurz "mo.img" usw.!!
+    // addToMap(movableObject) {// oder kurz "mo"!!
+    //     if (movableObject.otherDirection) {
+    //         console.log('otherDirection. ' + movableObject.otherDirection);
+    //         this.ctx.save();
+    //         this.ctx.translate(movableObject.img.width, 0);// oder kurz "mo.img" usw.!!
+    //         this.ctx.scale(-1, 1);
+    //     }
+
+    //     this.ctx.drawImage(movableObject.img, movableObject.x, movableObject.y, movableObject.width, movableObject.height);// oder kurz "mo.img" usw.!!
+
+    //     if (movableObject.otherDirection) {
+    //         this.ctx.restore();
+    //     }
+    // }
+
+
+    // addToMap(mo) {
+    //     this.ctx.save();
+
+    //     if (mo.otherDirection) {
+    //         this.ctx.translate(mo.x + mo.width, mo.y);
+    //         this.ctx.scale(-1, 1);
+    //         this.ctx.drawImage(mo.img, 0, 0, mo.width, mo.height);
+    //     } else {
+    //         this.ctx.translate(mo.x, mo.y);
+    //         this.ctx.drawImage(mo.img, 0, 0, mo.width, mo.height);
+    //     }
+
+    //     this.ctx.restore();
+    // }
+
+
+    // addToMap(mo) {
+    //     this.ctx.save();
+
+    //     if (mo.otherDirection) {
+    //         console.log('otherDirection. ' + mo.otherDirection);
+    //         this.ctx.translate(mo.x + mo.width, mo.y);
+    //         this.ctx.scale(-1, 1);
+    //     } else {
+    //         this.ctx.translate(mo.x, mo.y);
+    //     }
+
+    //     this.ctx.drawImage(mo.img, 0, 0, mo.width, mo.height);
+
+    //     this.ctx.restore();
+    // }
+
+
+    addToMap(mo) {
+        if (mo.otherDirection) {
+            console.log('otherDirection. ' + mo.otherDirection);
+            this.ctx.save();
+            this.ctx.translate(mo.width, 0);
+            this.ctx.scale(-1, 1);
+            mo.x = mo.x * -1;
+        }
+        this.ctx.drawImage(mo.img, mo.x, mo.y, mo.width, mo.height);// oder kurz "mo.img" usw.!!
+        if (mo.otherDirection) {
+            mo.x = mo.x * -1;
+            this.ctx.restore();
+        }        
     }
+
+
 }
+
+
