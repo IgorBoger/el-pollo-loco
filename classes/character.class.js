@@ -14,6 +14,8 @@ class Character extends MovableObject {
         '../img/2_character_pepe/2_walk/W-25.png',
         '../img/2_character_pepe/2_walk/W-26.png'
     ];
+    world;
+    speed = 8;
 
 
     constructor() {
@@ -26,23 +28,41 @@ class Character extends MovableObject {
 
     animate() {
         // console.log('charackter speed to left is: ' + this.speed);
+        setInterval(() => {
+            if (this.world.keyBaord.RIGHT) {
+                this.x += this.speed;
+            }
 
+            if (this.world.keyBaord.LEFT) {
+                this.x -= this.speed;
+            }
+        }, 1000 / 60);
 
         setInterval(() => {
-            let i = this.currentImage % this.IMAGES_WALKING.length; // let i = 7 % 6; => 1; Rest 1
-            // i = 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5,
-            // let path = this.IMAGES_WALKING[this.currentImage];
-            let path = this.IMAGES_WALKING[i];
-            this.img = this.imageCache[path];
-            // console.log('mudulo is ' + i);
-            // console.log('currentImage ' + this.currentImage);
-            this.currentImage++;
+            // if (world.keyBaord.RIGHT) { hier geht es auch ohne "this."
+            if (this.world.keyBaord.RIGHT || this.world.keyBaord.LEFT) {
+                console.log(this.speed);
 
-            // if (this.currentImage === 5) {
-            //     console.log(this.currentImage);
-            //     this.currentImage = 0;
-            // }
-        }, 300);
+                let i = this.currentImage % this.IMAGES_WALKING.length; // let i = 7 % 6; => 1; Rest 1
+                // i = 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5,
+                // if (this.currentImage === 5) {
+                //     console.log(this.currentImage);
+                //     this.currentImage = 0;
+                // }
+                // let path = this.IMAGES_WALKING[this.currentImage];
+                let path = this.IMAGES_WALKING[i];
+                this.img = this.imageCache[path];
+                // console.log('mudulo is ' + i);
+                // console.log('currentImage ' + this.currentImage);
+                this.currentImage++;
+
+                // this.moveRight();
+
+            } else {
+                // world.character.world.keyBaord.RIGHT = false;
+            }
+
+        }, 50);
 
     }
 
