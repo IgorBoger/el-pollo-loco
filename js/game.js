@@ -6,30 +6,21 @@ let keyBaord = new KeyBaord();
 function init() {
     canvas = document.getElementById('canvas');
     world = new World(canvas, keyBaord);
-    console.log('My Caracter is ', world);
+    // console.log('My Caracter is ', world);
     console.log('My backGrounds are ');
-    console.table(world.backgroundObjects);
+    console.table(world.level.backgroundObjects);
 }
 
 
-// const character = new Character();
-// console.log(keyBaord);
-// console.log(LEFT, RIGHT, UP, SPACE, DOWN);
-
-
 document.addEventListener("keyup", function (event) {
-    // console.log(event);
-
     if (event.key === "ArrowLeft") { // Left arrow
         keyBaord.LEFT = false;
     }
     if (event.key === "ArrowRight") { // Right arrow
         keyBaord.RIGHT = false;
     }
-    // console.log(event.key);
     if (event.key === " ") { // Right arrow
         console.log('Space');
-        // character.moveRight();
         keyBaord.SPACE = false;
         console.log('Space is :' + keyBaord.SPACE);
         console.log(keyBaord);

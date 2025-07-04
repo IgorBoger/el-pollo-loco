@@ -34,6 +34,16 @@ class MovableObject {
     };
 
 
+    playAnimation(images) {
+        // if (!images || images.length === 0) return;
+        let i = this.currentImage % images.length; //(% = "Modulo") let i = 7 % 6; => 1; Rest 1
+        // i = 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, so mit ersetzt die "VARIABLE++;"
+        let path = images[i];
+        this.img = this.imageCache[path];
+        this.currentImage++;
+    }
+
+
     moveLeft() {
         setInterval(() => {
             this.x -= this.speed;

@@ -1,12 +1,12 @@
 class World {
     character = new Character();
-    enemies = level1.enemies;
-    clouds = level1.clouds;
-    layers = level1.layers;
-    altLayers = level1.altLayers;
-    // backgroundTileCount = 1; // var -1
+    level = level1;
+    // enemies = level1.enemies;
+    // clouds = level1.clouds;
+    // layers = level1.layers;
+    // altLayers = level1.altLayers;
+    // level_end_x = level1.level_end_x;
     backgroundTileCount = 1; // var -2
-    // backgroundTileCount = 2; // var - 3
     canvas;
     ctx;
     keyBaord;
@@ -35,7 +35,7 @@ class World {
     initBackground() {
         for (let i = -1; i < this.backgroundTileCount; i++) { // var -2
             const xPos = i * 720;
-            const currentLayers = i % 2 === 0 ? this.layers : this.altLayers; // ersetz die if - else abfrage
+            const currentLayers = i % 2 === 0 ? this.level.layers : this.level.altLayers; // ersetz die if - else abfrage
             // let currentLayers;
             // if (i % 2 === 0) {
             //     currentLayers = this.layers;
@@ -49,7 +49,7 @@ class World {
 
     addTile(xPos, layers) {
         layers.forEach(imagePath => {
-            this.backgroundObjects.push(new BackgroundObject(imagePath, xPos));
+            this.level.backgroundObjects.push(new BackgroundObject(imagePath, xPos));
         });
     }
 
@@ -66,11 +66,19 @@ class World {
         this.ctx.translate(this.camera_x, 0);
         // this.ctx.translate(Math.round(this.camera_x), 0);
 
+        // console.table(this.level.enemies.map(e => ({
+        //     x: e.x,
+        //     y: e.y,
+        //     imgLoaded: e.img?.complete,
+        //     imgSrc: e.img?.src
+        // })));
 
-        this.addObjectsToMap(this.backgroundObjects);
+
+        this.addObjectsToMap(this.level.backgroundObjects);
         this.addToMap(this.character);
-        this.addObjectsToMap(this.enemies);
-        this.addObjectsToMap(this.clouds);
+        this.addObjectsToMap(this.level.clouds);
+        this.addObjectsToMap(this.level.enemies);
+
 
         if (this.character.x + this.canvas.width > this.backgroundTileCount * 720) {
             this.addBackgroundTile(this.backgroundTileCount);
@@ -94,7 +102,7 @@ class World {
     */
     addBackgroundTile(tileIndex) {
         const xPos = tileIndex * 720;
-        const currentLayers = tileIndex % 2 === 0 ? this.layers : this.altLayers;
+        const currentLayers = tileIndex % 2 === 0 ? this.level.layers : this.level.altLayers;
 
         this.addTile(xPos, currentLayers);
         // console.log(world.backgroundObjects);

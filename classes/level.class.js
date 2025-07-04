@@ -4,6 +4,7 @@ class Level {
     backgroundObjects;
     layers;
     altLayers;
+    level_end_x = 1 * 720;
 
 
     constructor(enemies, clouds, backgroundObjects, layers, altLayers ) {

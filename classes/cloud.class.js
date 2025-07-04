@@ -18,6 +18,6 @@ class Cloud extends MovableObject {
 
     animate() {
         this.moveLeft();
-        console.log('cloud speed to lef is: ' + this.speed);
+        // console.log('cloud speed to lef is: ' + this.speed);
     }
 }

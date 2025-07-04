@@ -13,56 +13,47 @@ class Character extends MovableObject {
     ];
     world;
     speed = 8;
+    minX = 150 - 720; // Startwert minus eine Kachelbreite
 
 
     constructor() {
         super().loadImage('../img/2_character_pepe/2_walk/W-21.png');
         this.loadImages(this.IMAGES_WALKING);
 
+        // console.log(this.minX);
+
         this.animate();
     }
 
 
     animate() {
-        setInterval(() => {
-            if (this.world.keyBaord.RIGHT) {
+        setInterval((minX) => {
+            if (this.world.keyBaord.RIGHT && this.x < this.world.level.level_end_x) {
+                console.log(this.world.backgroundTileCount);
+
                 this.x += this.speed;
                 this.otherDirection = false;
             }
 
-            if (this.world.keyBaord.LEFT) {
+
+            if (this.world.keyBaord.LEFT && this.x > this.minX) {
                 this.x -= this.speed;
                 this.otherDirection = true;
-
+                console.log('is smaller like', this.x);
             }
-            this.world.camera_x = -this.x;
+            this.world.camera_x = -this.x + 100;
             // this.world.camera_x = Math.round(-this.x);
 
         }, 1000 / 60);
 
         setInterval(() => {
-            // if (world.keyBaord.RIGHT) { hier geht es auch ohne "this."
             if (this.world.keyBaord.RIGHT || this.world.keyBaord.LEFT) {
-                let i = this.currentImage % this.IMAGES_WALKING.length; //(% = "Modulo") let i = 7 % 6; => 1; Rest 1
-                // i = 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5,
-                // if (this.currentImage === 5) {
-                //     console.log(this.currentImage);
-                //     this.currentImage = 0;
-                // }
-                // let path = this.IMAGES_WALKING[this.currentImage];
-                let path = this.IMAGES_WALKING[i];
-                this.img = this.imageCache[path];
-                // console.log('mudulo is ' + i);
-                // console.log('currentImage ' + this.currentImage);
-                this.currentImage++;
-            } else {
-                // world.character.world.keyBaord.RIGHT = false;
+                this.playAnimation(this.IMAGES_WALKING);
             }
 
         }, 50);
 
     }
-
 
 
     jump() {
