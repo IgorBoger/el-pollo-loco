@@ -8,6 +8,25 @@ class MovableObject {
     currentImage = 0;
     speed = 0.1;
     otherDirection = false;
+    speedY = 0;
+    acceleration = 3;
+    minY = 180;
+
+
+    applyGravity() {
+        setInterval(() => {
+            if (this.isAboveGround()) {
+                this.y -= this.speedY;
+                this.speedY -= this.acceleration;
+            }
+
+        }, 1000 / 25);
+    }
+
+
+    isAboveGround() {
+        return this.y < this.minY;
+    }
 
 
     loadImage(pathCharacter) {
@@ -25,11 +44,6 @@ class MovableObject {
             let img = new Image();
             img.src = pathImagesWalking;
             this.imageCache[pathImagesWalking] = img;
-
-
-            // if (this.imageCache[pathImagesWalking] === 5) {
-            //     console.log(this.imageCache[pathImagesWalking]);
-            // }
         })
     };
 

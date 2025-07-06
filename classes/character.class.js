@@ -1,6 +1,6 @@
 class Character extends MovableObject {
     x = 50;
-    y = 180;
+    y = 50;
     height = 250;
     width = 100;
     IMAGES_WALKING = [
@@ -14,14 +14,13 @@ class Character extends MovableObject {
     world;
     speed = 8;
     minX = 150 - 720; // Startwert minus eine Kachelbreite
+    minY = 180;
 
 
     constructor() {
         super().loadImage('../img/2_character_pepe/2_walk/W-21.png');
         this.loadImages(this.IMAGES_WALKING);
-
-        // console.log(this.minX);
-
+        this.applyGravity();
         this.animate();
     }
 

@@ -36,12 +36,6 @@ class World {
         for (let i = -1; i < this.backgroundTileCount; i++) { // var -2
             const xPos = i * 720;
             const currentLayers = i % 2 === 0 ? this.level.layers : this.level.altLayers; // ersetz die if - else abfrage
-            // let currentLayers;
-            // if (i % 2 === 0) {
-            //     currentLayers = this.layers;
-            // } else {
-            //     currentLayers = this.altLayers;
-            // }
             this.addTile(xPos, currentLayers);
         }
     }
@@ -65,14 +59,6 @@ class World {
 
         this.ctx.translate(this.camera_x, 0);
         // this.ctx.translate(Math.round(this.camera_x), 0);
-
-        // console.table(this.level.enemies.map(e => ({
-        //     x: e.x,
-        //     y: e.y,
-        //     imgLoaded: e.img?.complete,
-        //     imgSrc: e.img?.src
-        // })));
-
 
         this.addObjectsToMap(this.level.backgroundObjects);
         this.addToMap(this.character);
@@ -105,9 +91,6 @@ class World {
         const currentLayers = tileIndex % 2 === 0 ? this.level.layers : this.level.altLayers;
 
         this.addTile(xPos, currentLayers);
-        // console.log(world.backgroundObjects);
-        // console.log('My backGrounds are ');
-        // console.table(this.backgroundObjects);
     }
 
 
@@ -116,21 +99,6 @@ class World {
             this.addToMap(obj);
         });
     }
-
-
-    // addToMap(mo) {
-    //     if (mo.otherDirection) {
-    //         this.ctx.save();
-    //         this.ctx.translate(mo.width, 0);
-    //         this.ctx.scale(-1, 1);
-    //         mo.x = mo.x * -1;
-    //     }
-    //     this.ctx.drawImage(mo.img, mo.x, mo.y, mo.width, mo.height);// oder kurz "mo.img" usw.!!
-    //     if (mo.otherDirection) {
-    //         mo.x = mo.x * -1;
-    //         this.ctx.restore();
-    //     }        
-    // }
 
 
     addToMap(mo) {
@@ -146,7 +114,4 @@ class World {
 
         this.ctx.restore();
     }
-
-
-
 }
