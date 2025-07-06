@@ -6,7 +6,7 @@ let keyBaord = new KeyBaord();
 function init() {
     canvas = document.getElementById('canvas');
     world = new World(canvas, keyBaord);
-    // console.log('My Caracter is ', world);
+    console.log('My Caracter is ', world);
     // console.log('My backGrounds are ');
     // console.table(world.level.backgroundObjects);
 }

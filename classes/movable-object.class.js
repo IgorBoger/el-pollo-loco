@@ -9,17 +9,24 @@ class MovableObject {
     speed = 0.1;
     otherDirection = false;
     speedY = 0;
-    acceleration = 3;
+    acceleration = 2.5;
     minY = 180;
 
-
+    //  || this.speedY > 0
     applyGravity() {
         setInterval(() => {
-            if (this.isAboveGround()) {
+            if (this.isAboveGround() || this.speedY > 0) {
                 this.y -= this.speedY;
                 this.speedY -= this.acceleration;
+                // this.world.keyBaord.UP = true;
             }
 
+            // else {
+            //     if (this.y > this.minY) {
+            //         this.y = this.minY;
+            //     }
+            //     this.speedY = 0;
+            // }
         }, 1000 / 25);
     }
 
