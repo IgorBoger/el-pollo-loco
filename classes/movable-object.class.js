@@ -31,6 +31,10 @@ class MovableObject {
     }
 
 
+    /**
+     * Gibt true zurück, wenn der Charakter in der Luft ist (y < minY).
+     * Gibt false zurück, wenn der Charakter am Boden ist.
+     */
     isAboveGround() {
         return this.y < this.minY;
     }
@@ -66,16 +70,28 @@ class MovableObject {
 
 
     moveLeft() {
-        setInterval(() => {
-            this.x -= this.speed;
-        }, 1000 / 60);
+        this.x -= this.speed;
+        // setInterval(() => {
+        //     this.x -= this.speed;
+        // }, 1000 / 60);
+        // this.x -= this.speed;
+        // this.otherDirection = true;
     }
 
 
     moveRight() {
-        setInterval(() => {
-            this.x += this.speed;
-        }, 1000 / 60);
-        console.log('Moving right to', this.x);
+        this.x += this.speed;
+        // setInterval(() => {
+        //     this.x += this.speed;
+        // }, 1000 / 60);
+
+        // this.x += this.speed;
+        // this.otherDirection = false;
+        // console.log('Moving right to', this.x);
+    }
+
+
+    jump() {
+        this.speedY = 27.5;
     }
 }

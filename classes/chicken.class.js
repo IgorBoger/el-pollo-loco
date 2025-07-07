@@ -23,8 +23,9 @@ class Chicken extends MovableObject {
 
 
     animate() {
-        this.moveLeft();
-        // console.log('chicken speed to left is: ' + this.speed);
+        setInterval(() => {
+            this.moveLeft();
+        }, 1000 / 60);
 
 
         setInterval(() => {

@@ -20,10 +20,7 @@ document.addEventListener("keyup", function (event) {
         keyBaord.RIGHT = false;
     }
     if (event.key === " ") { // Right arrow
-        console.log('Space');
         keyBaord.SPACE = false;
-        console.log('Space is :' + keyBaord.SPACE);
-        console.log(keyBaord);
     }
     if (event.key === "ArrowUp") { // Right arrow
         console.log('up');
@@ -50,11 +47,7 @@ document.addEventListener("keydown", function (event) {
         keyBaord.RIGHT = true;
     }
     if (event.key === " ") { // Right arrow
-        console.log('Space');
-        // character.moveRight();
         keyBaord.SPACE = true;
-        console.log('Space is :' + keyBaord.SPACE);
-        console.log(keyBaord);
     }
     if (event.key === "ArrowUp") { // Right arrow
         console.log('up');

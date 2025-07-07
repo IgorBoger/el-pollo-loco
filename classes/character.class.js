@@ -23,6 +23,7 @@ class Character extends MovableObject {
         '../img/2_character_pepe/3_jump/J-38.png',
         '../img/2_character_pepe/3_jump/J-39.png',
     ]
+    walking_sound;
     world;
     speed = 8;
     minX = 150 - 720; // Startwert minus eine Kachelbreite
@@ -39,16 +40,19 @@ class Character extends MovableObject {
 
     animate() {
         setInterval((minX) => {
+            // this.walking_sound.pause();
             if (this.world.keyBaord.RIGHT && this.x < this.world.level.level_end_x) {
                 // console.log(this.world.backgroundTileCount);
-                this.x += this.speed;
+                this.moveRight()
+                // this.x += this.speed;
                 this.otherDirection = false;
                 // this.walking_sound.play();
             }
 
 
             if (this.world.keyBaord.LEFT && this.x > this.minX) {
-                this.x -= this.speed;
+                this.moveLeft();
+                // this.x -= this.speed;
                 this.otherDirection = true;
                 // this.walking_sound.play();
             }
@@ -57,8 +61,9 @@ class Character extends MovableObject {
             // console.log('this.speedY', this.speedY);
 
 
-            if (this.world.keyBaord.UP && !this.isAboveGround()) {
-                this.speedY = 27.5;
+            if (this.world.keyBaord.SPACE && !this.isAboveGround()) { // Taste "Space" gedrückt und(&&) Charackter ist auf dem Boden
+                // this.speedY = 27.5;
+                this.jump();
             }
 
             this.world.camera_x = -this.x + 100;
@@ -84,7 +89,7 @@ class Character extends MovableObject {
     }
 
 
-    jump() {
-
-    }
+    // jump() {
+    //     this.speedY = 27.5;
+    // }
 }
