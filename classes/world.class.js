@@ -21,6 +21,24 @@ class World {
         this.initBackground();
         this.draw();
         this.setWorld();
+        this.checkCollisions();
+    }
+    
+
+    setWorld() {
+        this.character.world = this;
+    }
+
+
+    checkCollisions() {
+        setInterval(() => {
+            this.level.enemies.forEach((enemy) => {
+                if (this.character.isColliding(enemy)) {
+                    console.log('Collision with Character', enemy);
+                    
+                }
+            });
+        }, 200);
     }
 
 
@@ -45,12 +63,6 @@ class World {
         layers.forEach(imagePath => {
             this.level.backgroundObjects.push(new BackgroundObject(imagePath, xPos));
         });
-    }
-
-
-
-    setWorld() {
-        this.character.world = this;
     }
 
 
@@ -104,14 +116,24 @@ class World {
     addToMap(mo) {
         this.ctx.save();
         if (mo.otherDirection) {
-            this.ctx.translate(mo.x + mo.width, mo.y);
-            this.ctx.scale(-1, 1);
+            this.flipImage(mo);
         } else {
-            this.ctx.translate(mo.x, mo.y);
+            // this.ctx.translate(mo.x, mo.y);
+            this.flipImageBack(mo);
         }
         // this.ctx.drawImage(mo.img, 0, 0, mo.width, mo.height);
-        this.ctx.drawImage(mo.img, Math.round(0), Math.round(0), mo.width, mo.height);
-
+        mo.draw(this.ctx);
+        mo.drawFrame(this.ctx);
         this.ctx.restore();
+    }
+
+    flipImage(mo) {
+        this.ctx.translate(mo.x + mo.width, mo.y);
+        this.ctx.scale(-1, 1);
+    }
+
+
+    flipImageBack(mo) {
+        this.ctx.translate(mo.x, mo.y);
     }
 }

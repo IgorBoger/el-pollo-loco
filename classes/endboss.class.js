@@ -23,7 +23,7 @@ class Endboss extends MovableObject {
         this.loadImages(this.IMAGES_WALKING);
         // console.log("Endboss created at", this.x, this.y);
 
-        console.log("Endboss", this.x, this.y, this.img?.src);
+        // console.log("Endboss", this.x, this.y, this.img?.src);
 
         this.animate();
     }

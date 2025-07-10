@@ -42,27 +42,16 @@ class Character extends MovableObject {
         setInterval((minX) => {
             // this.walking_sound.pause();
             if (this.world.keyBaord.RIGHT && this.x < this.world.level.level_end_x) {
-                // console.log(this.world.backgroundTileCount);
                 this.moveRight()
-                // this.x += this.speed;
                 this.otherDirection = false;
                 // this.walking_sound.play();
             }
-
-
             if (this.world.keyBaord.LEFT && this.x > this.minX) {
                 this.moveLeft();
-                // this.x -= this.speed;
                 this.otherDirection = true;
                 // this.walking_sound.play();
             }
-
-
-            // console.log('this.speedY', this.speedY);
-
-
             if (this.world.keyBaord.SPACE && !this.isAboveGround()) { // Taste "Space" gedrückt und(&&) Charackter ist auf dem Boden
-                // this.speedY = 27.5;
                 this.jump();
             }
 

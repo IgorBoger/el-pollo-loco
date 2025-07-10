@@ -11,6 +11,24 @@ class MovableObject {
     speedY = 0;
     acceleration = 2.5;
     minY = 180;
+    colisionPointX = 0;
+    colisionPointY = 0;
+
+
+    // character.isColliding(chicken);
+    isColliding(mo) {
+        return this.x + this.width > mo.x &&
+            this.y + this.height > mo.y &&
+            this.x < mo.x &&
+            this.y < mo.y + mo.height;
+
+        // if (character.x + character.width > chicken.x && 
+        //     character.y + character.height > chicken.y && 
+        //     character.x < chicken.x && 
+        //     character.y < chicken.y + chicken.height) {
+
+        // }
+    }
 
     //  || this.speedY > 0
     applyGravity() {
@@ -37,6 +55,26 @@ class MovableObject {
      */
     isAboveGround() {
         return this.y < this.minY;
+    }
+
+
+    draw(ctx) {
+        // this.colisionPointX = this.x + this.width;
+        // this.characterColisionPointY = this.y + this.height;
+        // console.log(this.characterColisionPoint);
+        ctx.drawImage(this.img, Math.round(0), Math.round(0), this.width, this.height);
+    }
+
+
+    drawFrame(ctx) {
+        if (this instanceof Character || this instanceof Chicken) {
+            // Blue rectangle
+            ctx.beginPath();
+            ctx.lineWidth = '3';
+            ctx.strokeStyle = 'blue';
+            ctx.rect(Math.round(0), Math.round(0), this.width, this.height);
+            ctx.stroke();
+        }
     }
 
 
@@ -71,23 +109,11 @@ class MovableObject {
 
     moveLeft() {
         this.x -= this.speed;
-        // setInterval(() => {
-        //     this.x -= this.speed;
-        // }, 1000 / 60);
-        // this.x -= this.speed;
-        // this.otherDirection = true;
     }
 
 
     moveRight() {
         this.x += this.speed;
-        // setInterval(() => {
-        //     this.x += this.speed;
-        // }, 1000 / 60);
-
-        // this.x += this.speed;
-        // this.otherDirection = false;
-        // console.log('Moving right to', this.x);
     }
 
 
