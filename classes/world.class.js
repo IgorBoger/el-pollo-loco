@@ -23,7 +23,7 @@ class World {
         this.setWorld();
         this.checkCollisions();
     }
-    
+
 
     setWorld() {
         this.character.world = this;
@@ -34,8 +34,10 @@ class World {
         setInterval(() => {
             this.level.enemies.forEach((enemy) => {
                 if (this.character.isColliding(enemy)) {
-                    console.log('Collision with Character', enemy);
-                    
+                    // console.log('Collision with Character', enemy);
+                    // this.character.energy -= 5;
+                    this.character.hit(enemy);
+                    // console.log(this.character.energy);
                 }
             });
         }, 200);

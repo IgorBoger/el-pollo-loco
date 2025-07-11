@@ -1,18 +1,20 @@
-class MovableObject {
-    x;
-    y;
-    height;
-    width;
-    img;
-    imageCache = {};
-    currentImage = 0;
+class MovableObject extends DrawableObject {
+    // x;
+    // y;
+    // height;
+    // width;
+    // img;
+    // imageCache = {};
+    // currentImage = 0;
     speed = 0.1;
     otherDirection = false;
     speedY = 0;
     acceleration = 2.5;
     minY = 180;
-    colisionPointX = 0;
-    colisionPointY = 0;
+    // colisionPointX = 0;
+    // colisionPointY = 0;
+    energy = 100;
+    lastHit = 0;
 
 
     // character.isColliding(chicken);
@@ -29,6 +31,35 @@ class MovableObject {
 
         // }
     }
+
+
+    hit(enemy) {
+        this.energy -= 5;
+        if (this.energy <= 0) {
+            this.energy = 0;
+            console.log('ENERGY ', this.energy);
+            // console.log('Collision with Character, ENERGY ', this.energy);
+        } else {
+            this.lastHit = new Date().getTime();
+            console.log(this.lastHit);
+
+        }
+    }
+
+
+    isHurt() {
+        let timePassed = new Date().getTime() - this.lastHit; // Differnce in "MS"
+        timePassed = timePassed / 1000;
+        console.log(timePassed);
+        return timePassed < 1;
+        // return this.energy < 100;
+    }
+
+
+    isDead() {
+        return this.energy == 0;
+    }
+
 
     //  || this.speedY > 0
     applyGravity() {
