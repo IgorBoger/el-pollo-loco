@@ -5,7 +5,7 @@ class Level {
     layers;
     altLayers;
     level_end_x = 1 * 720;
-    coinStatus;
+    // coinStatus;
 
     constructor(enemies, clouds, backgroundObjects, layers, altLayers) {
         this.enemies = enemies;

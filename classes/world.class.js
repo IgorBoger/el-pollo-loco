@@ -11,6 +11,10 @@ class World {
     ctx;
     keyBaord;
     camera_x = 0;
+    // statusBar = new StatusBar();
+    healthBar = new StatusBar('health');
+    coinBar = new StatusBar('coin');
+    bottleBar = new StatusBar('bottle');
 
 
     constructor(canvas, keyBaord) {
@@ -38,9 +42,18 @@ class World {
                     // this.character.energy -= 5;
                     this.character.hit(enemy);
                     // console.log(this.character.energy);
+                    // this.statusBar.setPercentage(this.character.energy);
+                    this.updateHealthStatusBar();
                 }
             });
         }, 200);
+    }
+
+
+    updateHealthStatusBar() {
+        // this.statusBar.setPercentage(this.character.energy);
+        this.healthBar.setPercentage(this.character.energy);
+        // this.coinBar.setPercentage(this.character.energy);
     }
 
 
@@ -76,8 +89,10 @@ class World {
 
         this.addObjectsToMap(this.level.backgroundObjects);
         this.addObjectsToMap(this.level.clouds);
+        // this.addToMap(this.statusBar);
         this.addToMap(this.character);
         this.addObjectsToMap(this.level.enemies);
+        // this.addObjectsToMap(this.level.enemies);
 
 
         if (this.character.x + this.canvas.width > this.backgroundTileCount * 720) {
@@ -87,6 +102,14 @@ class World {
 
         this.ctx.translate(-this.camera_x, 0);
         // this.ctx.translate(Math.round(-this.camera_x), 0);
+
+        // ::::::::::Zeigen nach dem "camera_x" Reset zeichnen/Oder "statusBar" x = -100; - geben,
+        // this.updateHealthStatusBar();
+        // this.addToMap(this.statusBar);
+        this.addToMap(this.healthBar);
+        this.addToMap(this.coinBar);
+        this.addToMap(this.bottleBar);
+
 
 
         let self = this;

@@ -1,5 +1,5 @@
 class Character extends MovableObject {
-    x = 50;
+    x = 0;
     y = 50;
     height = 250;
     width = 100;
@@ -46,7 +46,8 @@ class Character extends MovableObject {
 
 
     constructor() {
-        super().loadImage('../img/2_character_pepe/2_walk/W-21.png');
+        // super().loadImage('../img/2_character_pepe/2_walk/W-21.png');
+        super().loadImage(this.IMAGES_WALKING[0]);
         this.loadImages(this.IMAGES_WALKING);
         this.loadImages(this.IMAGES_JUMPING);
         this.loadImages(this.IMAGES_DEAD);
@@ -81,10 +82,10 @@ class Character extends MovableObject {
 
         setInterval(() => {
             if (this.isDead()) {
-                console.log("isDead:", this.isDead());
+                // console.log("isDead:", this.isDead());
                 this.playAnimation(this.IMAGES_DEAD);
                 this.img = this.imageCache[this.IMAGES_DEAD[this.IMAGES_DEAD.length - 1]];
-                console.log(this.img);
+                // console.log(this.img);
             } else if (this.isHurt()) {
                 this.playAnimation(this.IMAGES_HURT);
                 // this.img = this.imageCache[this.IMAGES_HURT[this.IMAGES_HURT.length - 1]];
