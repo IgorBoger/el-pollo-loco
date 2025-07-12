@@ -30,6 +30,7 @@ class MovableObject extends DrawableObject {
             this.energy = 0;
             // console.log('ENERGY ', this.energy);
             // console.log('Collision with Character, ENERGY ', this.energy);
+            // console.log('Collision with ', enemy);
         } else {
             this.lastHit = new Date().getTime();
             // console.log(this.lastHit);
@@ -76,7 +77,11 @@ class MovableObject extends DrawableObject {
      * Gibt false zurück, wenn der Charakter am Boden ist.
      */
     isAboveGround() {
-        return this.y < this.minY;
+        if (this instanceof ThrowableObject) {//Throwable object should always fall/Wurfobjekte sollten immer fallen
+            return true;
+        } else {
+            return this.y < this.minY;
+        }
     }
 
 

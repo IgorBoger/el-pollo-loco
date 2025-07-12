@@ -4,6 +4,7 @@ class KeyBaord {
     UP = false;
     SPACE = false;
     DOWN = false;
+    THROW = false;
 
 
     constructor() {

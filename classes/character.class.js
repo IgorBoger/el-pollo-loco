@@ -61,7 +61,7 @@ class Character extends MovableObject {
         setInterval((minX) => {
             // this.walking_sound.pause();
             if (this.world.keyBaord.RIGHT && this.x < this.world.level.level_end_x) {
-                this.moveRight()
+                this.moveRight();
                 this.otherDirection = false;
                 // this.walking_sound.play();
             }

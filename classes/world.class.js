@@ -1,5 +1,9 @@
 class World {
     character = new Character();
+    healthBar = new StatusBar('health');
+    coinBar = new StatusBar('coin');
+    bottleBar = new StatusBar('bottle');
+    throwableObject = [];
     level = level1;
     // enemies = level1.enemies;
     // clouds = level1.clouds;
@@ -12,9 +16,6 @@ class World {
     keyBaord;
     camera_x = 0;
     // statusBar = new StatusBar();
-    healthBar = new StatusBar('health');
-    coinBar = new StatusBar('coin');
-    bottleBar = new StatusBar('bottle');
 
 
     constructor(canvas, keyBaord) {
@@ -25,28 +26,42 @@ class World {
         this.initBackground();
         this.draw();
         this.setWorld();
-        this.checkCollisions();
+        this.run();
     }
 
 
     setWorld() {
         this.character.world = this;
+        // this.bottle.world = this;
+        this.throwableObject.world = this;
+    }
+
+
+    run() {
+        setInterval(() => {
+            this.checkCollisions();
+            this.checkThrowObject();
+        }, 200);
+        // this.checkThrowObject();
     }
 
 
     checkCollisions() {
-        setInterval(() => {
-            this.level.enemies.forEach((enemy) => {
-                if (this.character.isColliding(enemy)) {
-                    // console.log('Collision with Character', enemy);
-                    // this.character.energy -= 5;
-                    this.character.hit(enemy);
-                    // console.log(this.character.energy);
-                    // this.statusBar.setPercentage(this.character.energy);
-                    this.updateHealthStatusBar();
-                }
-            });
-        }, 200);
+        this.level.enemies.forEach((enemy) => {
+            if (this.character.isColliding(enemy)) {
+                // console.log('Collision with Character', enemy);
+                this.character.hit(enemy);
+                this.updateHealthStatusBar();
+            }
+        });
+    }
+
+
+    checkThrowObject() {
+        if (this.keyBaord.THROW) {
+            let bottle = new ThrowableObject(this.character.x + 100, this.character.y + 100)
+            this.throwableObject.push(bottle);
+        }
     }
 
 
@@ -91,8 +106,9 @@ class World {
         this.addObjectsToMap(this.level.clouds);
         // this.addToMap(this.statusBar);
         this.addToMap(this.character);
+        // this.addToMap(this.bottle);
         this.addObjectsToMap(this.level.enemies);
-        // this.addObjectsToMap(this.level.enemies);
+        this.addObjectsToMap(this.throwableObject);
 
 
         if (this.character.x + this.canvas.width > this.backgroundTileCount * 720) {
