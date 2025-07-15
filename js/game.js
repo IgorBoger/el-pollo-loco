@@ -9,8 +9,7 @@ function init() {
     console.log('My Caracter is ', world);
     // console.log('My backGrounds are ');
     // console.table(world.level.backgroundObjects);
-    console.log(keyBaord);
-
+    // console.log(keyBaord);
 }
 
 
@@ -26,21 +25,18 @@ document.addEventListener("keyup", function (event) {
     }
     if (event.key === "ArrowUp") {
         console.log('up');
-        // character.moveRight();
         keyBaord.UP = false;
         console.log('up is :' + keyBaord.UP);
         console.log(keyBaord);
     }
     if (event.key === "ArrowDown") {
         console.log('down');
-        // character.moveRight();
         keyBaord.DOWN = false;
         console.log('down is :' + keyBaord.DOWN);
         console.log(keyBaord);
     }
     if (event.key === "d") {
         console.log('throw');
-        // character.moveRight();
         keyBaord.THROW = false;
         console.log('throw is :' + keyBaord.THROW);
         console.log(keyBaord);
@@ -62,21 +58,18 @@ document.addEventListener("keydown", function (event) {
     }
     if (event.key === "ArrowUp") {
         console.log('up');
-        // character.moveRight();
         keyBaord.UP = true;
         console.log('up is :' + keyBaord.UP);
         console.log(keyBaord);
     }
     if (event.key === "ArrowDown") {
         console.log('down');
-        // character.moveRight();
         keyBaord.DOWN = true;
         console.log('up is :' + keyBaord.DOWN);
         console.log(keyBaord);
     }
     if (event.key === "d") {
         console.log('throw');
-        // character.moveRight();
         keyBaord.THROW = true;
         console.log('throw is :' + keyBaord.THROW);
         console.log(keyBaord);

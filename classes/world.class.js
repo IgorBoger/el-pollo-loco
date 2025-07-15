@@ -3,6 +3,11 @@ class World {
     healthBar = new StatusBar('health');
     coinBar = new StatusBar('coin');
     bottleBar = new StatusBar('bottle');
+    // coin = new Coin();
+    coins = [
+        // new Coin(150, 150),
+        // new Coin(600, 200)
+    ];
     throwableObject = [];
     level = level1;
     // enemies = level1.enemies;
@@ -27,6 +32,7 @@ class World {
         this.draw();
         this.setWorld();
         this.run();
+        this.initCoins();
     }
 
 
@@ -54,7 +60,34 @@ class World {
                 this.updateHealthStatusBar();
             }
         });
+
+
+        const coinIndex = this.coins.findIndex(coin => this.character.isColliding(coin));
+        if (coinIndex !== -1) {
+            const coin = this.coins[coinIndex];
+            this.character.coin += 20;
+            if (this.character.coin > 100) this.character.coin = 100;
+            if (this.character.coin >= 100) {
+            }
+            this.updateCoinStatusBar();
+            this.coins.splice(coinIndex, 1);
+        }
     }
+
+
+    initCoins() {
+        const segments = 5;
+        const segmentWidth = this.level.level_end_x / segments;
+        for (let i = 0; i < segments; i++) {
+            const minX = i * segmentWidth + 200;
+            const maxX = (i + 1) * segmentWidth - 50;
+            const x = Math.random() * (maxX - minX) + minX;
+            const y = Math.random() * 200 + 150;
+            this.coins.push(new Coin(x, y));
+        }
+    }
+
+
 
 
     checkThrowObject() {
@@ -66,9 +99,12 @@ class World {
 
 
     updateHealthStatusBar() {
-        // this.statusBar.setPercentage(this.character.energy);
         this.healthBar.setPercentage(this.character.energy);
-        // this.coinBar.setPercentage(this.character.energy);
+    }
+
+
+    updateCoinStatusBar() {
+        this.coinBar.setPercentage(this.character.coin);
     }
 
 
@@ -106,9 +142,16 @@ class World {
         this.addObjectsToMap(this.level.clouds);
         // this.addToMap(this.statusBar);
         this.addToMap(this.character);
+
+        // this.addToMap(this.coin);
+        // this.addObjectsToMap(this.coins);
+        this.addObjectsToMap(this.coins.filter(c => !c.collected));
+
+
         // this.addToMap(this.bottle);
-        this.addObjectsToMap(this.level.enemies);
+        // this.addObjectsToMap(this.level.enemies);
         this.addObjectsToMap(this.throwableObject);
+        // this.addObjectsToMap(this.coin);
 
 
         if (this.character.x + this.canvas.width > this.backgroundTileCount * 720) {
