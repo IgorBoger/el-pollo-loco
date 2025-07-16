@@ -31,7 +31,6 @@ class Character extends MovableObject {
         '../img/2_character_pepe/5_dead/D-54.png',
         '../img/2_character_pepe/5_dead/D-55.png',
         '../img/2_character_pepe/5_dead/D-56.png',
-        // '../img/2_character_pepe/5_dead/D-57.png'
     ];
 
     IMAGES_HURT = [
@@ -42,11 +41,10 @@ class Character extends MovableObject {
     walking_sound;
     world;
     speed = 8;
-    minX = 150 - 720; // Startwert minus eine Kachelbreite
+    minX = 150 - 720;
 
 
     constructor() {
-        // super().loadImage('../img/2_character_pepe/2_walk/W-21.png');
         super().loadImage(this.IMAGES_WALKING[0]);
         this.loadImages(this.IMAGES_WALKING);
         this.loadImages(this.IMAGES_JUMPING);

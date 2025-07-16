@@ -1,5 +1,4 @@
 class Endboss extends MovableObject {
-    // x = 220;
     x = 1 * 720;
     y = -50;
     height = 500;
@@ -15,23 +14,19 @@ class Endboss extends MovableObject {
         '../img/4_enemie_boss_chicken/2_alert/G11.png',
         '../img/4_enemie_boss_chicken/2_alert/G12.png',
     ];
-    // damage = 20;
 
 
 
     constructor() {
-        super().loadImage(this.IMAGES_WALKING[0]); // Startet mit dem ersten Bild aus dem Array!!!
+        super().loadImage(this.IMAGES_WALKING[0]);
         this.loadImages(this.IMAGES_WALKING);
         // console.log("Endboss created at", this.x, this.y);
-
         // console.log("Endboss", this.x, this.y, this.img?.src);
-
         this.animate();
     }
 
 
     animate() {
-        // this.moveLeft();
         setInterval(() => {
             this.playAnimation(this.IMAGES_WALKING);
         }, 200);

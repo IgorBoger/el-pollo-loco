@@ -10,7 +10,6 @@ class Chicken extends MovableObject {
         '../img/3_enemies_chicken/chicken_normal/1_walk/2_w.png',
         '../img/3_enemies_chicken/chicken_normal/1_walk/3_w.png'
     ];
-    // damage = 5;
 
 
     constructor() {
@@ -25,10 +24,6 @@ class Chicken extends MovableObject {
     animate() {
         setInterval(() => {
             this.moveLeft();
-            // if (this.x <= chara) {
-
-            // }
-            // console.log(this.x);
         }, 1000 / 60);
 
 

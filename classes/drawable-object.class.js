@@ -14,15 +14,13 @@ class DrawableObject {
 
 
     draw(ctx) {
-        // this.colisionPointX = this.x + this.width;
-        // this.characterColisionPointY = this.y + this.height;
-        // console.log(this.characterColisionPoint);
         ctx.drawImage(this.img, Math.round(0), Math.round(0), this.width, this.height);
     }
 
 
     drawFrame(ctx) {
-        if (this instanceof Character || this instanceof Chicken || this instanceof Coin) {
+        if (this instanceof Character || this instanceof Chicken || 
+            this instanceof Coin || this instanceof Bottle) {
             // Blue rectangle
             ctx.beginPath();
             ctx.lineWidth = '3';
@@ -30,13 +28,6 @@ class DrawableObject {
             ctx.rect(Math.round(0), Math.round(0), this.width, this.height);
             ctx.stroke();
         }
-
-        // // Blue rectangle
-        // ctx.beginPath();
-        // ctx.lineWidth = '3';
-        // ctx.strokeStyle = 'blue';
-        // ctx.rect(Math.round(0), Math.round(0), this.width, this.height);
-        // ctx.stroke();
     }
 
 
