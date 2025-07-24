@@ -24,6 +24,13 @@ class Character extends MovableObject {
         '../img/2_character_pepe/3_jump/J-39.png',
     ]
 
+
+    IMAGES_HURT = [
+        '../img/2_character_pepe/4_hurt/H-41.png',
+        '../img/2_character_pepe/4_hurt/H-42.png',
+        '../img/2_character_pepe/4_hurt/H-43.png'
+    ];
+
     IMAGES_DEAD = [
         '../img/2_character_pepe/5_dead/D-51.png',
         '../img/2_character_pepe/5_dead/D-52.png',
@@ -32,16 +39,15 @@ class Character extends MovableObject {
         '../img/2_character_pepe/5_dead/D-55.png',
         '../img/2_character_pepe/5_dead/D-56.png',
     ];
-
-    IMAGES_HURT = [
-        '../img/2_character_pepe/4_hurt/H-41.png',
-        '../img/2_character_pepe/4_hurt/H-42.png',
-        '../img/2_character_pepe/4_hurt/H-43.png'
-    ];
     walking_sound;
     world;
     speed = 8;
     minX = 150 - 720;
+    coin = 0;
+    bottle = 0;
+    deadSoundPlayed = false;
+    hurtSoundPlayed = false;
+
 
 
     constructor() {
@@ -57,16 +63,22 @@ class Character extends MovableObject {
 
     animate() {
         setInterval((minX) => {
-            // this.walking_sound.pause();
+            if (this.world.keyBaord.RIGHT || this.world.keyBaord.LEFT) {
+                if (this.world?.sounds?.walk?.paused) {
+                    this.world.sounds.walk.loop = true;
+                    this.world.sounds.walk.volume = 0.1;
+                    this.world.playEffectSound(this.world.sounds.walk);
+                }
+            } else {
+                this.world?.sounds?.walk?.pause();
+            }
             if (this.world.keyBaord.RIGHT && this.x < this.world.level.level_end_x) {
                 this.moveRight();
                 this.otherDirection = false;
-                // this.walking_sound.play();
             }
             if (this.world.keyBaord.LEFT && this.x > this.minX) {
                 this.moveLeft();
                 this.otherDirection = true;
-                // this.walking_sound.play();
             }
             if (this.world.keyBaord.SPACE && !this.isAboveGround()) { // Taste "Space" gedrückt und(&&) Charackter ist auf dem Boden
                 this.jump();
@@ -83,28 +95,39 @@ class Character extends MovableObject {
                 // console.log("isDead:", this.isDead());
                 this.playAnimation(this.IMAGES_DEAD);
                 this.img = this.imageCache[this.IMAGES_DEAD[this.IMAGES_DEAD.length - 1]];
-                // console.log(this.img);
+                if (!this.deadSoundPlayed) {
+                    this.world.playEffectSound(this.world.sounds.dead);
+                    this.deadSoundPlayed = true;
+                }
+
             } else if (this.isHurt()) {
                 this.playAnimation(this.IMAGES_HURT);
-                // this.img = this.imageCache[this.IMAGES_HURT[this.IMAGES_HURT.length - 1]];
-                // this.img = this.imageCache[this.IMAGES_WALKING];
+                if (!this.hurtSoundPlayed) {
+                    this.world.playEffectSound(this.world.sounds.hurt);
+                    this.hurtSoundPlayed = true;
+                }
             } else if (this.isAboveGround()) {
                 this.playAnimation(this.IMAGES_JUMPING);
+                this.hurtSoundPlayed = false;
             } else {
                 if (this.world.keyBaord.RIGHT || this.world.keyBaord.LEFT) {
                     this.playAnimation(this.IMAGES_WALKING);
-                } else { // vom ChatGPT
+                    this.hurtSoundPlayed = false;
+                } else {
                     // Am Boden und keine Taste gedrückt → letztes Sprungbild auch der Charakter immer 
                     //  „ordentlich“ auf dem Boden steht, ohne dass er in einem falschen Frame einfriert.
                     this.img = this.imageCache[this.IMAGES_JUMPING[this.IMAGES_JUMPING.length - 1]];
                     // oder nur 8 - "this.IMAGES_JUMPING.length/9 - 1 = 8" 
+                    this.hurtSoundPlayed = false;
                 }
             }
         }, 50);
     }
 
 
-    // jump() {
-    //     this.speedY = 27.5;
-    // }
+
+    jump() {
+        this.speedY = 27.5;
+        this.world.playEffectSound(this.world.sounds.jump);
+    }
 }

@@ -12,6 +12,20 @@ class World {
     ctx;
     keyBaord;
     camera_x = 0;
+    sounds = {
+        background: new Audio('../audio/background.mp3'),       //  Sound-OK
+        walk: new Audio('../audio/walk.mp3'),                   //  Sound-OK
+        jump: new Audio('../audio/jump.mp3'),                   //  Sound-OK
+        hurt: new Audio('../audio/hurt.mp3'),                   //  Sound-OK
+        dead: new Audio('../audio/dead.mp3'),                   //  Sound-OK
+        coin: new Audio('../audio/coin.mp3'),                   //  Sound-OK
+        bottle: new Audio('../audio/bottle.mp3'),               //  Sound-OK
+        hit: new Audio('../audio/hit.mp3'),                     //  Sound-OK
+        throw: new Audio('../audio/bottle-throw.mp3'),          //  Sound-OK
+
+        // endbossAppear: new Audio('../audio/endboss_appear.mp3'),
+        // endbossDead: new Audio('../audio/endboss_dead.mp3')
+    };
 
 
     constructor(canvas, keyBaord) {
@@ -25,6 +39,8 @@ class World {
         this.run();
         this.initCollectables(this.coins, Coin, 200, 50);
         this.initCollectables(this.bottles, Bottle, 100, 150);
+        this.sounds.background.loop = true;
+        this.sounds.background.volume = 0.1;
     }
 
 
@@ -52,25 +68,40 @@ class World {
 
     collisionWithChicken() {
         this.level.enemies.forEach((enemy) => {
-            if (this.character.isColliding(enemy)) {
-                // console.log('Collision with Character', enemy);
+            let now = new Date().getTime();
+            if (this.character.isColliding(enemy) && !this.character.isDead() && (!enemy.lastHit || now - enemy.lastHit > 3000)) { // 3 Sekunden Cooldown
                 this.character.hit(enemy);
+                enemy.lastHit = now;
                 this.updateHealthStatusBar();
             }
         });
+
     }
 
 
     collisionWithCollectable(array, propertyName, updateStatusBarCallback) {
         const index = array.findIndex(item => this.character.isColliding(item));
         if (index !== -1) {
+            // console.log(`propertyName ist aktuell: "${propertyName}"`);
             this.character[propertyName] += 20;
             if (this.character[propertyName] > 100) this.character[propertyName] = 100;
-
             updateStatusBarCallback.call(this);
-
             array.splice(index, 1);
+            if (propertyName === 'coin') {
+                this.playEffectSound(this.sounds.coin);
+            }
+            if (propertyName === 'bottle') {
+                this.playEffectSound(this.sounds.bottle);
+            }
         }
+    }
+
+
+    playEffectSound(sound) {
+        if (!sound) return;
+        sound.pause();
+        sound.currentTime = 0;
+        sound.play();
     }
 
 
@@ -89,15 +120,14 @@ class World {
 
     checkThrowObject() {
         if (this.keyBaord.THROW && this.character.bottle > 0) {
-            console.log(this.character.bottle);
-            let bottle = new ThrowableObject(this.character.x + 100, this.character.y + 100)
+            let bottle = new ThrowableObject(this.character.x + 100, this.character.y + 100, this);
             this.throwableObject.push(bottle);
             this.character.bottle -= 20;
             if (this.character.bottle < 0) {
                 this.character.bottle = 0;
             }
             this.updateBottleStatusBar();
-            console.log(`Bottle thrown. Remaining: ${this.character.bottle}`);
+            // console.log(`Bottle thrown. Remaining: ${this.character.bottle}`);
         }
     }
 

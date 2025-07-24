@@ -26,10 +26,13 @@ class MovableObject extends DrawableObject {
     }
 
 
-    hit(enemy) {
-        this.energy -= 5;
+    hit() {
+        this.world.playEffectSound(this.world.sounds.hit);
+        this.energy -= 20;
         if (this.energy <= 0) {
             this.energy = 0;
+            // console.log(this.energy);
+
             // console.log('ENERGY ', this.energy);
             // console.log('Collision with Character, ENERGY ', this.energy);
             // console.log('Collision with ', enemy);
@@ -61,15 +64,7 @@ class MovableObject extends DrawableObject {
             if (this.isAboveGround() || this.speedY > 0) {
                 this.y -= this.speedY;
                 this.speedY -= this.acceleration;
-                // this.world.keyBaord.UP = true;
             }
-
-            // else {
-            //     if (this.y > this.minY) {
-            //         this.y = this.minY;
-            //     }
-            //     this.speedY = 0;
-            // }
         }, 1000 / 25);
     }
 
@@ -107,7 +102,7 @@ class MovableObject extends DrawableObject {
     }
 
 
-    jump() {
-        this.speedY = 27.5;
-    }
+    // jump() {
+    //     this.speedY = 27.5;
+    // }
 }

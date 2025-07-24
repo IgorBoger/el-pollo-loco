@@ -13,6 +13,19 @@ function init() {
 }
 
 
+function startGame() {
+    console.log('gecklickt');
+    document.getElementById('startScreen').classList.add('d-none');
+    init();
+
+    if (world?.sounds?.background) {
+        // console.log('background-sound is activated');
+        world.playEffectSound(world.sounds.background);
+        // world.sounds.background.play();
+    }
+}
+
+
 document.addEventListener("keyup", function (event) {
     if (event.key === "ArrowLeft") {
         keyBaord.LEFT = false;
@@ -36,10 +49,10 @@ document.addEventListener("keyup", function (event) {
         console.log(keyBaord);
     }
     if (event.key === "d") {
-        console.log('throw');
+        // console.log('throw');
         keyBaord.THROW = false;
-        console.log('throw is :' + keyBaord.THROW);
-        console.log(keyBaord);
+        // console.log('throw is :' + keyBaord.THROW);
+        // console.log(keyBaord);
     }
 });
 
@@ -69,9 +82,9 @@ document.addEventListener("keydown", function (event) {
         console.log(keyBaord);
     }
     if (event.key === "d") {
-        console.log('throw');
+        // console.log('throw');
         keyBaord.THROW = true;
-        console.log('throw is :' + keyBaord.THROW);
-        console.log(keyBaord);
-    }
+        // console.log('throw is :' + keyBaord.THROW);
+        // console .log(keyBaor d); 
+         }
 });
