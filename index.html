@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>El Pollo Loco</title>
 
+    <link rel="icon" href="img/favicon/favicon-32x32.png" type="image/png">
+
     <link rel="stylesheet" href="style.css">
 
     <script src="classes/world.class.js"></script>
@@ -38,6 +40,25 @@
 
         <canvas id="canvas" width="720" height="480"></canvas>
     </div>
+
+    <div id="mobileControls" class="d-none">
+        <button class="control-btn" id="btnLeft">⬅️</button>
+        <button class="control-btn" id="btnRight">➡️</button>
+        <button class="control-btn" id="btnJump">⤴️ Springen</button>
+        <button class="control-btn" id="btnThrow">🧴 Werfen</button>
+    </div>
+
+    <div id="controlsInfo">
+        <h3>Steuerung</h3>
+        <ul>
+            <li><strong>Pfeil nach rechts</strong> – Nach rechts laufen</li>
+            <li><strong>Pfeil nach links</strong> – Nach links laufen</li>
+            <li><strong>Leertaste</strong> – Springen</li>
+            <li><strong>D</strong> – Flasche werfen</li>
+            <li><strong>Pfeil nach oben/unten</strong> – Weitere Aktionen (optional)</li>
+        </ul>
+    </div>
+
 </body>
 
 </html>

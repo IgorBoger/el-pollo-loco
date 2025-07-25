@@ -96,3 +96,53 @@ canvas {
     transform: translateY(0);
     box-shadow: 0 3px 4px rgba(0, 0, 0, 0.3);
 } */
+
+#mobileControls {
+    width: 720px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.control-btn {
+    padding: 10px 20px;
+    font-size: 1.2em;
+    border: none;
+    border-radius: 8px;
+    background-color: #ffa726;
+    color: white;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+}
+
+.control-btn:active {
+    background-color: #fb8c00;
+}
+
+
+#controlsInfo {
+    margin-top: 20px;
+    width: 720px;
+    background-color: #fef6e4;
+    border: 2px solid #ffb703;
+    border-radius: 10px;
+    /* padding: 15px; */
+    font-family: Arial, sans-serif;
+}
+
+#controlsInfo h3 {
+    margin: 0;
+    color: #333;
+    padding: 16px
+}
+
+#controlsInfo ul {
+    /* padding-left: 20px; */
+    padding: 0 16px 16px 36px;
+    margin: 0;
+}
+
+#controlsInfo li {
+    margin-bottom: 8px;
+}

@@ -16,11 +16,11 @@ class World {
         background: new Audio('../audio/background.mp3'),       //  Sound-OK
         walk: new Audio('../audio/walk.mp3'),                   //  Sound-OK
         jump: new Audio('../audio/jump.mp3'),                   //  Sound-OK
-        hurt: new Audio('../audio/hurt.mp3'),                   //  Sound-OK
-        dead: new Audio('../audio/dead.mp3'),                   //  Sound-OK
+        // hurt: new Audio('../audio/hurt.mp3'),                   //  Sound-OK
+        // dead: new Audio('../audio/dead.mp3'),                   //  Sound-OK
         coin: new Audio('../audio/coin.mp3'),                   //  Sound-OK
         bottle: new Audio('../audio/bottle.mp3'),               //  Sound-OK
-        hit: new Audio('../audio/hit.mp3'),                     //  Sound-OK
+        // hit: new Audio('../audio/hit.mp3'),                     //  Sound-OK
         throw: new Audio('../audio/bottle-throw.mp3'),          //  Sound-OK
 
         // endbossAppear: new Audio('../audio/endboss_appear.mp3'),

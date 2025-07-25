@@ -1,6 +1,12 @@
 let canvas;
 let world;
 let keyBaord = new KeyBaord();
+const buttons = [
+    { id: 'btnLeft', key: 'LEFT' },
+    { id: 'btnRight', key: 'RIGHT' },
+    { id: 'btnJump', key: 'SPACE' },
+    { id: 'btnThrow', key: 'THROW' }
+];
 
 
 function init() {
@@ -86,5 +92,95 @@ document.addEventListener("keydown", function (event) {
         keyBaord.THROW = true;
         // console.log('throw is :' + keyBaord.THROW);
         // console .log(keyBaor d); 
-         }
+    }
 });
+
+
+// window.addEventListener('load', () => {
+//     const mobileControls = document.getElementById('mobileControls');
+
+//     if (/Mobi|Android/i.test(navigator.userAgent)) {
+//         mobileControls.classList.remove('d-none');
+//         mobileControls.classList.add('d-flex');
+//     }
+
+//     // document.getElementById('btnLeft').addEventListener('touchstart', () => keyBaord.LEFT = true);
+//     // document.getElementById('btnLeft').addEventListener('touchend', () => keyBaord.LEFT = false);
+
+//     // document.getElementById('btnRight').addEventListener('touchstart', () => keyBaord.RIGHT = true);
+//     // document.getElementById('btnRight').addEventListener('touchend', () => keyBaord.RIGHT = false);
+
+//     // document.getElementById('btnJump').addEventListener('touchstart', () => keyBaord.SPACE = true);
+//     // document.getElementById('btnJump').addEventListener('touchend', () => keyBaord.SPACE = false);
+
+//     // document.getElementById('btnThrow').addEventListener('touchstart', () => keyBaord.THROW = true);
+//     // document.getElementById('btnThrow').addEventListener('touchend', () => keyBaord.THROW = false);
+
+
+//     buttons.forEach(btn => {
+//         const el = document.getElementById(btn.id);
+//         el.addEventListener('touchstart', () => keyBaord[btn.key] = true);
+//         el.addEventListener('touchend', () => keyBaord[btn.key] = false);
+//     });
+// });
+
+
+function updateMobileControlsVisibility() {
+    console.log('updateMobileControlsVisibility aufgerufen');
+    const mobileControls = document.getElementById('mobileControls');
+    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const isSmallScreen = window.innerWidth < 800;
+
+    if (isMobile || isSmallScreen) {
+        console.log('display ist unter 800px ODER mobil');
+
+        mobileControls.classList.remove('d-none');
+        mobileControls.classList.add('d-flex');
+    } else {
+        console.log('display ist größer als 800px UND nicht mobil');
+        mobileControls.classList.remove('d-flex');
+        mobileControls.classList.add('d-none');
+    }
+}
+
+
+function addMobileButtonsFunction(params) {
+    buttons.forEach(btn => {
+        const el = document.getElementById(btn.id);
+        el.addEventListener('touchstart', () => keyBaord[btn.key] = true);
+        el.addEventListener('touchend', () => keyBaord[btn.key] = false);
+    });
+}
+
+
+function addMobileButtonsFunction() {
+    buttons.forEach(btn => {
+        const el = document.getElementById(btn.id);
+
+        ['touchstart', 'mousedown'].forEach(evt =>
+            el.addEventListener(evt, () => keyBaord[btn.key] = true)
+        );
+
+        ['touchend', 'mouseup', 'mouseleave'].forEach(evt =>
+            el.addEventListener(evt, () => keyBaord[btn.key] = false)
+        );
+    });
+}
+
+
+
+window.addEventListener('load', () => {
+    updateMobileControlsVisibility();
+
+    // buttons.forEach(btn => {
+    //     const el = document.getElementById(btn.id);
+    //     el.addEventListener('touchstart', () => keyBaord[btn.key] = true);
+    //     el.addEventListener('touchend', () => keyBaord[btn.key] = false);
+    // });
+
+    addMobileButtonsFunction();
+});
+
+
+// window.addEventListener('load', updateMobileControlsVisibility, addMobileButtonsFunction);
+window.addEventListener('resize', updateMobileControlsVisibility);
