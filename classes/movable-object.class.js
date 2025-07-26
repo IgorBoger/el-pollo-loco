@@ -9,11 +9,6 @@ class MovableObject extends DrawableObject {
     bottle = 0;
     lastHit = 0;
 
-    warnedAt80 = false;
-    warnedAt60 = false;
-    warnedAt20 = false;
-
-
 
     // character.isColliding(chicken);
     isColliding(mo) {
@@ -84,6 +79,11 @@ class MovableObject extends DrawableObject {
         } else {
             return this.y < this.minY;
         }
+    }
+
+
+    isOnGround() {
+        return this.y >= this.minY && !(this instanceof Character);
     }
 
 

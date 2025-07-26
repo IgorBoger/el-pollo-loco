@@ -58,6 +58,8 @@ class Character extends MovableObject {
         this.loadImages(this.IMAGES_HURT);
         this.applyGravity();
         this.animate();
+
+        this.bottle = 100; // 🧴 Flaschen-Vorrat immer voll beim Start
     }
 
 

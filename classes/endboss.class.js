@@ -1,9 +1,13 @@
 class Endboss extends MovableObject {
     // x = 1 * 720; // Standart
-    x = 250; // Test
-    y = -50;
-    height = 500;
-    width = 420;
+    // y = -50;
+    // height = 500;
+    // width = 420;
+
+    x = 450; // Test
+    y = 50;
+    height = 400;
+    width = 360;
 
     IMAGES_WALKING = [
         '../img/4_enemie_boss_chicken/2_alert/G5.png',
@@ -21,8 +25,6 @@ class Endboss extends MovableObject {
     constructor() {
         super().loadImage(this.IMAGES_WALKING[0]);
         this.loadImages(this.IMAGES_WALKING);
-        // console.log("Endboss created at", this.x, this.y);
-        // console.log("Endboss", this.x, this.y, this.img?.src);
 
         this.energy = 100; // Neu: Energie wie andere Gegner
         this.animate();
