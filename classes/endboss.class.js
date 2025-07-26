@@ -1,5 +1,6 @@
 class Endboss extends MovableObject {
-    x = 1 * 720;
+    // x = 1 * 720; // Standart
+    x = 250; // Test
     y = -50;
     height = 500;
     width = 420;
@@ -22,6 +23,8 @@ class Endboss extends MovableObject {
         this.loadImages(this.IMAGES_WALKING);
         // console.log("Endboss created at", this.x, this.y);
         // console.log("Endboss", this.x, this.y, this.img?.src);
+
+        this.energy = 100; // Neu: Energie wie andere Gegner
         this.animate();
     }
 

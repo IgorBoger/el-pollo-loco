@@ -3,6 +3,7 @@ class World {
     healthBar = new StatusBar('health');
     coinBar = new StatusBar('coin');
     bottleBar = new StatusBar('bottle');
+    endbossBar = new StatusBar('endboss');
     coins = [];
     bottles = [];
     throwableObject = [];
@@ -16,12 +17,13 @@ class World {
         background: new Audio('../audio/background.mp3'),       //  Sound-OK
         walk: new Audio('../audio/walk.mp3'),                   //  Sound-OK
         jump: new Audio('../audio/jump.mp3'),                   //  Sound-OK
-        // hurt: new Audio('../audio/hurt.mp3'),                   //  Sound-OK
-        // dead: new Audio('../audio/dead.mp3'),                   //  Sound-OK
+        hurt: new Audio('../audio/hurt.mp3'),                   //  Sound-OK
+        dead: new Audio('../audio/dead.mp3'),                   //  Sound-OK
         coin: new Audio('../audio/coin.mp3'),                   //  Sound-OK
         bottle: new Audio('../audio/bottle.mp3'),               //  Sound-OK
         // hit: new Audio('../audio/hit.mp3'),                     //  Sound-OK
         throw: new Audio('../audio/bottle-throw.mp3'),          //  Sound-OK
+        chicken: new Audio('../audio/chicken.mp3'),
 
         // endbossAppear: new Audio('../audio/endboss_appear.mp3'),
         // endbossDead: new Audio('../audio/endboss_dead.mp3')
@@ -47,6 +49,11 @@ class World {
     setWorld() {
         this.character.world = this;
         this.throwableObject.world = this;
+
+        // NEU:
+        this.level.enemies.forEach(enemy => {
+            enemy.world = this;
+        });
     }
 
 
@@ -63,13 +70,14 @@ class World {
         this.collisionWithCollectable(this.coins, 'coin', this.updateCoinStatusBar);
         this.collisionWithCollectable(this.bottles, 'bottle', this.updateBottleStatusBar);
 
+        this.collisionWithEndboss(); // NEU
     }
 
 
     collisionWithChicken() {
         this.level.enemies.forEach((enemy) => {
             let now = new Date().getTime();
-            if (this.character.isColliding(enemy) && !this.character.isDead() && (!enemy.lastHit || now - enemy.lastHit > 3000)) { // 3 Sekunden Cooldown
+            if (this.character.isColliding(enemy) && !this.character.isDead() && (!enemy.lastHit || now - enemy.lastHit > 4000)) { // 4 Sekunden Cooldown
                 this.character.hit(enemy);
                 enemy.lastHit = now;
                 this.updateHealthStatusBar();
@@ -95,6 +103,40 @@ class World {
             }
         }
     }
+
+
+    collisionWithEndboss() {
+        const endboss = this.level.enemies.find(e => e instanceof Endboss);
+        if (!endboss || endboss.isDead()) return;
+
+        this.throwableObject.forEach((bottle, index) => {
+            // console.log('Bottle X:', bottle.x, 'Y:', bottle.y, '| Endboss X:', endboss.x, 'Y:', endboss.y);
+            // console.log('Kollision:', bottle.isColliding(endboss));
+
+            if (bottle.isColliding(endboss)) {
+                console.log('Endboss wurde getroffen!');
+
+                endboss.hit();
+                console.log('Endboss Energie nach Hit:', endboss.energy);
+                this.endbossBar.setPercentage(endboss.energy);
+                // this.updateEndbossStatusBar(endboss);
+                this.throwableObject.splice(index, 1); // Flasche verschwindet nach Treffer
+            }
+
+            // if (endboss.isDead()) {
+            //     console.log('Endboss ist besiegt!');
+            //     this.level.enemies = this.level.enemies.filter(e => e !== endboss); // Entferne ihn
+            //     // Hier kannst du z. B. ein Endbild zeigen:
+            //     this.showWinScreen(); // ➕ Neue Methode definieren
+            // }
+        });
+    }
+
+
+    // updateEndbossStatusBar(endboss) {
+    //     this.bottleBar.setPercentage(endboss.energy);
+    // }
+
 
 
     playEffectSound(sound) {
@@ -147,6 +189,11 @@ class World {
     }
 
 
+    // updateEndbossStatusBar() {
+    //     this.bottleBar.setPercentage(this.character.bottle);
+    // }
+
+
     debugBackgrounds() {
         console.table(this.backgroundObjects);
     }
@@ -190,6 +237,7 @@ class World {
         this.addToMap(this.healthBar);
         this.addToMap(this.coinBar);
         this.addToMap(this.bottleBar);
+        this.addToMap(this.endbossBar);
         let self = this;
         requestAnimationFrame(function () {
             self.draw();

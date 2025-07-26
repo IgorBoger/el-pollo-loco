@@ -28,6 +28,15 @@ class StatusBar extends DrawableObject {
         '../img/7_statusbars/1_statusbar/3_statusbar_bottle/orange/80.png',
         '../img/7_statusbars/1_statusbar/3_statusbar_bottle/orange/100.png'
     ];
+
+    IMAGES_ENDBOSS = [
+        '../img/7_statusbars/2_statusbar_endboss/orange/orange0.png',
+        '../img/7_statusbars/2_statusbar_endboss/orange/orange20.png',
+        '../img/7_statusbars/2_statusbar_endboss/orange/orange40.png',
+        '../img/7_statusbars/2_statusbar_endboss/orange/orange60.png',
+        '../img/7_statusbars/2_statusbar_endboss/orange/orange80.png',
+        '../img/7_statusbars/2_statusbar_endboss/orange/orange100.png',
+    ];
     percentage = 0;
 
 
@@ -41,15 +50,20 @@ class StatusBar extends DrawableObject {
             this.IMAGES = this.IMAGES_BOTTLE;
             this.x = 20;
             this.y = 80;
-        }
-        else {
+        } else {
             this.IMAGES = this.IMAGES_HEALTH;
             this.x = 20;
             this.y = 0;
         }
+        if (type === 'endboss') {
+            this.IMAGES = this.IMAGES_ENDBOSS;
+            this.x = 550;
+            this.y = 5;
+        }
+
         this.loadImages(this.IMAGES);
         this.setPercentage(
-            type === 'health' ? 100 : 0
+            type === 'health' || type === 'endboss' ? 100 : 0
         );
     }
 

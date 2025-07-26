@@ -9,6 +9,11 @@ class MovableObject extends DrawableObject {
     bottle = 0;
     lastHit = 0;
 
+    warnedAt80 = false;
+    warnedAt60 = false;
+    warnedAt20 = false;
+
+
 
     // character.isColliding(chicken);
     isColliding(mo) {
@@ -27,19 +32,19 @@ class MovableObject extends DrawableObject {
 
 
     hit() {
-        this.world.playEffectSound(this.world.sounds.hit);
+        console.log('ist verletzt');
         this.energy -= 20;
+        console.log('energy is ', this.energy);
+
+        if (this instanceof Chicken || this instanceof Endboss) {
+            this.world.playEffectSound(this.world.sounds.chicken);
+        }
+
         if (this.energy <= 0) {
             this.energy = 0;
-            // console.log(this.energy);
-
-            // console.log('ENERGY ', this.energy);
-            // console.log('Collision with Character, ENERGY ', this.energy);
-            // console.log('Collision with ', enemy);
+            console.log('Charakter ist tot:', this.energy);
         } else {
             this.lastHit = new Date().getTime();
-            // console.log(this.lastHit);
-
         }
     }
 
