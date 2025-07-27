@@ -117,7 +117,7 @@ class World {
                 endboss.hit();
                 console.log('Endboss Energie nach Hit:', endboss.energy);
                 this.updateEndbossStatusBar(endboss);
-                bottle.splash(); // 💥 Jetzt wird Splash korrekt animiert!
+                bottle.splash();
             }
 
 
@@ -167,16 +167,15 @@ class World {
     checkThrowObject() {
         if (this.keyBaord.THROW && this.character.bottle > 0) {
             const direction = this.character.otherDirection ? -1 : 1; //Wenn der Charakter nach links schaut (otherDirection === true) → direction = -1, Sonst nach rechts → direction = 1
-            const offsetX = direction * 50;
+            const offsetX = direction * 30;
             console.log(direction);
             let bottle;
             if (direction === -1) {
-                // let bottle = new ThrowableObject(this.character.x + offsetX, this.character.y + 100, this, direction);
                 console.log('wurf nach links');
-                bottle = new ThrowableObject(this.character.x + offsetX, this.character.y + 100, this, direction);
+                bottle = new ThrowableObject(this.character.x + offsetX, this.character.y + 140, this, direction);
 
             } else {
-                bottle = new ThrowableObject(this.character.x, this.character.y + 100, this, direction);
+                bottle = new ThrowableObject(this.character.x + 50, this.character.y + 140, this, direction);
             }
             this.throwableObject.push(bottle);
             this.character.bottle -= 5;
@@ -184,56 +183,6 @@ class World {
             this.updateBottleStatusBar();
         }
     }
-
-
-    // checkThrowObject() {
-    //     if (this.keyBaord.THROW && this.character.bottle > 0) {
-    //         const direction = this.character.otherDirection ? -1 : 1;
-    //         const offsetX = direction * 40;
-
-    //         console.log('Wurf nach', direction === -1 ? 'links' : 'rechts');
-    //         let bottle = new ThrowableObject(this.character.x + offsetX, this.character.y + 100, this, direction);
-
-    //         this.throwableObject.push(bottle);
-    //         this.character.bottle -= 5;
-    //         if (this.character.bottle < 0) this.character.bottle = 0;
-    //         this.updateBottleStatusBar();
-    //     }
-    // }
-
-
-    // checkThrowObject() {
-    //     if (this.keyBaord.THROW && this.character.bottle > 0) {
-    //         const direction = this.character.otherDirection ? -1 : 1;
-    //         const characterCenterX = this.character.x + this.character.width / 2;
-    //         const offsetX = direction * 10;
-
-    //         console.log('Wurf nach', direction === -1 ? 'links' : 'rechts');
-    //         let bottle = new ThrowableObject(characterCenterX + offsetX, this.character.y + 100, this, direction);
-
-    //         this.throwableObject.push(bottle);
-    //         this.character.bottle -= 5;
-    //         if (this.character.bottle < 0) this.character.bottle = 0;
-    //         this.updateBottleStatusBar();
-    //     }
-    // }
-
-
-    // checkThrowObject() {
-    //     if (this.keyBaord.THROW && this.character.bottle > 0) {
-    //         const direction = this.character.otherDirection ? -1 : 1;
-    //         const offset = 20;
-    //         const bottleX = direction === 1
-    //             ? this.character.x + this.character.width - offset  // Rechte Seite
-    //             : this.character.x + offset;                         // Linke Seite
-
-    //         const bottle = new ThrowableObject(bottleX, this.character.y + 100, this, direction);
-    //         this.throwableObject.push(bottle);
-    //         this.character.bottle -= 5;
-    //         if (this.character.bottle < 0) this.character.bottle = 0;
-    //         this.updateBottleStatusBar();
-    //     }
-    // }
 
 
     updateHealthStatusBar() {

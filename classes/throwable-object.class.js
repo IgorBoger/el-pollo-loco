@@ -1,6 +1,6 @@
 class ThrowableObject extends MovableObject {
-    height = 150;
-    width = 150;
+    height = 70;
+    width = 70;
 
     IMAGES_THROW = [ // 1) Als erstens die Pfade werden angelegt!
         '../img/6_salsa_bottle/bottle_rotation/1_bottle_rotation.png',
@@ -69,6 +69,6 @@ class ThrowableObject extends MovableObject {
             } else {
                 this.playAnimation(this.IMAGES_THROW);// 3) Die Pfade werden nacheinander animiert!
             }
-        }, 1000 / 20); // 20 FPS
+        }, 1000 / 60); // Oder 20 FPS
     }
 }
