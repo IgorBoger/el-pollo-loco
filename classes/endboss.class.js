@@ -1,10 +1,10 @@
 class Endboss extends MovableObject {
-    // x = 1 * 720; // Standart
+    x = 2 * 720; // Standart
     // y = -50;
     // height = 500;
     // width = 420;
 
-    x = 350; // Test
+    // x = 350; // Test
     y = 50;
     height = 400;
     width = 360;
@@ -66,16 +66,23 @@ class Endboss extends MovableObject {
 
 
     animate() {
-        setInterval(() => {
-            this.playAnimation(this.IMAGES_WALKING);
+        this.animationInterval = setInterval(() => {
+            if (this.isDead()) {
+                this.playAnimation(this.IMAGES_DEAD);
 
-            // ::::::: Ab HIER werden alle Animationen nur TESTEN ausgeführt!!
+                // Nach 2 Sekunde: Endboss entfernen
+                setTimeout(() => {
+                    if (this.world) {
+                        this.world.level.enemies = this.world.level.enemies.filter(e => e !== this);
+                    }
+                    clearInterval(this.animationInterval); // Stoppe Animation nach Tod
+                }, 2000);
 
-            // this.playAnimation(this.IMAGES_ALERT);
-            // this.playAnimation(this.IMAGES_ATTACK);
-            // this.playAnimation(this.IMAGES_HURT);
-            // this.playAnimation(this.IMAGES_DEAD);
+            } else if (this.isHurt()) {
+                this.playAnimation(this.IMAGES_HURT);
+            } else {
+                this.playAnimation(this.IMAGES_WALKING);
+            }
         }, 200);
     }
-
 }

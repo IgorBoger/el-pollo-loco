@@ -51,9 +51,11 @@ class World {
         this.character.world = this;
         this.throwableObject.world = this;
 
-        // NEU:
+        this.character.animate(); // Jetzt ist world definiert
+
         this.level.enemies.forEach(enemy => {
-            enemy.world = this;
+            enemy.world = this;       // ✅ für Sound etc.
+            enemy.animate?.();        // ✅ falls Methode vorhanden
         });
     }
 
@@ -63,7 +65,7 @@ class World {
             this.checkCollisions();
             this.checkThrowObject();
             this.checkBottleOnGround();
-        }, 200);
+        }, 200); // Oder auch 160 FPS, da läuft es besser
     }
 
 
@@ -72,21 +74,39 @@ class World {
         this.collisionWithCollectable(this.coins, 'coin', this.updateCoinStatusBar);
         this.collisionWithCollectable(this.bottles, 'bottle', this.updateBottleStatusBar);
 
-        this.collisionWithEndboss();
-        this.collisionWithEnemiesByBottle();
+        this.checkBottleHitsEnemies(); // Zentral
     }
+
+
+    // collisionWithChicken() {
+    //     this.level.enemies.forEach((enemy) => {
+    //         let now = new Date().getTime();
+    //         if (this.character.isColliding(enemy) && !this.character.isDead() && (!enemy.lastHit || now - enemy.lastHit > 4000)) { // 4 Sekunden Cooldown
+    //             this.character.hit(enemy);
+    //             enemy.lastHit = now;
+    //             this.updateHealthStatusBar();
+    //         }
+    //     });
+    // }
 
 
     collisionWithChicken() {
         this.level.enemies.forEach((enemy) => {
             let now = new Date().getTime();
-            if (this.character.isColliding(enemy) && !this.character.isDead() && (!enemy.lastHit || now - enemy.lastHit > 4000)) { // 4 Sekunden Cooldown
+
+            if (
+                this.character.isColliding(enemy) &&
+                !this.character.isDead() &&
+                !enemy.isDead() && // 🛡️ NEU: Tote Gegner ignorieren!
+                (!enemy.lastHit || now - enemy.lastHit > 4000)
+            ) {
                 this.character.hit(enemy);
                 enemy.lastHit = now;
                 this.updateHealthStatusBar();
             }
         });
     }
+
 
 
     collisionWithCollectable(array, propertyName, updateStatusBarCallback) {
@@ -107,36 +127,58 @@ class World {
     }
 
 
-    collisionWithEndboss() {
-        const endboss = this.level.enemies.find(e => e instanceof Endboss);
-        if (!endboss || endboss.isDead()) return;
+    // checkBottleHitsEnemies() {
+    //     const now = new Date().getTime();
 
-        this.throwableObject.forEach((bottle, index) => {
-            if (bottle.isColliding(endboss) && !bottle.isSplashed) {
-                console.log('Endboss wurde getroffen!');
-                endboss.hit();
-                console.log('Endboss Energie nach Hit:', endboss.energy);
-                this.updateEndbossStatusBar(endboss);
-                bottle.splash();
-            }
+    //     this.level.enemies.forEach(enemy => {
+    //         this.throwableObject.forEach(bottle => {
+    //             if (!bottle.isSplashed && bottle.isColliding(enemy)) {
+    //                 // this.playEffectSound(this.sounds.chicken);
+    //                 // END-BOSS LOGIK
+    //                 if (enemy instanceof Endboss) {
+    //                     if (!enemy.lastHit || now - enemy.lastHit > 500) {
+    //                         enemy.hit(); // Energie -20, Sound, lastHit
+    //                         enemy.lastHit = now;
+    //                         this.updateEndbossStatusBar(enemy);
+    //                         bottle.splash();
+    //                     }
+    //                 }
+
+    //                 // CHICKEN & SMALLCHICKEN LOGIK
+    //                 else if (enemy instanceof Chicken || enemy instanceof SmallChicken) {
+    //                     enemy.energy = 0;
+    //                     enemy.hit(); // Energie -20, Sound, lastHit, zentral alles behandeln
+    //                     bottle.splash();
+    //                 }
+    //             }
+    //         });
+    //     });
+    // }
 
 
-            // if (endboss.isDead()) {
-            //     console.log('Endboss ist besiegt!');
-            //     this.level.enemies = this.level.enemies.filter(e => e !== endboss); // Entferne ihn
-            //     // Hier kannst du z. B. ein Endbild zeigen:
-            //     this.showWinScreen(); // ➕ Neue Methode definieren
-            // }
-        });
-    }
+    checkBottleHitsEnemies() {
+        const now = new Date().getTime();
 
+        this.level.enemies.forEach(enemy => {
+            if (enemy.isDead()) return; // 🛡️ NEU: tote Gegner ignorieren
 
-    collisionWithEnemiesByBottle() {
-        this.level.enemies.forEach((enemy) => {
-            this.throwableObject.forEach((bottle, index) => {
+            this.throwableObject.forEach(bottle => {
                 if (!bottle.isSplashed && bottle.isColliding(enemy)) {
-                    enemy.hit();
-                    bottle.splash();
+
+                    if (enemy instanceof Endboss) {
+                        if (!enemy.lastHit || now - enemy.lastHit > 500) {
+                            enemy.hit();
+                            enemy.lastHit = now;
+                            this.updateEndbossStatusBar(enemy);
+                            bottle.splash();
+                        }
+                    }
+
+                    else if (enemy instanceof Chicken || enemy instanceof SmallChicken) {
+                        enemy.energy = 0;
+                        enemy.hit();
+                        bottle.splash();
+                    }
                 }
             });
         });

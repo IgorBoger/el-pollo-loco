@@ -12,10 +12,14 @@ class MovableObject extends DrawableObject {
 
     // character.isColliding(chicken);
     isColliding(mo) {
-        return this.x + this.width > mo.x &&
-            this.y + this.height > mo.y &&
-            this.x < mo.x &&
-            this.y < mo.y + mo.height;
+        return this.x + this.width * 0.8 > mo.x &&
+            this.x + this.width * 0.2 < mo.x + mo.width &&
+            this.y + this.height * 0.8 > mo.y &&
+            this.y + this.height * 0.2 < mo.y + mo.height;
+        // return this.x + this.width > mo.x &&
+        //     this.y + this.height > mo.y &&
+        //     this.x < mo.x &&
+        //     this.y < mo.y + mo.height;
 
         // if (character.x + character.width > chicken.x && 
         //     character.y + character.height > chicken.y && 
@@ -31,13 +35,14 @@ class MovableObject extends DrawableObject {
         this.energy -= 20;
         console.log('energy is ', this.energy);
 
-        if (this instanceof Chicken || this instanceof Endboss) {
+        if (this instanceof Chicken || this instanceof Endboss
+            || this instanceof SmallChicken) {
             this.world.playEffectSound(this.world.sounds.chicken);
         }
 
         if (this.energy <= 0) {
             this.energy = 0;
-            console.log('Charakter ist tot:', this.energy);
+            console.log(this.world.level.enemies, 'ist tot:', this.energy);
         } else {
             this.lastHit = new Date().getTime();
         }

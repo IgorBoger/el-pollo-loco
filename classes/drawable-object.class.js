@@ -14,15 +14,16 @@ class DrawableObject {
 
 
     draw(ctx) {
+        if (!this.img) return; // 🛡️ Schutz gegen ungültige Bilder
         ctx.drawImage(this.img, Math.round(0), Math.round(0), this.width, this.height);
     }
 
 
     drawFrame(ctx) {
-        if (this instanceof Character || this instanceof Chicken || 
-            this instanceof Coin || this instanceof Bottle || 
+        if (this instanceof Character || this instanceof Chicken ||
+            this instanceof Coin || this instanceof Bottle ||
             this instanceof Endboss || this instanceof SmallChicken
-        || this instanceof ThrowableObject) {
+            || this instanceof ThrowableObject) {
             // Blue rectangle
             ctx.beginPath();
             ctx.lineWidth = '3';
@@ -33,9 +34,11 @@ class DrawableObject {
     }
 
 
-    loadImage(pathCharacter) {
-        this.img = new Image();
-        this.img.src = pathCharacter;
+    loadImage(path) {
+        const img = new Image();
+        img.src = path;
+        img.onerror = () => console.warn('Bild konnte nicht geladen werden:', path); // 🧪 TEST
+        this.img = img;
     }
 
 
