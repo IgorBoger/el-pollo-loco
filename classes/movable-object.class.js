@@ -12,10 +12,31 @@ class MovableObject extends DrawableObject {
 
     // character.isColliding(chicken);
     isColliding(mo) {
-        return this.x + this.width * 0.8 > mo.x &&
-            this.x + this.width * 0.2 < mo.x + mo.width &&
-            this.y + this.height * 0.8 > mo.y &&
-            this.y + this.height * 0.2 < mo.y + mo.height;
+
+        // Wenn das Objekt gesammelt wurde, keine Kollision mehr
+        if (this.collected) return false;
+        if (mo.collected) return false;
+
+        const aLeft = this.x + (this.frameOffsetX || 0);
+        const aRight = aLeft + (this.frameWidth || this.width);
+        const aTop = this.y + (this.frameOffsetY || 0);
+        const aBottom = aTop + (this.frameHeight || this.height);
+
+        const bLeft = mo.x + (mo.frameOffsetX || 0);
+        const bRight = bLeft + (mo.frameWidth || mo.width);
+        const bTop = mo.y + (mo.frameOffsetY || 0);
+        const bBottom = bTop + (mo.frameHeight || mo.height);
+
+        return aRight > bLeft &&
+            aLeft < bRight &&
+            aBottom > bTop &&
+            aTop < bBottom;
+
+        // return this.x + this.width * 0.8 > mo.x &&
+        //     this.x + this.width * 0.2 < mo.x + mo.width &&
+        //     this.y + this.height * 0.8 > mo.y &&
+        //     this.y + this.height * 0.2 < mo.y + mo.height;
+
         // return this.x + this.width > mo.x &&
         //     this.y + this.height > mo.y &&
         //     this.x < mo.x &&
@@ -42,7 +63,9 @@ class MovableObject extends DrawableObject {
 
         if (this.energy <= 0) {
             this.energy = 0;
-            console.log(this.world.level.enemies, 'ist tot:', this.energy);
+            // console.log(this.world.level.enemies, 'ist tot:', this.energy);
+            console.log(`${this.constructor.name} ist tot:`, this.energy, 'bei X:', this.x.toFixed(0), 'Y:', this.y.toFixed(0));
+
         } else {
             this.lastHit = new Date().getTime();
         }

@@ -1,8 +1,5 @@
 class Character extends MovableObject {
-    x = 0;
-    y = 50;
-    height = 250;
-    width = 100;
+
     IMAGES_WALKING = [
         '../img/2_character_pepe/2_walk/W-21.png',
         '../img/2_character_pepe/2_walk/W-22.png',
@@ -23,7 +20,6 @@ class Character extends MovableObject {
         '../img/2_character_pepe/3_jump/J-38.png',
         '../img/2_character_pepe/3_jump/J-39.png'
     ]
-
 
     IMAGES_HURT = [
         '../img/2_character_pepe/4_hurt/H-41.png',
@@ -66,6 +62,10 @@ class Character extends MovableObject {
         '../img/2_character_pepe/1_idle/long_idle/I-20.png',
     ];
 
+    x = 0;
+    y = 70;
+    height = 250;
+    width = 100;
     walking_sound;
     world;
     speed = 8;
@@ -87,6 +87,13 @@ class Character extends MovableObject {
         this.loadImages(this.IMAGES_LONG_IDLE);
         this.applyGravity();
         this.animate();
+
+        // Wird nur für Colisionberechnung gezeichnet, danach muss weg!!!
+        this.frameOffsetX = 20;
+        this.frameWidth = this.width - 40;
+
+        this.frameOffsetY = 100;
+        this.frameHeight = this.height - 110;
 
         this.bottle = 100; // 🧴 Flaschen-Vorrat immer voll beim Start
     }
@@ -143,7 +150,7 @@ class Character extends MovableObject {
             } else {
                 if (this.world.keyBaord.RIGHT || this.world.keyBaord.LEFT) {
                     this.playAnimation(this.IMAGES_WALKING);
-                    
+
                     // ::::::: Ab HIER werden alle Animationen nur TESTEN ausgeführt!!
                     // this.playAnimation(this.IMAGES_IDLE);
                     // this.playAnimation(this.IMAGES_LONG_IDLE);

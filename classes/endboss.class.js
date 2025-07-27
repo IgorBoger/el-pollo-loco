@@ -4,7 +4,7 @@ class Endboss extends MovableObject {
     // height = 500;
     // width = 420;
 
-    // x = 350; // Test
+    // x = 250; // Test
     y = 50;
     height = 400;
     width = 360;
@@ -62,6 +62,13 @@ class Endboss extends MovableObject {
 
         this.energy = 100; // Neu: Energie wie andere Gegner
         this.animate();
+
+        // Wird nur für Colisionberechnung gezeichnet, danach muss weg!!!
+        this.frameOffsetX = 30;
+        this.frameWidth = this.width - 40;
+
+        this.frameOffsetY = 70;
+        this.frameHeight = this.height - 90;
     }
 
 

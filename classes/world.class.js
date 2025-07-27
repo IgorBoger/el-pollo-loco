@@ -200,7 +200,10 @@ class World {
             const minX = i * segmentWidth + offsetMinX;
             const maxX = (i + 1) * segmentWidth - offsetMaxX;
             const x = Math.random() * (maxX - minX) + minX;
-            const y = Math.random() * 200 + 150;
+            // const y = Math.random() * 200 + 150;
+            // const y = Math.random() * 300 + 50;
+            const y = Math.random() * 150 + 120;
+
             array.push(new ClassRef(x, y));
         }
     }

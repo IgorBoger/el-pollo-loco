@@ -24,11 +24,19 @@ class DrawableObject {
             this instanceof Coin || this instanceof Bottle ||
             this instanceof Endboss || this instanceof SmallChicken
             || this instanceof ThrowableObject) {
+
+            const frameOffsetX = this.frameOffsetX || 0;
+            const frameOffsetY = this.frameOffsetY || 0;
+            const frameWidth = this.frameWidth || this.width;
+            const frameHeight = this.frameHeight || this.height;
+
             // Blue rectangle
             ctx.beginPath();
             ctx.lineWidth = '3';
             ctx.strokeStyle = 'blue';
-            ctx.rect(Math.round(0), Math.round(0), this.width, this.height);
+            // ctx.rect(Math.round(0), Math.round(0), this.width, this.height);
+            ctx.rect(frameOffsetX, frameOffsetY, frameWidth, frameHeight);
+
             ctx.stroke();
         }
     }

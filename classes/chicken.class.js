@@ -23,13 +23,20 @@ class Chicken extends MovableObject {
         this.x = 150 + Math.random() * 1200;
         this.speed = 0.15 + Math.random() * 0.2;
         // this.animate();
+
+        // Wird nur für Colisionberechnung gezeichnet, danach muss weg!!!
+        this.frameOffsetX = 3;
+        this.frameWidth = this.width - 8;
+
+        this.frameOffsetY = 6;
+        this.frameHeight = this.height - 13;
     }
 
-    
+
     animate() {
         this.walkInterval = setInterval(() => {
             if (!this.isDead()) {
-                this.moveLeft();
+                // this.moveLeft();
             }
         }, 1000 / 60);
 

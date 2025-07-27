@@ -96,35 +96,6 @@ document.addEventListener("keydown", function (event) {
 });
 
 
-// window.addEventListener('load', () => {
-//     const mobileControls = document.getElementById('mobileControls');
-
-//     if (/Mobi|Android/i.test(navigator.userAgent)) {
-//         mobileControls.classList.remove('d-none');
-//         mobileControls.classList.add('d-flex');
-//     }
-
-//     // document.getElementById('btnLeft').addEventListener('touchstart', () => keyBaord.LEFT = true);
-//     // document.getElementById('btnLeft').addEventListener('touchend', () => keyBaord.LEFT = false);
-
-//     // document.getElementById('btnRight').addEventListener('touchstart', () => keyBaord.RIGHT = true);
-//     // document.getElementById('btnRight').addEventListener('touchend', () => keyBaord.RIGHT = false);
-
-//     // document.getElementById('btnJump').addEventListener('touchstart', () => keyBaord.SPACE = true);
-//     // document.getElementById('btnJump').addEventListener('touchend', () => keyBaord.SPACE = false);
-
-//     // document.getElementById('btnThrow').addEventListener('touchstart', () => keyBaord.THROW = true);
-//     // document.getElementById('btnThrow').addEventListener('touchend', () => keyBaord.THROW = false);
-
-
-//     buttons.forEach(btn => {
-//         const el = document.getElementById(btn.id);
-//         el.addEventListener('touchstart', () => keyBaord[btn.key] = true);
-//         el.addEventListener('touchend', () => keyBaord[btn.key] = false);
-//     });
-// });
-
-
 function updateMobileControlsVisibility() {
     console.log('updateMobileControlsVisibility aufgerufen');
     const mobileControls = document.getElementById('mobileControls');
