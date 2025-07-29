@@ -1,6 +1,6 @@
 class Chicken extends MovableObject {
     // x = 150 + Math.random() * 500;
-    y = 350;
+    y = 360;
     height = 70;
     width = 60;
     // speed = 0.3;

@@ -4,6 +4,21 @@ class World {
     coinBar = new StatusBar('coin');
     bottleBar = new StatusBar('bottle');
     endbossBar = new StatusBar('endboss');
+    sounds = {
+        background: new Audio('../audio/background.mp3'),       //  Sound-OK
+        walk: new Audio('../audio/walk.mp3'),                   //  Sound-OK
+        // jump: new Audio('../audio/jump.mp3'),                   //  Sound-OK 
+        hurt: new Audio('../audio/hurt.mp3'),                   //  Sound-OK
+        dead: new Audio('../audio/dead.mp3'),                   //  Sound-OK
+        // coin: new Audio('../audio/coin.mp3'),                   //  Sound-OK
+        // bottle: new Audio('../audio/bottle.mp3'),               //  Sound-OK
+        // hit: new Audio('../audio/hit.mp3'),                     //  Sound-OK
+        throw: new Audio('../audio/bottle-throw.mp3'),          //  Sound-OK
+        chicken: new Audio('../audio/chicken.mp3'),
+
+        // endbossAppear: new Audio('../audio/endboss_appear.mp3'),
+        // endbossDead: new Audio('../audio/endboss_dead.mp3')
+    };
     coins = [];
     bottles = [];
     throwableObject = [];
@@ -13,21 +28,7 @@ class World {
     ctx;
     keyBaord;
     camera_x = 0;
-    sounds = {
-        background: new Audio('../audio/background.mp3'),       //  Sound-OK
-        walk: new Audio('../audio/walk.mp3'),                   //  Sound-OK
-        jump: new Audio('../audio/jump.mp3'),                   //  Sound-OK
-        hurt: new Audio('../audio/hurt.mp3'),                   //  Sound-OK
-        dead: new Audio('../audio/dead.mp3'),                   //  Sound-OK
-        coin: new Audio('../audio/coin.mp3'),                   //  Sound-OK
-        bottle: new Audio('../audio/bottle.mp3'),               //  Sound-OK
-        // hit: new Audio('../audio/hit.mp3'),                     //  Sound-OK
-        throw: new Audio('../audio/bottle-throw.mp3'),          //  Sound-OK
-        chicken: new Audio('../audio/chicken.mp3'),
-
-        // endbossAppear: new Audio('../audio/endboss_appear.mp3'),
-        // endbossDead: new Audio('../audio/endboss_dead.mp3')
-    };
+    lastBottleThrow = 0;
 
 
     constructor(canvas, keyBaord) {
@@ -65,7 +66,7 @@ class World {
             this.checkCollisions();
             this.checkThrowObject();
             this.checkBottleOnGround();
-        }, 200); // Oder auch 160 FPS, da läuft es besser
+        }, 50); // Oder auch 160 FPS, da läuft es besser
     }
 
 
@@ -77,36 +78,28 @@ class World {
         this.checkBottleHitsEnemies(); // Zentral
     }
 
-
-    // collisionWithChicken() {
-    //     this.level.enemies.forEach((enemy) => {
-    //         let now = new Date().getTime();
-    //         if (this.character.isColliding(enemy) && !this.character.isDead() && (!enemy.lastHit || now - enemy.lastHit > 4000)) { // 4 Sekunden Cooldown
-    //             this.character.hit(enemy);
-    //             enemy.lastHit = now;
-    //             this.updateHealthStatusBar();
-    //         }
-    //     });
-    // }
-
-
+    
     collisionWithChicken() {
         this.level.enemies.forEach((enemy) => {
-            let now = new Date().getTime();
-
-            if (
-                this.character.isColliding(enemy) &&
-                !this.character.isDead() &&
-                !enemy.isDead() && // 🛡️ NEU: Tote Gegner ignorieren!
-                (!enemy.lastHit || now - enemy.lastHit > 4000)
-            ) {
-                this.character.hit(enemy);
-                enemy.lastHit = now;
-                this.updateHealthStatusBar();
+            if (enemy.isDead() || this.character.isDead()) return;
+            const now = new Date().getTime();
+            if (this.character.isColliding(enemy)) {
+                if (
+                    this.character.isCollidingFromTop(enemy) &&
+                    (enemy instanceof Chicken || enemy instanceof SmallChicken)
+                ) {
+                    enemy.energy = 0;
+                    enemy.hit();
+                    console.warn(`☠️ Gegner ${enemy.constructor.name} bei X=${enemy.x} wurde durch STOMP getötet`);
+                    enemy._killedByStomp = true;
+                } else if (!enemy.lastHit || now - enemy.lastHit > 4000) {
+                    this.character.hit(enemy);
+                    enemy.lastHit = now;
+                    this.updateHealthStatusBar();
+                }
             }
         });
     }
-
 
 
     collisionWithCollectable(array, propertyName, updateStatusBarCallback) {
@@ -125,35 +118,6 @@ class World {
             }
         }
     }
-
-
-    // checkBottleHitsEnemies() {
-    //     const now = new Date().getTime();
-
-    //     this.level.enemies.forEach(enemy => {
-    //         this.throwableObject.forEach(bottle => {
-    //             if (!bottle.isSplashed && bottle.isColliding(enemy)) {
-    //                 // this.playEffectSound(this.sounds.chicken);
-    //                 // END-BOSS LOGIK
-    //                 if (enemy instanceof Endboss) {
-    //                     if (!enemy.lastHit || now - enemy.lastHit > 500) {
-    //                         enemy.hit(); // Energie -20, Sound, lastHit
-    //                         enemy.lastHit = now;
-    //                         this.updateEndbossStatusBar(enemy);
-    //                         bottle.splash();
-    //                     }
-    //                 }
-
-    //                 // CHICKEN & SMALLCHICKEN LOGIK
-    //                 else if (enemy instanceof Chicken || enemy instanceof SmallChicken) {
-    //                     enemy.energy = 0;
-    //                     enemy.hit(); // Energie -20, Sound, lastHit, zentral alles behandeln
-    //                     bottle.splash();
-    //                 }
-    //             }
-    //         });
-    //     });
-    // }
 
 
     checkBottleHitsEnemies() {
@@ -209,16 +173,35 @@ class World {
     }
 
 
+    // checkThrowObject() {
+    //     if (this.keyBaord.THROW && this.character.bottle > 0) {
+    //         const direction = this.character.otherDirection ? -1 : 1; //Wenn der Charakter nach links schaut (otherDirection === true) → direction = -1, Sonst nach rechts → direction = 1
+    //         const offsetX = direction * 30;
+    //         console.log(direction);
+    //         let bottle;
+    //         if (direction === -1) {
+    //             console.log('wurf nach links');
+    //             bottle = new ThrowableObject(this.character.x + offsetX, this.character.y + 140, this, direction);
+
+    //         } else {
+    //             bottle = new ThrowableObject(this.character.x + 50, this.character.y + 140, this, direction);
+    //         }
+    //         this.throwableObject.push(bottle);
+    //         this.character.bottle -= 5;
+    //         if (this.character.bottle < 0) this.character.bottle = 0;
+    //         this.updateBottleStatusBar();
+    //     }
+    // }
+
+
     checkThrowObject() {
-        if (this.keyBaord.THROW && this.character.bottle > 0) {
-            const direction = this.character.otherDirection ? -1 : 1; //Wenn der Charakter nach links schaut (otherDirection === true) → direction = -1, Sonst nach rechts → direction = 1
+        const now = Date.now();
+        if (this.keyBaord.THROW && this.character.bottle > 0 && now - this.lastBottleThrow > 500) {
+            const direction = this.character.otherDirection ? -1 : 1;
             const offsetX = direction * 30;
-            console.log(direction);
             let bottle;
             if (direction === -1) {
-                console.log('wurf nach links');
                 bottle = new ThrowableObject(this.character.x + offsetX, this.character.y + 140, this, direction);
-
             } else {
                 bottle = new ThrowableObject(this.character.x + 50, this.character.y + 140, this, direction);
             }
@@ -226,8 +209,11 @@ class World {
             this.character.bottle -= 5;
             if (this.character.bottle < 0) this.character.bottle = 0;
             this.updateBottleStatusBar();
+
+            this.lastBottleThrow = now; // ⬅️ Sperre setzen
         }
     }
+
 
 
     updateHealthStatusBar() {

@@ -63,12 +63,12 @@ class Character extends MovableObject {
     ];
 
     x = 0;
-    y = 70;
+    y = 50;
     height = 250;
     width = 100;
     walking_sound;
     world;
-    speed = 8;
+    speed = 5;
     minX = 150 - 720;
     coin = 0;
     bottle = 0;

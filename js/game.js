@@ -97,18 +97,18 @@ document.addEventListener("keydown", function (event) {
 
 
 function updateMobileControlsVisibility() {
-    console.log('updateMobileControlsVisibility aufgerufen');
+    // console.log('updateMobileControlsVisibility aufgerufen');
     const mobileControls = document.getElementById('mobileControls');
     const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     const isSmallScreen = window.innerWidth < 800;
 
     if (isMobile || isSmallScreen) {
-        console.log('display ist unter 800px ODER mobil');
+        // console.log('display ist unter 800px ODER mobil');
 
         mobileControls.classList.remove('d-none');
         mobileControls.classList.add('d-flex');
     } else {
-        console.log('display ist größer als 800px UND nicht mobil');
+        // console.log('display ist größer als 800px UND nicht mobil');
         mobileControls.classList.remove('d-flex');
         mobileControls.classList.add('d-none');
     }
@@ -155,3 +155,6 @@ window.addEventListener('load', () => {
 
 // window.addEventListener('load', updateMobileControlsVisibility, addMobileButtonsFunction);
 window.addEventListener('resize', updateMobileControlsVisibility);
+
+
+// canvas.requestFullscreen()
