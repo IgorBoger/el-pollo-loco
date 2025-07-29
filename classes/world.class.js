@@ -30,6 +30,8 @@ class World {
     camera_x = 0;
     lastBottleThrow = 0;
 
+    lastDrawLogTime = 0;
+
 
     constructor(canvas, keyBaord) {
         this.ctx = canvas.getContext("2d");
@@ -66,7 +68,7 @@ class World {
             this.checkCollisions();
             this.checkThrowObject();
             this.checkBottleOnGround();
-        }, 50); // Oder auch 160 FPS, da läuft es besser
+        }, 50); //  besser mit this.lastBottleThrow = now; in checkThrowObject()
     }
 
 
@@ -78,7 +80,7 @@ class World {
         this.checkBottleHitsEnemies(); // Zentral
     }
 
-    
+
     collisionWithChicken() {
         this.level.enemies.forEach((enemy) => {
             if (enemy.isDead() || this.character.isDead()) return;
@@ -130,6 +132,9 @@ class World {
                 if (!bottle.isSplashed && bottle.isColliding(enemy)) {
 
                     if (enemy instanceof Endboss) {
+
+                        console.log('💥 Flasche trifft Endboss!'); // 🟡 HIER DEBUG-ZEILE
+
                         if (!enemy.lastHit || now - enemy.lastHit > 500) {
                             enemy.hit();
                             enemy.lastHit = now;
@@ -173,27 +178,6 @@ class World {
     }
 
 
-    // checkThrowObject() {
-    //     if (this.keyBaord.THROW && this.character.bottle > 0) {
-    //         const direction = this.character.otherDirection ? -1 : 1; //Wenn der Charakter nach links schaut (otherDirection === true) → direction = -1, Sonst nach rechts → direction = 1
-    //         const offsetX = direction * 30;
-    //         console.log(direction);
-    //         let bottle;
-    //         if (direction === -1) {
-    //             console.log('wurf nach links');
-    //             bottle = new ThrowableObject(this.character.x + offsetX, this.character.y + 140, this, direction);
-
-    //         } else {
-    //             bottle = new ThrowableObject(this.character.x + 50, this.character.y + 140, this, direction);
-    //         }
-    //         this.throwableObject.push(bottle);
-    //         this.character.bottle -= 5;
-    //         if (this.character.bottle < 0) this.character.bottle = 0;
-    //         this.updateBottleStatusBar();
-    //     }
-    // }
-
-
     checkThrowObject() {
         const now = Date.now();
         if (this.keyBaord.THROW && this.character.bottle > 0 && now - this.lastBottleThrow > 500) {
@@ -210,7 +194,7 @@ class World {
             if (this.character.bottle < 0) this.character.bottle = 0;
             this.updateBottleStatusBar();
 
-            this.lastBottleThrow = now; // ⬅️ Sperre setzen
+            this.lastBottleThrow = now; // ⬅️ Sperre setzen für run() ist notwendig
         }
     }
 
@@ -271,6 +255,8 @@ class World {
 
 
     draw() {
+        const start = performance.now();
+
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.ctx.translate(this.camera_x, 0);
         this.addObjectsToMap(this.level.backgroundObjects);
@@ -290,7 +276,20 @@ class World {
         this.addToMap(this.coinBar);
         this.addToMap(this.bottleBar);
         this.addToMap(this.endbossBar);
+
+        const end = performance.now();
+        const duration = end - start;
+        // Nur alle 2 Sekunden loggen – wenn langsam
+        const now = Date.now();
+        if (duration > 30 && now - this.lastDrawLogTime > 2000) {
+            console.warn(`⚠️ draw() dauerte ${Math.round(duration)} ms`);
+            this.lastDrawLogTime = now;
+        }
+
         let self = this;
+
+        document.getElementById('frameTime').innerText = `draw: ${Math.round(duration)} ms`;
+
         requestAnimationFrame(function () {
             self.draw();
         });

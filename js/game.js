@@ -129,11 +129,11 @@ function addMobileButtonsFunction() {
         const el = document.getElementById(btn.id);
 
         ['touchstart', 'mousedown'].forEach(evt =>
-            el.addEventListener(evt, () => keyBaord[btn.key] = true)
+            el.addEventListener(evt, () => keyBaord[btn.key] = true, { passive: true })
         );
 
         ['touchend', 'mouseup', 'mouseleave'].forEach(evt =>
-            el.addEventListener(evt, () => keyBaord[btn.key] = false)
+            el.addEventListener(evt, () => keyBaord[btn.key] = false, { passive: true })
         );
     });
 }
