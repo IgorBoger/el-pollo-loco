@@ -29,8 +29,9 @@
     <script src="js/game.js"></script>
 </head>
 
-<body onload="init()">
-    <!-- <body> -->
+<!-- <body onload="init()"> -->
+
+<body>
 
     <div id="frameTime" style="position: fixed; top: 5px; left: 5px; background: rgba(0,0,0,0.7); color: #0f0;
             font-family: monospace; font-size: 12px; padding: 2px 6px; z-index: 10000;">
@@ -40,12 +41,22 @@
     <h1>El Pollo Loco</h1>
 
     <div id="gameContainer">
-        <!-- <div id="startScreen">
+        <div id="startScreen">
             <img id="startscreenImg" src="img/9_intro_outro_screens/start/startscreen_1.png">
             <button id="startButton" onclick="startGame()">Start Game</button>
-        </div> -->
+        </div>
 
-        <canvas id="canvas" width="720" height="480"></canvas>
+        <canvas id="canvas" width="720" height="480">
+            <!-- <button id="muteButton" class="control-btn" style="position:absolute; top:10px; right:10px; z-index:999;">
+                🔇
+            </button> -->
+
+        </canvas>
+        <button id="muteButton" class="control-btn d-flex">🔈</button>
+        <!-- <button id="muteButton" class="control-btn d-flex">🔇</button> -->
+
+        <!-- Fullscreen Button -->
+        <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶</button>
     </div>
 
     <div id="mobileControls" class="d-none">
@@ -55,7 +66,7 @@
         <button class="control-btn" id="btnThrow">🧴 Werfen</button>
     </div>
 
-    <div id="controlsInfo">
+    <!-- <div id="controlsInfo">
         <h3>Steuerung</h3>
         <ul>
             <li><strong>Pfeil nach rechts</strong> – Nach rechts laufen</li>
@@ -64,7 +75,7 @@
             <li><strong>D</strong> – Flasche werfen</li>
             <li><strong>Pfeil nach oben/unten</strong> – Weitere Aktionen (optional)</li>
         </ul>
-    </div>
+    </div> -->
 
 </body>
 

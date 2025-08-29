@@ -59,22 +59,11 @@ canvas {
 }
 
 
-/* #startButton {
-    margin-top: -50px;
-    padding: 10px 20px;
-    font-size: 1.2em;
-    cursor: pointer;
-    background-color: rgb(229, 139, 69);
-} */
-
-
 #startButton {
-    /* margin-top: -46px; */
     padding: 12px 24px;
     font-size: 1.2em;
     cursor: pointer;
     color: #fff;
-    /* background-color: #ff9800; */
     background-color: rgb(255, 186, 0);
     border: none;
     border-radius: 8px;
@@ -85,17 +74,83 @@ canvas {
 }
 
 #startButton:hover {
-    /* background-color: #e68900; */
     background-color: rgb(227 166 2);
-    /* transform: translateY(-2px); */
     box-shadow: 0 6px 8px rgba(0, 0, 0, 0.4);
 }
 
-/* #startButton:active {
-    background-color: #cc7a00;
-    transform: translateY(0);
-    box-shadow: 0 3px 4px rgba(0, 0, 0, 0.3);
-} */
+
+#muteButton {
+    position: absolute;
+    top: 10px;
+    right: 190px;
+    z-index: 20;
+    padding: 10px 14px;
+    font-size: 1.2em;
+    border: none;
+    border-radius: 8px;
+    background-color: #ffa726;
+    color: white;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+}
+
+
+#muteButton:hover {
+    background-color: #fb8c00;
+}
+
+
+#fullscreenBtn {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    padding: 10px 16px;
+    font-size: 1.2em;
+    cursor: pointer;
+    color: #fff;
+    background-color: rgb(255, 186, 0);
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    z-index: 20;
+}
+
+#fullscreenBtn:hover {
+    background-color: rgb(227, 166, 2);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.4);
+}
+
+
+:fullscreen,
+:-webkit-full-screen {
+    background: #000;
+}
+
+
+#gameContainer:fullscreen,
+#gameContainer:-webkit-full-screen,
+#gameContainer:-webkit-full-screen #startScreen {
+    width: 100vw;
+    height: 100vh;
+}
+
+
+#gameContainer canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    image-rendering: auto;
+}
+
+
+#startscreenImg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    image-rendering: auto;
+}
+
 
 #mobileControls {
     width: 720px;
@@ -104,6 +159,7 @@ canvas {
     justify-content: center;
     gap: 10px;
 }
+
 
 .control-btn {
     padding: 10px 20px;
@@ -115,6 +171,7 @@ canvas {
     box-shadow: 0 3px 5px rgba(0, 0, 0, 0.3);
     cursor: pointer;
 }
+
 
 .control-btn:active {
     background-color: #fb8c00;
@@ -131,17 +188,20 @@ canvas {
     font-family: Arial, sans-serif;
 }
 
+
 #controlsInfo h3 {
     margin: 0;
     color: #333;
     padding: 16px
 }
 
+
 #controlsInfo ul {
     /* padding-left: 20px; */
     padding: 0 16px 16px 36px;
     margin: 0;
 }
+
 
 #controlsInfo li {
     margin-bottom: 8px;

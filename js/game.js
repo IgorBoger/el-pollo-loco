@@ -7,15 +7,27 @@ const buttons = [
     { id: 'btnJump', key: 'SPACE' },
     { id: 'btnThrow', key: 'THROW' }
 ];
+// let isMuted = false;
+let isMuted = localStorage.getItem('isMuted') === 'true';
+
 
 
 function init() {
     canvas = document.getElementById('canvas');
+    setupHiDPICanvas();      // <- hier einmalig aufrufen, fertig
     world = new World(canvas, keyBaord);
     console.log('My Caracter is ', world);
     // console.log('My backGrounds are ');
     // console.table(world.level.backgroundObjects);
     // console.log(keyBaord);
+
+    // Wende den Mute-Zustand auf alle Sounds an
+    Object.values(world.sounds).forEach(sound => {
+        if (sound instanceof Audio) {
+            sound.muted = isMuted;
+        }
+    });
+    updateMuteIcon(); // Symbol korrekt beim Start
 }
 
 
@@ -30,6 +42,33 @@ function startGame() {
         // world.sounds.background.play();
     }
 }
+
+
+function toggleMute() {
+    isMuted = !isMuted;
+    localStorage.setItem('isMuted', isMuted);
+    updateMuteIcon();
+
+    if (!world || !world.sounds) return;
+
+    Object.values(world.sounds).forEach(sound => {
+        if (sound instanceof Audio) {
+            sound.muted = isMuted;
+        }
+    });
+}
+
+
+function updateMuteIcon() {
+    const btn = document.getElementById('muteButton');
+    btn.textContent = isMuted ? '🔇' : '🔈';
+}
+
+
+// window.addEventListener('load', () => {
+//     document.getElementById('muteButton').addEventListener('click', toggleMute);
+// });
+
 
 
 document.addEventListener("keyup", function (event) {
@@ -139,22 +178,122 @@ function addMobileButtonsFunction() {
 }
 
 
-
 window.addEventListener('load', () => {
     updateMobileControlsVisibility();
-
-    // buttons.forEach(btn => {
-    //     const el = document.getElementById(btn.id);
-    //     el.addEventListener('touchstart', () => keyBaord[btn.key] = true);
-    //     el.addEventListener('touchend', () => keyBaord[btn.key] = false);
-    // });
-
     addMobileButtonsFunction();
+    const muteBtn = document.getElementById('muteButton');
+    if (muteBtn) {
+        muteBtn.addEventListener('click', toggleMute);
+    }
+    updateMuteIcon(); // damit Symbol beim Start stimmt
 });
 
 
-// window.addEventListener('load', updateMobileControlsVisibility, addMobileButtonsFunction);
-window.addEventListener('resize', updateMobileControlsVisibility);
+window.addEventListener('resize', () => {
+    updateMobileControlsVisibility();
+});
 
 
-// canvas.requestFullscreen()
+function toggleFullscreen() {
+    const el = document.getElementById('gameContainer');
+    if (document.fullscreenElement) {
+        document.exitFullscreen?.();
+    } else {
+        (el.requestFullscreen
+            || el.webkitRequestFullscreen
+            || el.msRequestFullscreen
+            || el.mozRequestFullScreen
+        )?.call(el);
+    }
+}
+
+
+// function setupHiDPICanvas() {
+//     const canvas = document.getElementById('canvas');
+//     const dpr = window.devicePixelRatio || 1;
+//     const BASE_W = 720, BASE_H = 480;
+
+//     // Logische Größe bleibt 720×480 (deine Game-Koordinaten)
+//     canvas.style.width = '100%';
+//     canvas.style.height = '100%';
+
+//     // Physische Pixelzahl hochsetzen (schärfere Kanten/Fonts/Sprites)
+//     canvas.width = BASE_W * dpr;
+//     canvas.height = BASE_H * dpr;
+
+//     // Renderkontext an DPI anpassen (keine Codeänderungen im Spiel nötig)
+//     const ctx = canvas.getContext('2d');
+//     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+// }
+
+
+
+function setupHiDPICanvas() {
+    const c = document.getElementById('canvas');
+    const ctx = c.getContext('2d');
+    const BASE_W = 720, BASE_H = 480;
+
+    function fit() {
+        const dpr = Math.max(1, window.devicePixelRatio || 1);
+
+        // sichtbare CSS-Größe des Canvas (nicht per JS setzen!)
+        const cssW = Math.round(c.clientWidth);
+        const cssH = Math.round(c.clientHeight);
+
+        // physische Puffergröße in Pixeln
+        const pxW = cssW * dpr;
+        const pxH = cssH * dpr;
+
+        // nur neu setzen wenn nötig (spart Arbeit)
+        if (c.width !== pxW || c.height !== pxH) {
+            c.width = pxW;
+            c.height = pxH;
+        }
+
+        // Koordinatensystem skalieren: 720x480 -> füllt cssW/cssH exakt
+        const scaleX = pxW / BASE_W;
+        const scaleY = pxH / BASE_H;
+        ctx.setTransform(scaleX, 0, 0, scaleY, 0, 0);
+        ctx.imageSmoothingEnabled = true;
+    }
+
+    window.addEventListener('resize', fit);
+    window.addEventListener('orientationchange', fit);
+    document.addEventListener('fullscreenchange', fit);
+    fit(); // initial
+}
+
+
+
+
+// // === HiDPI & Vollbild-scharf: einmal aufrufen (z.B. am Ende von init()) ===
+// function setupHiDPICanvas() {
+//     const c = document.getElementById('canvas');
+//     const ctx = c.getContext('2d');
+
+//     function fit() {
+//         const dpr = Math.max(1, window.devicePixelRatio || 1);
+//         // CSS-Größe (vom Layout) auslesen – NICHT per JS setzen
+//         const cssW = Math.round(c.clientWidth);
+//         const cssH = Math.round(c.clientHeight);
+
+//         // Zeichenpuffer nur anpassen, wenn nötig (spart Arbeit)
+//         const need = c.width !== cssW * dpr || c.height !== cssH * dpr;
+//         if (need) {
+//             c.width = cssW * dpr;   // physische Pixel
+//             c.height = cssH * dpr;
+//             ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // Koordinaten bleiben „wie vorher“
+//             ctx.imageSmoothingEnabled = true;       // glatt statt pixelig
+//         }
+//     }
+
+//     // Auf Vollbild-/Resize-Änderungen reagieren (klein & robust)
+//     window.addEventListener('resize', fit);
+//     window.addEventListener('orientationchange', fit);
+//     document.addEventListener('fullscreenchange', fit);
+
+//     fit(); // initial
+// }
+// // >>> In deiner init(): nach dem Holen des Canvas EINMAL aufrufen:
+// // const canvas = document.getElementById('canvas');
+// // setupHiDPICanvas();

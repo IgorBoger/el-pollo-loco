@@ -7,11 +7,11 @@ class World {
     sounds = {
         background: new Audio('../audio/background.mp3'),       //  Sound-OK
         walk: new Audio('../audio/walk.mp3'),                   //  Sound-OK
-        // jump: new Audio('../audio/jump.mp3'),                   //  Sound-OK 
+        jump: new Audio('../audio/jump.mp3'),                   //  Sound-OK 
         hurt: new Audio('../audio/hurt.mp3'),                   //  Sound-OK
         dead: new Audio('../audio/dead.mp3'),                   //  Sound-OK
-        // coin: new Audio('../audio/coin.mp3'),                   //  Sound-OK
-        // bottle: new Audio('../audio/bottle.mp3'),               //  Sound-OK
+        coin: new Audio('../audio/coin.mp3'),                   //  Sound-OK
+        bottle: new Audio('../audio/bottle.mp3'),               //  Sound-OK
         // hit: new Audio('../audio/hit.mp3'),                     //  Sound-OK
         throw: new Audio('../audio/bottle-throw.mp3'),          //  Sound-OK
         chicken: new Audio('../audio/chicken.mp3'),
@@ -39,7 +39,8 @@ class World {
         this.keyBaord = keyBaord;
         this.backgroundObjects = [];
         this.initBackground();
-        this.draw();
+        // this.draw();
+        setTimeout(() => this.draw(), 100);
         this.setWorld();
         this.updateBottleStatusBar();
         this.run();
@@ -47,6 +48,7 @@ class World {
         this.initCollectables(this.bottles, Bottle, 100, 150);
         this.sounds.background.loop = true;
         this.sounds.background.volume = 0.1;
+        this.sounds.background.muted = isMuted; // Mute sofort
     }
 
 
@@ -154,11 +156,59 @@ class World {
     }
 
 
+    // playEffectSound(sound) {
+    //     if (!sound) return;
+    //     sound.pause();
+    //     sound.currentTime = 0;
+    //     sound.play();
+    // }
+
+
+    // playEffectSound(sound) {
+    //     if (!sound || isMuted) return;
+
+    //     try {
+    //         sound.pause();
+    //         sound.currentTime = 0;
+    //         sound.volume = 1.0; // stelle sicher, volle Lautstärke
+    //         sound.play();
+    //     } catch (e) {
+    //         console.warn('Fehler beim Abspielen:', e);
+    //     }
+
+    //     // Wichtig: background nicht beeinflussen
+    //     if (this.sounds.background) {
+    //         this.sounds.background.volume = 0.1; // deine normale Hintergrundlautstärke
+    //     }
+    // }
+
+
     playEffectSound(sound) {
-        if (!sound) return;
-        sound.pause();
-        sound.currentTime = 0;
-        sound.play();
+        if (!sound || isMuted) return;
+
+        try {
+            sound.pause();
+            sound.currentTime = 0;
+
+            const playPromise = sound.play();
+
+            if (playPromise !== undefined) {
+                playPromise
+                    .then(() => {
+                        // alles gut
+                    })
+                    .catch(error => {
+                        console.warn('Sound konnte nicht abgespielt werden:', error);
+                    });
+            }
+        } catch (e) {
+            console.warn('Fehler beim Abspielen:', e);
+        }
+
+        // Hintergrundmusik Lautstärke stabil halten
+        if (this.sounds.background) {
+            this.sounds.background.volume = 0.1;
+        }
     }
 
 
