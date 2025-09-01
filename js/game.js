@@ -7,27 +7,27 @@ const buttons = [
     { id: 'btnJump', key: 'SPACE' },
     { id: 'btnThrow', key: 'THROW' }
 ];
-// let isMuted = false;
-let isMuted = localStorage.getItem('isMuted') === 'true';
+let isMusicMuted = localStorage.getItem('isMusicMuted') === 'true';
+let isSoundMuted = localStorage.getItem('isSoundMuted') === 'true';
+let currentLanguage = localStorage.getItem('language') || 'DE';
 
 
 
 function init() {
     canvas = document.getElementById('canvas');
-    setupHiDPICanvas();      // <- hier einmalig aufrufen, fertig
+    setupHiDPICanvas();
     world = new World(canvas, keyBaord);
     console.log('My Caracter is ', world);
-    // console.log('My backGrounds are ');
-    // console.table(world.level.backgroundObjects);
-    // console.log(keyBaord);
 
-    // Wende den Mute-Zustand auf alle Sounds an
-    Object.values(world.sounds).forEach(sound => {
+    Object.entries(world.sounds).forEach(([name, sound]) => {
         if (sound instanceof Audio) {
-            sound.muted = isMuted;
+            if (name === 'background') {
+                sound.muted = isMusicMuted;
+            } else {
+                sound.muted = isSoundMuted;
+            }
         }
     });
-    updateMuteIcon(); // Symbol korrekt beim Start
 }
 
 
@@ -35,40 +35,83 @@ function startGame() {
     console.log('gecklickt');
     document.getElementById('startScreen').classList.add('d-none');
     init();
-
     if (world?.sounds?.background) {
-        // console.log('background-sound is activated');
-        world.playEffectSound(world.sounds.background);
-        // world.sounds.background.play();
+        const bg = world.sounds.background;
+        bg.loop = true;
+        bg.volume = 0.1;
+        bg.muted = isMusicMuted;
+
+        if (!isMusicMuted) {
+            bg.play().catch((e) => console.warn('Musikstart fehlgeschlagen:', e));
+        }
+    }
+
+}
+
+
+function toggleSettingsMenu() {
+    const overlay = document.getElementById('settingsOverlay');
+
+    const isOpen = overlay.classList.contains('open');
+
+    if (isOpen) {
+        overlay.classList.remove('open');
+        setTimeout(() => overlay.classList.add('d-none'), 300);
+    } else {
+        overlay.classList.remove('d-none');
+        setTimeout(() => overlay.classList.add('open'), 10);
     }
 }
 
 
-function toggleMute() {
-    isMuted = !isMuted;
-    localStorage.setItem('isMuted', isMuted);
-    updateMuteIcon();
+function toggleMusic() {
+    isMusicMuted = !isMusicMuted;
+    localStorage.setItem('isMusicMuted', isMusicMuted);
+    document.getElementById('musicToggle').textContent = isMusicMuted ? '🔇' : '🔈';
+    // if (world?.sounds?.background) world.sounds.background.muted = isMusicMuted;
+    const bg = world?.sounds?.background;
 
-    if (!world || !world.sounds) return;
+    if (bg) {
+        bg.muted = isMusicMuted;
 
-    Object.values(world.sounds).forEach(sound => {
-        if (sound instanceof Audio) {
-            sound.muted = isMuted;
+        if (!isMusicMuted) {
+            bg.play().catch((e) => console.warn('Musik konnte nicht gestartet werden:', e));
+        } else {
+            bg.pause();
+            bg.currentTime = 0; // optional: bei jedem Mute zurück
         }
-    });
+    }
+
+}
+
+function toggleSound() {
+    isSoundMuted = !isSoundMuted;
+    localStorage.setItem('isSoundMuted', isSoundMuted);
+    document.getElementById('soundToggle').textContent = isSoundMuted ? '🔇' : '🔈';
+    if (!world || !world.sounds) return;
+    for (const [name, sound] of Object.entries(world.sounds)) {
+        if (name !== 'background' && sound instanceof Audio) {
+            sound.muted = isSoundMuted;
+        }
+    }
+}
+
+function toggleLanguage() {
+    currentLanguage = currentLanguage === 'DE' ? 'EN' : 'DE';
+    localStorage.setItem('language', currentLanguage);
+    document.getElementById('langToggle').textContent = currentLanguage;
+    // 👉 Optional: hier kannst du Texte umstellen
 }
 
 
-function updateMuteIcon() {
-    const btn = document.getElementById('muteButton');
-    btn.textContent = isMuted ? '🔇' : '🔈';
-}
-
-
-// window.addEventListener('load', () => {
-//     document.getElementById('muteButton').addEventListener('click', toggleMute);
-// });
-
+window.addEventListener('click', function (e) {
+    const overlay = document.getElementById('settingsOverlay');
+    const button = document.getElementById('settingsBtn');
+    if (!overlay.contains(e.target) && e.target !== button) {
+        overlay.classList.remove('open');
+        setTimeout(() => overlay.classList.add('d-none'), 300);
+    }
+});
 
 
 document.addEventListener("keyup", function (event) {
@@ -181,12 +224,19 @@ function addMobileButtonsFunction() {
 window.addEventListener('load', () => {
     updateMobileControlsVisibility();
     addMobileButtonsFunction();
-    const muteBtn = document.getElementById('muteButton');
-    if (muteBtn) {
-        muteBtn.addEventListener('click', toggleMute);
-    }
-    updateMuteIcon(); // damit Symbol beim Start stimmt
+
+    // Einstellungen
+    document.getElementById('settingsBtn').addEventListener('click', toggleSettingsMenu);
+    document.getElementById('musicToggle').addEventListener('click', toggleMusic);
+    document.getElementById('soundToggle').addEventListener('click', toggleSound);
+    document.getElementById('langToggle').addEventListener('click', toggleLanguage);
+
+    // Initialstatus setzen
+    document.getElementById('musicToggle').textContent = isMusicMuted ? '🔇' : '🔈';
+    document.getElementById('soundToggle').textContent = isSoundMuted ? '🔇' : '🔈';
+    document.getElementById('langToggle').textContent = currentLanguage;
 });
+
 
 
 window.addEventListener('resize', () => {

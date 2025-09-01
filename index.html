@@ -47,13 +47,27 @@
         </div>
 
         <canvas id="canvas" width="720" height="480">
-            <!-- <button id="muteButton" class="control-btn" style="position:absolute; top:10px; right:10px; z-index:999;">
-                🔇
-            </button> -->
 
         </canvas>
-        <button id="muteButton" class="control-btn d-flex">🔈</button>
-        <!-- <button id="muteButton" class="control-btn d-flex">🔇</button> -->
+
+        <!-- ⚙️ Zahnrad Button -->
+        <button id="settingsBtn" class="control-btn">⚙️</button>
+        <!-- Settings Overlay-Menü -->
+        <div id="settingsOverlay" class="settings-overlay d-none">
+            <div class="setting-row">
+                <span>Musik</span>
+                <button id="musicToggle" class="toggle-btn">🔈</button>
+            </div>
+            <div class="setting-row">
+                <span>Ton</span>
+                <button id="soundToggle" class="toggle-btn">🔈</button>
+            </div>
+            <div class="setting-row">
+                <span>Sprache</span>
+                <button id="langToggle" class="toggle-btn">DE</button>
+            </div>
+        </div>
+
 
         <!-- Fullscreen Button -->
         <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶</button>

@@ -48,7 +48,7 @@ class World {
         this.initCollectables(this.bottles, Bottle, 100, 150);
         this.sounds.background.loop = true;
         this.sounds.background.volume = 0.1;
-        this.sounds.background.muted = isMuted; // Mute sofort
+        this.sounds.background.muted = isMusicMuted;
     }
 
 
@@ -56,11 +56,11 @@ class World {
         this.character.world = this;
         this.throwableObject.world = this;
 
-        this.character.animate(); // Jetzt ist world definiert
+        this.character.animate();
 
         this.level.enemies.forEach(enemy => {
-            enemy.world = this;       // ✅ für Sound etc.
-            enemy.animate?.();        // ✅ falls Methode vorhanden
+            enemy.world = this;
+            enemy.animate?.();
         });
     }
 
@@ -79,7 +79,7 @@ class World {
         this.collisionWithCollectable(this.coins, 'coin', this.updateCoinStatusBar);
         this.collisionWithCollectable(this.bottles, 'bottle', this.updateBottleStatusBar);
 
-        this.checkBottleHitsEnemies(); // Zentral
+        this.checkBottleHitsEnemies();
     }
 
 
@@ -156,60 +156,35 @@ class World {
     }
 
 
-    // playEffectSound(sound) {
-    //     if (!sound) return;
-    //     sound.pause();
-    //     sound.currentTime = 0;
-    //     sound.play();
-    // }
-
-
-    // playEffectSound(sound) {
-    //     if (!sound || isMuted) return;
-
-    //     try {
-    //         sound.pause();
-    //         sound.currentTime = 0;
-    //         sound.volume = 1.0; // stelle sicher, volle Lautstärke
-    //         sound.play();
-    //     } catch (e) {
-    //         console.warn('Fehler beim Abspielen:', e);
-    //     }
-
-    //     // Wichtig: background nicht beeinflussen
-    //     if (this.sounds.background) {
-    //         this.sounds.background.volume = 0.1; // deine normale Hintergrundlautstärke
-    //     }
-    // }
-
-
     playEffectSound(sound) {
-        if (!sound || isMuted) return;
+        if (!sound) return;
+
+        const isBackground = sound === this.sounds?.background;
+
+        // Mute-Regeln anwenden
+        if (isBackground && isMusicMuted) return;
+        if (!isBackground && isSoundMuted) return;
 
         try {
             sound.pause();
             sound.currentTime = 0;
 
             const playPromise = sound.play();
-
             if (playPromise !== undefined) {
-                playPromise
-                    .then(() => {
-                        // alles gut
-                    })
-                    .catch(error => {
-                        console.warn('Sound konnte nicht abgespielt werden:', error);
-                    });
+                playPromise.catch((error) => {
+                    console.warn('Sound konnte nicht abgespielt werden:', error);
+                });
             }
         } catch (e) {
-            console.warn('Fehler beim Abspielen:', e);
+            console.warn('Fehler beim Abspielen des Sounds:', e);
         }
 
-        // Hintergrundmusik Lautstärke stabil halten
+        // Hintergrundlautstärke fixieren
         if (this.sounds.background) {
             this.sounds.background.volume = 0.1;
         }
     }
+
 
 
     initCollectables(array, ClassRef, offsetMinX = 200, offsetMaxX = 50) {
@@ -219,10 +194,7 @@ class World {
             const minX = i * segmentWidth + offsetMinX;
             const maxX = (i + 1) * segmentWidth - offsetMaxX;
             const x = Math.random() * (maxX - minX) + minX;
-            // const y = Math.random() * 200 + 150;
-            // const y = Math.random() * 300 + 50;
             const y = Math.random() * 150 + 120;
-
             array.push(new ClassRef(x, y));
         }
     }
@@ -244,7 +216,7 @@ class World {
             if (this.character.bottle < 0) this.character.bottle = 0;
             this.updateBottleStatusBar();
 
-            this.lastBottleThrow = now; // ⬅️ Sperre setzen für run() ist notwendig
+            this.lastBottleThrow = now;
         }
     }
 
@@ -277,7 +249,6 @@ class World {
             }
         });
     }
-
 
 
     debugBackgrounds() {

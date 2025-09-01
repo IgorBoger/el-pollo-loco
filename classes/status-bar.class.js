@@ -57,7 +57,7 @@ class StatusBar extends DrawableObject {
         }
         if (type === 'endboss') {
             this.IMAGES = this.IMAGES_ENDBOSS;
-            this.x = 550;
+            this.x = 480;
             this.y = 5;
         }
 
