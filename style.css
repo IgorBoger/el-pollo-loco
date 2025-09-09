@@ -5,6 +5,35 @@ body {
     align-items: center;
     justify-content: flex-start;
     min-height: 100vh;
+    /* font-family: 'UnifrakturCook', cursive; */
+    /* font-family: 'Jacquard 12', cursive; */
+
+    /* font-family: 'Honk', system-ui; */
+    /* font-size: 2em; */
+    /* font-variation-settings: "MORF" 20, "SHLN" 80; */
+    /* Werte 0..45 und 0..100 */
+
+    font-family: "Bungee Spice", sans-serif;
+    /* font-size: 2.2em; */
+
+    /* text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7); */
+    /* Schlagschatten */
+
+    /* letter-spacing: 2px; */
+    /* Buchstabenabstand */
+
+    text-transform: uppercase;
+    /* Alles groß */
+
+    /* text-shadow:
+        0 0 5px #ffae00,
+        0 0 10px #ff7300,
+        0 0 20px #ff0000;
+
+    filter: hue-rotate(-20deg) brightness(1.1) contrast(1.2); */
+
+    background-image: url('img/game-bg.jpg');
+    background-position: center;
 }
 
 
@@ -20,6 +49,21 @@ body {
 
 h1 {
     margin-top: 20px;
+    font-size: 3.2em;
+    transform: skew(-12deg);
+    /* leicht schief */
+
+    text-shadow:
+        0 0 5px #ffae00,
+        0 0 10px #ff7300,
+        0 0 20px #ff0000;
+
+    filter: hue-rotate(0deg) brightness(1.1) contrast(1.1);
+
+    /* color: #ffcc00; */
+    /* Overlay-Farbe */
+    /* mix-blend-mode: multiply; */
+
 }
 
 
@@ -27,9 +71,9 @@ h1 {
     position: relative;
     width: 720px;
     height: 480px;
-    /* margin-top: 20px; */
     overflow: hidden;
-    /* ← ganz wichtig: verhindert Rausgucken! */
+    border-radius: 12px;
+    text-shadow: 3px 2px 8px rgba(0, 0, 0, 0.8);
 }
 
 
@@ -67,75 +111,45 @@ canvas {
     cursor: pointer;
     color: #fff;
     background-color: rgb(255, 186, 0);
-    border: none;
-    border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    font-family: "Bungee Spice", sans-serif;
+    border: none;
+    border: white 1px solid;
+    border-radius: 8px;
     transition: all 0.3s ease;
     position: absolute;
     bottom: 12px;
 }
 
-#startButton:hover {
+/* #startButton:hover {
     background-color: rgb(227 166 2);
     box-shadow: 0 6px 8px rgba(0, 0, 0, 0.4);
-}
-
-
-/* #muteButton {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    z-index: 20;
-    padding: 10px 14px;
-    font-size: 1.2em;
-    border: none;
-    border-radius: 8px;
-    background-color: #ffa726;
-    color: white;
-    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.3);
-    cursor: pointer;
-}
-
-
-#muteButton:hover {
-    background-color: #fb8c00;
 } */
 
 
-#settingsBtn {
+#burgerBtn {
     position: absolute;
     top: 12px;
     right: 12px;
     z-index: 30;
     padding: 10px 14px;
     font-size: 1.2em;
-    border: none;
+    /* border: none; */
+    border: white 1px solid;
     border-radius: 8px;
     background-color: rgb(255, 186, 0);
-    color: white;
     box-shadow: 0 3px 5px rgba(0, 0, 0, 0.3);
+    color: white;
     cursor: pointer;
 }
 
-/* .settings-overlay {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 200px;
-    height: 100%;
-    box-sizing: border-box;
-    background-color: rgba(255, 255, 255, 0.95);
-    box-shadow: -2px 0 6px rgba(0, 0, 0, 0.2);
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    z-index: 1000;
-    transform: translateX(100%);
-    transition: transform 0.3s ease;
-} */
+
+#burgerBtn:active {
+    transform: translateY(1px);
+}
 
 
+.burger-overlay,
 .settings-overlay {
     position: absolute;
     top: 0;
@@ -147,9 +161,8 @@ canvas {
     background: linear-gradient(135deg, rgba(255, 140, 0, 0.8), rgba(255, 215, 0, 0.7));
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    /* für Safari */
-    /* border-left: 2px solid rgba(255, 255, 255, 0.2); */
     box-shadow: -4px 0 12px rgba(255, 165, 0, 0.5);
+    text-shadow: 3px 2px 8px rgba(0, 0, 0, 0.8);
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -161,9 +174,140 @@ canvas {
 }
 
 
-
+.burger-overlay.open,
 .settings-overlay.open {
     transform: translateX(0);
+}
+
+
+.burger-overlay.open,
+.settings-overlay.open {
+    transform: translateX(0);
+}
+
+
+.burger-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: -4px -4px 12px -4px;
+    padding: 4px;
+}
+
+.burger-title img {
+    width: 28px;
+    height: 28px;
+}
+
+#burgerClose {
+    background: rgb(255, 186, 0);
+    border: 1px solid #fff;
+    border-radius: 8px;
+    padding: 4px;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .25);
+}
+
+
+
+.burger-overlay ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 12px;
+}
+
+.menu-btn {
+    padding: 10px 14px;
+    background: rgba(0, 0, 0, .15);
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
+}
+
+.menu-btn:hover {
+    background: rgba(0, 0, 0, .25);
+}
+
+
+
+/* .menu-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 220px;
+    height: 100%;
+    padding: 16px;
+    box-sizing: border-box;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    background: linear-gradient(135deg, rgba(255, 140, 0, .9), rgba(255, 215, 0, .8));
+    box-shadow: 4px 0 12px rgba(0, 0, 0, .25);
+    z-index: 120;
+    flex-direction: column;
+} */
+
+/* .menu-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 12px;
+} */
+
+/* .menu-item {
+    width: 100%;
+    text-align: left;
+    padding: 10px 12px;
+    border: none;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, .15);
+    color: #fff;
+    font: inherit;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
+}
+
+.menu-item:hover {
+    background: rgba(0, 0, 0, .25);
+} */
+
+
+/* Header oben im Overlay: Icon nach rechts */
+.settings-header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    /* margin: -4px -4px 8px -4px; */
+    /* leicht an den Rand ziehen */
+}
+
+/* kleines, pures Icon (kein Text), gut klickbar */
+.settings-button {
+    /* width: 36px; */
+    /* height: 36px; */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #fff;
+    border-radius: 8px;
+    /* background: rgba(255, 186, 0, 0.95); */
+    /* background-color: #ff9800; */
+    background-color: rgb(255, 186, 0);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    color: #fff;
+    /* box-shadow: 0 2px 4px rgba(0, 0, 0, .25); */
+    cursor: pointer;
+    font-size: 1.1em;
+    padding: 4px;
+    /* kein extra Innenabstand */
+}
+
+.settings-button:active {
+    transform: translateY(1px);
 }
 
 
@@ -173,32 +317,37 @@ canvas {
     align-items: center;
 }
 
-.toggle-btn {
-    padding: 6px 10px;
-    font-size: 1em;
-    border: none;
-    border-radius: 6px;
-    background-color: #ffa726;
-    color: white;
-    cursor: pointer;
-}
-
 
 .toggle-btn {
-    padding: 6px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* padding: 6px 10px; */
     font-size: 1em;
-    border: none;
+    /* border: none; */
+    border: white 1px solid;
     border-radius: 6px;
-    background-color: #ff9800;
+    background-color: rgb(255, 186, 0);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
     color: white;
-    box-shadow: 0 0 6px rgba(255, 200, 0, 0.6);
+    /* box-shadow: 0 0 6px rgba(255, 200, 0, 0.6); */
     cursor: pointer;
     transition: background-color 0.2s ease;
 }
 
-.toggle-btn:hover {
+/* .toggle-btn:hover {
     background-color: #ffc107;
+} */
+
+
+.icon-img {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    pointer-events: none;
+    /* Klick bleibt auf dem Button */
 }
+
 
 
 
@@ -211,14 +360,19 @@ canvas {
     cursor: pointer;
     color: #fff;
     background-color: rgb(255, 186, 0);
-    border: none;
-    border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    /* border: none; */
+    border: white 1px solid;
+    border-radius: 8px;
     transition: all 0.3s ease;
     z-index: 20;
 }
 
-#fullscreenBtn:hover {
+#fullscreenBtn:hover,
+#startButton:hover,
+#burgerBtn:hover,
+.toggle-btn:hover,
+.settings-button:hover {
     background-color: rgb(227, 166, 2);
     box-shadow: 0 6px 8px rgba(0, 0, 0, 0.4);
 }
@@ -287,7 +441,7 @@ canvas {
     border: 2px solid #ffb703;
     border-radius: 10px;
     /* padding: 15px; */
-    font-family: Arial, sans-serif;
+    /* font-family: Arial, sans-serif; */
 }
 
 

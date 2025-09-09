@@ -45,21 +45,83 @@ function startGame() {
             bg.play().catch((e) => console.warn('Musikstart fehlgeschlagen:', e));
         }
     }
-
 }
 
 
-function toggleSettingsMenu() {
-    const overlay = document.getElementById('settingsOverlay');
+function restartGame() {
+    startGame();
+}
 
-    const isOpen = overlay.classList.contains('open');
 
+// Burger Menü ein-/ausblenden
+function toggleBurgerMenu() {
+    const menu = document.getElementById('burgerMenu');
+    const isOpen = menu.classList.contains('open');
     if (isOpen) {
-        overlay.classList.remove('open');
-        setTimeout(() => overlay.classList.add('d-none'), 300);
+        menu.classList.remove('open');
+        setTimeout(() => menu.classList.add('d-none'), 300);
     } else {
-        overlay.classList.remove('d-none');
-        setTimeout(() => overlay.classList.add('open'), 10);
+        menu.classList.remove('d-none');
+        setTimeout(() => menu.classList.add('open'), 10);
+    }
+}
+
+
+function closeBurgerMenu() {
+    const menu = document.getElementById('burgerMenu');
+    if (!menu) return;
+
+    if (menu.classList.contains('open')) {
+        menu.classList.remove('open');
+
+        const onEnd = (e) => {
+            if (e.propertyName === 'transform') {
+                menu.classList.add('d-none');
+                menu.removeEventListener('transitionend', onEnd);
+            }
+        };
+        menu.addEventListener('transitionend', onEnd);
+    }
+}
+
+
+function openSettingsOverlay() {
+    const burger = document.getElementById('burgerMenu');
+    const settings = document.getElementById('settingsOverlay');
+    burger.classList.remove('open');
+    setTimeout(() => burger.classList.add('d-none'), 300);
+    settings.classList.remove('d-none');
+    setTimeout(() => settings.classList.add('open'), 320);
+}
+
+
+function closeSettingsOverlay() {
+    const burger = document.getElementById('burgerMenu');
+    const settings = document.getElementById('settingsOverlay');
+    settings.classList.remove('open');
+    setTimeout(() => settings.classList.add('d-none'), 300);
+    burger.classList.remove('d-none');
+    setTimeout(() => burger.classList.add('open'), 320);
+}
+
+
+// Datei: game.js — Funktion: outsideCloseHandler (NEU)
+function outsideCloseHandler(e) {
+    const burger = document.getElementById('burgerMenu');
+    const settings = document.getElementById('settingsOverlay');
+    const burgerBtn = document.getElementById('burgerBtn');
+
+    // 1) Settings offen? → Klick NICHT im Settings & NICHT auf Burger-Button ⇒ sanft schließen
+    if (settings && settings.classList.contains('open')
+        && !settings.contains(e.target) && e.target !== burgerBtn) {
+        closeSettingsOverlay();     // nutzt deine bestehende sanfte Animation
+        return;                     // nur eins schließen pro Klick
+    }
+
+    // 2) Burger offen? → Klick NICHT im Burger & NICHT auf Burger-Button ⇒ sanft schließen
+    if (burger && burger.classList.contains('open')
+        && !burger.contains(e.target) && e.target !== burgerBtn) {
+        closeBurgerMenu();          // nutzt deine bestehende sanfte Animation
     }
 }
 
@@ -67,13 +129,11 @@ function toggleSettingsMenu() {
 function toggleMusic() {
     isMusicMuted = !isMusicMuted;
     localStorage.setItem('isMusicMuted', isMusicMuted);
-    document.getElementById('musicToggle').textContent = isMusicMuted ? '🔇' : '🔈';
-    // if (world?.sounds?.background) world.sounds.background.muted = isMusicMuted;
+    const icon = document.getElementById('musicIcon');
+    if (icon) icon.src = isMusicMuted ? 'img/mute.png' : 'img/speaker.png';
     const bg = world?.sounds?.background;
-
     if (bg) {
         bg.muted = isMusicMuted;
-
         if (!isMusicMuted) {
             bg.play().catch((e) => console.warn('Musik konnte nicht gestartet werden:', e));
         } else {
@@ -87,7 +147,8 @@ function toggleMusic() {
 function toggleSound() {
     isSoundMuted = !isSoundMuted;
     localStorage.setItem('isSoundMuted', isSoundMuted);
-    document.getElementById('soundToggle').textContent = isSoundMuted ? '🔇' : '🔈';
+    const icon = document.getElementById('soundIcon');
+    if (icon) icon.src = isSoundMuted ? 'img/mute.png' : 'img/speaker.png';
     if (!world || !world.sounds) return;
     for (const [name, sound] of Object.entries(world.sounds)) {
         if (name !== 'background' && sound instanceof Audio) {
@@ -96,22 +157,13 @@ function toggleSound() {
     }
 }
 
+
 function toggleLanguage() {
     currentLanguage = currentLanguage === 'DE' ? 'EN' : 'DE';
     localStorage.setItem('language', currentLanguage);
     document.getElementById('langToggle').textContent = currentLanguage;
     // 👉 Optional: hier kannst du Texte umstellen
 }
-
-
-window.addEventListener('click', function (e) {
-    const overlay = document.getElementById('settingsOverlay');
-    const button = document.getElementById('settingsBtn');
-    if (!overlay.contains(e.target) && e.target !== button) {
-        overlay.classList.remove('open');
-        setTimeout(() => overlay.classList.add('d-none'), 300);
-    }
-});
 
 
 document.addEventListener("keyup", function (event) {
@@ -224,19 +276,25 @@ function addMobileButtonsFunction() {
 window.addEventListener('load', () => {
     updateMobileControlsVisibility();
     addMobileButtonsFunction();
+    document.getElementById('restartGame')?.addEventListener('click', restartGame);
+    
+    document.getElementById('burgerBtn')?.addEventListener('click', toggleBurgerMenu);
+    document.getElementById('burgerClose')?.addEventListener('click', closeBurgerMenu);
+    document.getElementById('openSettings')?.addEventListener('click', openSettingsOverlay);
+    document.getElementById('closeSettings')?.addEventListener('click', closeSettingsOverlay);
+    // Datei: game.js — im vorhandenen window.addEventListener('load', ...) GANZ AM ENDE ergänzen:
+    document.addEventListener('click', outsideCloseHandler);
 
-    // Einstellungen
-    document.getElementById('settingsBtn').addEventListener('click', toggleSettingsMenu);
+
     document.getElementById('musicToggle').addEventListener('click', toggleMusic);
     document.getElementById('soundToggle').addEventListener('click', toggleSound);
     document.getElementById('langToggle').addEventListener('click', toggleLanguage);
-
-    // Initialstatus setzen
-    document.getElementById('musicToggle').textContent = isMusicMuted ? '🔇' : '🔈';
-    document.getElementById('soundToggle').textContent = isSoundMuted ? '🔇' : '🔈';
+    const musicIcon = document.getElementById('musicIcon');
+    const soundIcon = document.getElementById('soundIcon');
+    if (musicIcon) musicIcon.src = isMusicMuted ? 'img/mute.png' : 'img/speaker.png';
+    if (soundIcon) soundIcon.src = isSoundMuted ? 'img/mute.png' : 'img/speaker.png';
     document.getElementById('langToggle').textContent = currentLanguage;
 });
-
 
 
 window.addEventListener('resize', () => {
@@ -258,26 +316,6 @@ function toggleFullscreen() {
 }
 
 
-// function setupHiDPICanvas() {
-//     const canvas = document.getElementById('canvas');
-//     const dpr = window.devicePixelRatio || 1;
-//     const BASE_W = 720, BASE_H = 480;
-
-//     // Logische Größe bleibt 720×480 (deine Game-Koordinaten)
-//     canvas.style.width = '100%';
-//     canvas.style.height = '100%';
-
-//     // Physische Pixelzahl hochsetzen (schärfere Kanten/Fonts/Sprites)
-//     canvas.width = BASE_W * dpr;
-//     canvas.height = BASE_H * dpr;
-
-//     // Renderkontext an DPI anpassen (keine Codeänderungen im Spiel nötig)
-//     const ctx = canvas.getContext('2d');
-//     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-// }
-
-
-
 function setupHiDPICanvas() {
     const c = document.getElementById('canvas');
     const ctx = c.getContext('2d');
@@ -285,7 +323,6 @@ function setupHiDPICanvas() {
 
     function fit() {
         const dpr = Math.max(1, window.devicePixelRatio || 1);
-
         // sichtbare CSS-Größe des Canvas (nicht per JS setzen!)
         const cssW = Math.round(c.clientWidth);
         const cssH = Math.round(c.clientHeight);
@@ -312,38 +349,3 @@ function setupHiDPICanvas() {
     document.addEventListener('fullscreenchange', fit);
     fit(); // initial
 }
-
-
-
-
-// // === HiDPI & Vollbild-scharf: einmal aufrufen (z.B. am Ende von init()) ===
-// function setupHiDPICanvas() {
-//     const c = document.getElementById('canvas');
-//     const ctx = c.getContext('2d');
-
-//     function fit() {
-//         const dpr = Math.max(1, window.devicePixelRatio || 1);
-//         // CSS-Größe (vom Layout) auslesen – NICHT per JS setzen
-//         const cssW = Math.round(c.clientWidth);
-//         const cssH = Math.round(c.clientHeight);
-
-//         // Zeichenpuffer nur anpassen, wenn nötig (spart Arbeit)
-//         const need = c.width !== cssW * dpr || c.height !== cssH * dpr;
-//         if (need) {
-//             c.width = cssW * dpr;   // physische Pixel
-//             c.height = cssH * dpr;
-//             ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // Koordinaten bleiben „wie vorher“
-//             ctx.imageSmoothingEnabled = true;       // glatt statt pixelig
-//         }
-//     }
-
-//     // Auf Vollbild-/Resize-Änderungen reagieren (klein & robust)
-//     window.addEventListener('resize', fit);
-//     window.addEventListener('orientationchange', fit);
-//     document.addEventListener('fullscreenchange', fit);
-
-//     fit(); // initial
-// }
-// // >>> In deiner init(): nach dem Holen des Canvas EINMAL aufrufen:
-// // const canvas = document.getElementById('canvas');
-// // setupHiDPICanvas();

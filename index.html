@@ -1,12 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" translate="no">
 
 <head>
+    <meta name="google" content="notranslate">
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>El Pollo Loco</title>
 
     <link rel="icon" href="img/favicon/favicon-32x32.png" type="image/png">
+
+    <!-- <link href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&display=swap" rel="stylesheet"> -->
+    <!-- <link href="https://fonts.googleapis.com/css2?family=Jacquard+12&display=swap" rel="stylesheet"> -->
+    <!-- <link href="https://fonts.googleapis.com/css2?family=Honk:MORF,SHLN@0..45,0..100&display=swap" rel="stylesheet"> -->
+    <link href="https://fonts.googleapis.com/css2?family=Bungee+Spice&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="style.css">
 
@@ -43,7 +50,7 @@
     <div id="gameContainer">
         <div id="startScreen">
             <img id="startscreenImg" src="img/9_intro_outro_screens/start/startscreen_1.png">
-            <button id="startButton" onclick="startGame()">Start Game</button>
+            <button id="startButton" onclick="startGame()">Start Game ></button>
         </div>
 
         <canvas id="canvas" width="720" height="480">
@@ -51,23 +58,80 @@
         </canvas>
 
         <!-- ⚙️ Zahnrad Button -->
-        <button id="settingsBtn" class="control-btn">⚙️</button>
-        <!-- Settings Overlay-Menü -->
-        <div id="settingsOverlay" class="settings-overlay d-none">
+        <!-- <button id="settingsBtn" class="control-btn">⚙️</button> -->
+
+        <!-- NEU: Hamburger-Button -->
+        <button id="burgerBtn" class="control-btn" aria-label="Menü">☰</button>
+
+        <!-- Burger-Menü -->
+        <div id="burgerMenu" class="burger-overlay d-none">
+            <div class="burger-header">
+                <!-- Settings-Icon: öffnet direkt Settings-Overlay -->
+                <button id="openSettings" class="settings-button" aria-label="Settings">
+                    <img src="img/settings.png" alt="Settings" class="icon-img">
+                </button>
+                <!-- Back-Button: schließt Burger-Menü -->
+                <button id="burgerClose" class="settings-button" aria-label="Zurück">
+                    <img src="img/arrow-right.png" alt="Zurück" class="icon-img">
+                </button>
+            </div>
+
+            <ul>
+                <li><button id="restartGame" class="menu-btn">🔄 Neustart</button></li>
+                <li><button id="showControls" class="menu-btn">🎮 Steuerung</button></li>
+                <li><button id="aboutGame" class="menu-btn">ℹ️ Über das Spiel</button></li>
+            </ul>
+        </div>
+
+        <!-- <div id="settingsOverlay" class="settings-overlay d-none">
+            <div class="settings-header">
+                <button id="settingsBtn" class="settings-button" aria-label="Einstellungen">
+                <img src="img/settings.png" alt="Settings" class="icon-img">
+                </button>
+            </div>
+
             <div class="setting-row">
                 <span>Musik</span>
-                <button id="musicToggle" class="toggle-btn">🔈</button>
+                <button id="musicToggle" class="toggle-btn">
+                    <img id="musicIcon" src="img/speaker.png" alt="Musik" class="icon-img">
+                </button>
             </div>
             <div class="setting-row">
                 <span>Ton</span>
-                <button id="soundToggle" class="toggle-btn">🔈</button>
+                <button id="soundToggle" class="toggle-btn">
+                    <img id="soundIcon" src="img/speaker.png" alt="Ton" class="icon-img">
+                </button>
+            </div>
+            <div class="setting-row">
+                <span>Sprache</span>
+                <button id="langToggle" class="toggle-btn">DE</button>
+            </div>
+        </div> -->
+
+        <!-- Settings-Overlay (separat) -->
+        <div id="settingsOverlay" class="settings-overlay d-none">
+            <div class="settings-header">
+                <button id="closeSettings" class="settings-button">
+                    <img id="closeIcon" src="img/arrow-right.png" alt="Close" class="icon-img">
+                </button>
+            </div>
+            <div class="setting-row">
+                <span>Musik</span>
+                <button id="musicToggle" class="toggle-btn">
+                    <img id="musicIcon" src="img/speaker.png" alt="Musik" class="icon-img">
+                </button>
+            </div>
+            <div class="setting-row">
+                <span>Ton</span>
+                <button id="soundToggle" class="toggle-btn">
+                    <img id="soundIcon" src="img/speaker.png" alt="Ton" class="icon-img">
+                </button>
             </div>
             <div class="setting-row">
                 <span>Sprache</span>
                 <button id="langToggle" class="toggle-btn">DE</button>
             </div>
         </div>
-
 
         <!-- Fullscreen Button -->
         <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶</button>
