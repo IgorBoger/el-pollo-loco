@@ -276,6 +276,8 @@ class World {
 
 
     draw() {
+        if (this.stopped) return;
+
         const start = performance.now();
 
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -357,4 +359,28 @@ class World {
     flipImageBack(mo) {
         this.ctx.translate(mo.x, mo.y);
     }
+
+
+    destroy() {
+        // alle Intervalle und Loops stoppen
+        this.stopped = true;
+
+        // Sounds stoppen
+        Object.values(this.sounds).forEach(s => {
+            if (s instanceof Audio) {
+                s.pause();
+                s.currentTime = 0;
+            }
+        });
+
+        // Gegner, Flaschen usw. zurücksetzen
+        this.level.enemies = [];
+        this.throwableObject = [];
+        this.coins = [];
+        this.bottles = [];
+
+        // Canvas leeren
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+
 }

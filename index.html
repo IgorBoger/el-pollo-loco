@@ -45,7 +45,7 @@
         draw: -
     </div>
 
-    <h1>El Pollo Loco</h1>
+    <h1 id="titleGame">El Pollo Loco</h1>
 
     <div id="gameContainer">
         <div id="startScreen">
@@ -77,82 +77,81 @@
             </div>
 
             <ul>
-                <li><button id="restartGame" class="menu-btn">🔄 Neustart</button></li>
-                <li><button id="showControls" class="menu-btn">🎮 Steuerung</button></li>
-                <li><button id="aboutGame" class="menu-btn">ℹ️ Über das Spiel</button></li>
+                <li><button id="restartGame" class="menu-btn">Spiel neu starten</button></li>
+                <li><button id="showControls" class="menu-btn">Steuerung</button></li>
+                <li><button id="aboutGame" class="menu-btn">Über das Spiel</button></li>
+                <li><button id="rankingList" class="menu-btn">Rangliste</button></li>
             </ul>
         </div>
-
-        <!-- <div id="settingsOverlay" class="settings-overlay d-none">
-            <div class="settings-header">
-                <button id="settingsBtn" class="settings-button" aria-label="Einstellungen">
-                <img src="img/settings.png" alt="Settings" class="icon-img">
-                </button>
-            </div>
-
-            <div class="setting-row">
-                <span>Musik</span>
-                <button id="musicToggle" class="toggle-btn">
-                    <img id="musicIcon" src="img/speaker.png" alt="Musik" class="icon-img">
-                </button>
-            </div>
-            <div class="setting-row">
-                <span>Ton</span>
-                <button id="soundToggle" class="toggle-btn">
-                    <img id="soundIcon" src="img/speaker.png" alt="Ton" class="icon-img">
-                </button>
-            </div>
-            <div class="setting-row">
-                <span>Sprache</span>
-                <button id="langToggle" class="toggle-btn">DE</button>
-            </div>
-        </div> -->
 
         <!-- Settings-Overlay (separat) -->
         <div id="settingsOverlay" class="settings-overlay d-none">
             <div class="settings-header">
+                <h2 id="settingsTitle">Einstellungen</h2>
                 <button id="closeSettings" class="settings-button">
                     <img id="closeIcon" src="img/arrow-right.png" alt="Close" class="icon-img">
                 </button>
             </div>
-            <div class="setting-row">
-                <span>Musik</span>
-                <button id="musicToggle" class="toggle-btn">
-                    <img id="musicIcon" src="img/speaker.png" alt="Musik" class="icon-img">
-                </button>
+
+            <div class="setting-block">
+                <div class="setting-row">
+                    <span id="labelMusic">Musik</span>
+                    <!-- <span>Musik</span> -->
+                    <button id="musicToggle" class="toggle-btn">
+                        <img id="musicIcon" src="img/speaker.png" alt="Musik" class="icon-img">
+                    </button>
+                </div>
+                <div class="setting-row">
+                    <span id="labelSound">Ton</span>
+                    <!-- <span>Ton</span> -->
+                    <button id="soundToggle" class="toggle-btn">
+                        <img id="soundIcon" src="img/speaker.png" alt="Ton" class="icon-img">
+                    </button>
+                </div>
             </div>
-            <div class="setting-row">
-                <span>Ton</span>
-                <button id="soundToggle" class="toggle-btn">
-                    <img id="soundIcon" src="img/speaker.png" alt="Ton" class="icon-img">
-                </button>
-            </div>
-            <div class="setting-row">
-                <span>Sprache</span>
-                <button id="langToggle" class="toggle-btn">DE</button>
-            </div>
+
+            <button id="langToggle" class="language-btn">Deutsch</button>
         </div>
 
         <!-- Fullscreen Button -->
         <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶</button>
+
+        <div id="mobileControls" class="d-none">
+            <button class="control-btn" id="btnLeft">⬅️</button>
+            <button class="control-btn" id="btnRight">➡️</button>
+            <button class="control-btn" id="btnJump">⤴️ Springen</button>
+            <button class="control-btn" id="btnThrow">🧴 Werfen</button>
+        </div>
+
+        <!-- Datei: index.html — EIN Overlay mit zentrierter Karte -->
+        <div id="langOverlay" class="modal-overlay d-none" role="dialog" aria-modal="true">
+            <div class="modal-card" role="document">
+                <div class="modal-header">
+                    <!-- Datei: index.html — Sprach-Overlay Titel -->
+                    <span id="langModalTitle" class="modal-title">Sprache</span>
+
+                    <!-- <span class="modal-title">Sprache</span> -->
+                    <button id="langClose" class="settings-button" aria-label="Schließen">
+                        <img src="img/arrow-right.png" alt="Close" class="icon-img">
+                    </button>
+                </div>
+                <div class="modal-content">
+                    <button class="lang-opt" data-lang="DE">Deutsch</button>
+                    <button class="lang-opt" data-lang="ES">Español</button>
+                    <button class="lang-opt" data-lang="EN">English</button>
+                </div>
+            </div>
+        </div>
+
+
     </div>
 
-    <div id="mobileControls" class="d-none">
+
+    <!-- <div id="mobileControls" class="d-none">
         <button class="control-btn" id="btnLeft">⬅️</button>
         <button class="control-btn" id="btnRight">➡️</button>
         <button class="control-btn" id="btnJump">⤴️ Springen</button>
         <button class="control-btn" id="btnThrow">🧴 Werfen</button>
-    </div>
-
-    <!-- <div id="controlsInfo">
-        <h3>Steuerung</h3>
-        <ul>
-            <li><strong>Pfeil nach rechts</strong> – Nach rechts laufen</li>
-            <li><strong>Pfeil nach links</strong> – Nach links laufen</li>
-            <li><strong>Leertaste</strong> – Springen</li>
-            <li><strong>D</strong> – Flasche werfen</li>
-            <li><strong>Pfeil nach oben/unten</strong> – Weitere Aktionen (optional)</li>
-        </ul>
     </div> -->
 
 </body>

@@ -9,7 +9,111 @@ const buttons = [
 ];
 let isMusicMuted = localStorage.getItem('isMusicMuted') === 'true';
 let isSoundMuted = localStorage.getItem('isSoundMuted') === 'true';
-let currentLanguage = localStorage.getItem('language') || 'DE';
+let currentLanguage = localStorage.getItem('language') || 'ES';
+
+
+// Datei: game.js — Block: I18N (NEU)
+// Datei: game.js — Block: I18N (ERGÄNZEN)
+const I18N = {
+    DE: {
+        // titleGame: "El Pollo Loco",
+        titleGame: "Das verrückte Huhn",
+        startButton: "Spiel starten›",
+        restartGame: "Spiel neu starten",
+        showControls: "Steuerung",
+        aboutGame: "Über das Spiel",
+        rankingList: "Rangliste",
+        labelMusic: "Musik",
+        labelSound: "Ton",
+        labelLanguage: "Sprache",
+        settingsTitle: "Einstellungen",
+        langName: "Deutsch",
+        langModalTitle: "Sprache",
+        mobileJump: "Springen",
+        mobileThrow: "Werfen",
+    },
+    ES: {
+        titleGame: "El Pollo Loco",
+        startButton: "Iniciar juego ›",
+        restartGame: "Reiniciar juego",
+        showControls: "Controles",
+        aboutGame: "Acerca del juego",
+        rankingList: "Clasificación",
+        labelMusic: "Música",
+        labelSound: "Sonido",
+        labelLanguage: "Idioma",
+        settingsTitle: "Ajustes",
+        langName: "Español",
+        langModalTitle: "Idioma",
+        mobileJump: "Saltar",
+        mobileThrow: "Tirar",
+    },
+    EN: {
+        // titleGame: "El Pollo Loco",
+        titleGame: "The Crazy Chicken",
+        startButton: "Start Game ›",
+        restartGame: "Restart Game",
+        showControls: "Controls",
+        aboutGame: "About",
+        rankingList: "Leaderboard",
+        labelMusic: "Music",
+        labelSound: "SFX",
+        labelLanguage: "Language",
+        settingsTitle: "Settings",
+        langName: "English",
+        langModalTitle: "Language",
+        mobileJump: "Jump",
+        mobileThrow: "Throw",
+    }
+};
+
+
+// Datei: game.js — Funktion: applyTranslations (NEU)
+// Datei: game.js — Funktion: applyTranslations
+function applyTranslations() {
+    const t = I18N[currentLanguage] || I18N.ES;
+    const set = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
+
+    // Titel / Start / Menü
+    set('titleGame', t.titleGame);
+    set('startButton', t.startButton);
+    set('restartGame', t.restartGame);
+    set('showControls', t.showControls);
+    set('aboutGame', t.aboutGame);
+    set('rankingList', t.rankingList);
+
+    // Settings-Bereich
+    set('settingsTitle', t.settingsTitle);
+    set('labelMusic', t.labelMusic);
+    set('labelSound', t.labelSound);
+    set('labelLanguage', t.labelLanguage); // falls du das Label wieder nutzt
+
+    // Grüner Sprach-Button → Name statt Kürzel
+    const langBtn = document.getElementById('langToggle');
+    if (langBtn) langBtn.textContent = t.langName;
+
+    // Sprach-Overlay Titel
+    set('langModalTitle', t.langModalTitle);
+
+    // Mobile Controls (mit Emoji davor)
+    const j = document.getElementById('btnJump');
+    if (j) j.textContent = `⤴️ ${t.mobileJump}`;
+    const th = document.getElementById('btnThrow');
+    if (th) th.textContent = `🧴 ${t.mobileThrow}`;
+
+    // // Sprachcode auf dem grünen Button
+    // const langBtn = document.getElementById('langToggle');
+    // if (langBtn) langBtn.textContent = currentLanguage;
+}
+
+
+
+// Datei: game.js — Funktion: setLanguage (NEU)
+function setLanguage(lang) {
+    currentLanguage = lang;
+    localStorage.setItem('language', currentLanguage);
+    applyTranslations();
+}
 
 
 
@@ -49,11 +153,16 @@ function startGame() {
 
 
 function restartGame() {
-    startGame();
+    closeBurgerMenu();
+
+    if (world && typeof world.destroy === "function") {
+        world.destroy();
+    }
+
+    document.getElementById('startScreen').classList.remove('d-none');
 }
 
 
-// Burger Menü ein-/ausblenden
 function toggleBurgerMenu() {
     const menu = document.getElementById('burgerMenu');
     const isOpen = menu.classList.contains('open');
@@ -110,6 +219,10 @@ function outsideCloseHandler(e) {
     const burger = document.getElementById('burgerMenu');
     const settings = document.getElementById('settingsOverlay');
     const burgerBtn = document.getElementById('burgerBtn');
+    const langOv = document.getElementById('langOverlay');
+
+    // ✅ Wenn Sprach-Overlay offen ist → NICHTS anderes schließen
+    if (langOv && !langOv.classList.contains('d-none')) return;
 
     // 1) Settings offen? → Klick NICHT im Settings & NICHT auf Burger-Button ⇒ sanft schließen
     if (settings && settings.classList.contains('open')
@@ -158,12 +271,88 @@ function toggleSound() {
 }
 
 
-function toggleLanguage() {
-    currentLanguage = currentLanguage === 'DE' ? 'EN' : 'DE';
-    localStorage.setItem('language', currentLanguage);
-    document.getElementById('langToggle').textContent = currentLanguage;
-    // 👉 Optional: hier kannst du Texte umstellen
+// function toggleLanguage() {
+//     currentLanguage = currentLanguage === 'DE' ? 'EN' : 'DE';
+//     localStorage.setItem('language', currentLanguage);
+//     document.getElementById('langToggle').textContent = currentLanguage;
+//     // 👉 Optional: hier kannst du Texte umstellen
+// }
+
+
+// Datei: game.js — Funktion: openLangModal (NEU)
+// function openLangModal() {
+//     const m = document.getElementById('langModal');
+//     const btn = document.getElementById('langToggle');
+//     const bg = document.getElementById('langBackdrop');
+
+//     m.classList.remove('d-none');
+//     m.classList.add('d-flex');       // sichtbar & zentriert
+//     bg.classList.remove('d-none');     // ⬅️ Backdrop sichtbar
+//     btn?.classList.add('is-active'); // grün: aktiver Zustand hervorheben
+// }
+
+
+// Datei: game.js — Funktion: openLangModal
+function openLangModal() {
+    const overlay = document.getElementById('langOverlay');
+    const btn = document.getElementById('langToggle');
+    overlay.classList.remove('d-none');
+    overlay.classList.add('d-flex');   // zeigt Overlay + zentriert Card
+    btn?.classList.add('is-active');   // Button optisch aktiv (grün)
 }
+
+
+
+// // Datei: game.js — Funktion: closeLangModal (NEU)
+// function closeLangModal() {
+//     const m = document.getElementById('langModal');
+//     const btn = document.getElementById('langToggle');
+//     m.classList.remove('d-flex');
+//     m.classList.add('d-none');       // nur über d-none/d-flex
+//     btn?.classList.remove('is-active');
+// }
+
+
+// Datei: game.js — Funktion: closeLangModal
+function closeLangModal() {
+    const overlay = document.getElementById('langOverlay');
+    const btn = document.getElementById('langToggle');
+    overlay.classList.remove('d-flex');
+    overlay.classList.add('d-none');
+    btn?.classList.remove('is-active');
+}
+
+
+// Datei: game.js — Funktion: onLangOptionClick (NEU)
+function onLangOptionClick(e) {
+    const btn = e.target.closest('.lang-opt');
+    if (!btn) return;
+    const lang = btn.getAttribute('data-lang');
+    if (!lang) return;
+
+    // // vorhandene Sprachlogik wiederverwenden
+    // setLanguage ? setLanguage(lang) : (currentLanguage = lang);
+    // localStorage.setItem('language', currentLanguage);
+    // document.getElementById('langToggle').textContent = currentLanguage;
+
+    // // ggf. vorhandene applyTranslations() aufrufen
+    // if (typeof applyTranslations === 'function') applyTranslations();
+
+    // closeLangModal();
+
+    // vorhandene Sprachlogik nutzen
+    if (typeof setLanguage === 'function') setLanguage(lang);
+    else {
+        currentLanguage = lang;
+        localStorage.setItem('language', currentLanguage);
+        if (typeof applyTranslations === 'function') applyTranslations();
+        const langBtn = document.getElementById('langToggle');
+        if (langBtn) langBtn.textContent = currentLanguage;
+    }
+
+    closeLangModal();
+}
+
 
 
 document.addEventListener("keyup", function (event) {
@@ -249,13 +438,13 @@ function updateMobileControlsVisibility() {
 }
 
 
-function addMobileButtonsFunction(params) {
-    buttons.forEach(btn => {
-        const el = document.getElementById(btn.id);
-        el.addEventListener('touchstart', () => keyBaord[btn.key] = true);
-        el.addEventListener('touchend', () => keyBaord[btn.key] = false);
-    });
-}
+// function addMobileButtonsFunction(params) {
+//     buttons.forEach(btn => {
+//         const el = document.getElementById(btn.id);
+//         el.addEventListener('touchstart', () => keyBaord[btn.key] = true);
+//         el.addEventListener('touchend', () => keyBaord[btn.key] = false);
+//     });
+// }
 
 
 function addMobileButtonsFunction() {
@@ -274,10 +463,12 @@ function addMobileButtonsFunction() {
 
 
 window.addEventListener('load', () => {
+    applyTranslations();
+
     updateMobileControlsVisibility();
     addMobileButtonsFunction();
     document.getElementById('restartGame')?.addEventListener('click', restartGame);
-    
+
     document.getElementById('burgerBtn')?.addEventListener('click', toggleBurgerMenu);
     document.getElementById('burgerClose')?.addEventListener('click', closeBurgerMenu);
     document.getElementById('openSettings')?.addEventListener('click', openSettingsOverlay);
@@ -288,12 +479,31 @@ window.addEventListener('load', () => {
 
     document.getElementById('musicToggle').addEventListener('click', toggleMusic);
     document.getElementById('soundToggle').addEventListener('click', toggleSound);
-    document.getElementById('langToggle').addEventListener('click', toggleLanguage);
+    // document.getElementById('langToggle').addEventListener('click', toggleLanguage);
     const musicIcon = document.getElementById('musicIcon');
     const soundIcon = document.getElementById('soundIcon');
     if (musicIcon) musicIcon.src = isMusicMuted ? 'img/mute.png' : 'img/speaker.png';
     if (soundIcon) soundIcon.src = isSoundMuted ? 'img/mute.png' : 'img/speaker.png';
-    document.getElementById('langToggle').textContent = currentLanguage;
+
+    // Datei: game.js — im load-Handler ergänzen
+    document.getElementById('langToggle')?.addEventListener('click', openLangModal);
+    document.getElementById('langClose')?.addEventListener('click', closeLangModal);
+
+    // Klick außerhalb der Karte schließt NUR Sprache; Ereignis stoppt hier.
+    document.getElementById('langOverlay')?.addEventListener('click', (e) => {
+        const card = document.querySelector('#langOverlay .modal-card');
+        if (card && !card.contains(e.target)) closeLangModal();
+        e.stopPropagation(); // ✅ verhindert, dass der globale Outside-Click ausgelöst wird
+    });
+
+    // Optionen (Delegation auf Container)
+    document.querySelector('#langOverlay .modal-content')
+        ?.addEventListener('click', (e) => {
+            onLangOptionClick(e);
+            e.stopPropagation(); // sicherheitshalber
+        });
+
+
 });
 
 
