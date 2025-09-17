@@ -311,7 +311,7 @@ class World {
 
         let self = this;
 
-        document.getElementById('frameTime').innerText = `draw: ${Math.round(duration)} ms`;
+        // document.getElementById('frameTime').innerText = `draw: ${Math.round(duration)} ms`;
 
         requestAnimationFrame(function () {
             self.draw();

@@ -39,15 +39,24 @@
 <!-- <body onload="init()"> -->
 
 <body>
-
-    <div id="frameTime" style="position: fixed; top: 5px; left: 5px; background: rgba(0,0,0,0.7); color: #0f0;
+    <!-- :: -->
+    <!-- <div id="frameTime" style="position: fixed; top: 5px; left: 5px; background: rgba(0,0,0,0.7); color: #0f0;
             font-family: monospace; font-size: 12px; padding: 2px 6px; z-index: 10000;">
         draw: -
-    </div>
+    </div> -->
 
     <h1 id="titleGame">El Pollo Loco</h1>
 
     <div id="gameContainer">
+
+        <!-- Orientation-Warnung -->
+        <div id="orientationWarning" class="orientation-overlay d-none">
+            <div class="orientation-card">
+                📱 Bitte drehen Sie Ihr Gerät ins Querformat (Landscape), um zu spielen.
+            </div>
+        </div>
+
+
         <div id="startScreen">
             <img id="startscreenImg" src="img/9_intro_outro_screens/start/startscreen_1.png">
             <button id="startButton" onclick="startGame()">Start Game ></button>

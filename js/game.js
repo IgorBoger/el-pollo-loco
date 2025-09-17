@@ -7,6 +7,8 @@ const buttons = [
     { id: 'btnJump', key: 'SPACE' },
     { id: 'btnThrow', key: 'THROW' }
 ];
+let _viewportRaf = null;
+// let _viewportRaf = null, _viewportTimer = null;
 let isMusicMuted = localStorage.getItem('isMusicMuted') === 'true';
 let isSoundMuted = localStorage.getItem('isSoundMuted') === 'true';
 let currentLanguage = localStorage.getItem('language') || 'ES';
@@ -68,8 +70,21 @@ const I18N = {
 };
 
 
+// function checkOrientation() {
+//     const warning = document.getElementById('orientationWarning');
+//     if (!warning) return; // ⬅️ Guard
+
+//     if (window.innerHeight > window.innerWidth) {
+//         warning.classList.remove('d-none');
+//         warning.classList.add('d-flex');
+//     } else {
+//         warning.classList.remove('d-flex');
+//         warning.classList.add('d-none');
+//     }
+// }
+
+
 // Datei: game.js — Funktion: applyTranslations (NEU)
-// Datei: game.js — Funktion: applyTranslations
 function applyTranslations() {
     const t = I18N[currentLanguage] || I18N.ES;
     const set = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
@@ -271,46 +286,16 @@ function toggleSound() {
 }
 
 
-// function toggleLanguage() {
-//     currentLanguage = currentLanguage === 'DE' ? 'EN' : 'DE';
-//     localStorage.setItem('language', currentLanguage);
-//     document.getElementById('langToggle').textContent = currentLanguage;
-//     // 👉 Optional: hier kannst du Texte umstellen
-// }
-
-
-// Datei: game.js — Funktion: openLangModal (NEU)
-// function openLangModal() {
-//     const m = document.getElementById('langModal');
-//     const btn = document.getElementById('langToggle');
-//     const bg = document.getElementById('langBackdrop');
-
-//     m.classList.remove('d-none');
-//     m.classList.add('d-flex');       // sichtbar & zentriert
-//     bg.classList.remove('d-none');     // ⬅️ Backdrop sichtbar
-//     btn?.classList.add('is-active'); // grün: aktiver Zustand hervorheben
-// }
-
-
 // Datei: game.js — Funktion: openLangModal
 function openLangModal() {
     const overlay = document.getElementById('langOverlay');
+    if (!overlay) return; // ⬅️ Guard
+
     const btn = document.getElementById('langToggle');
     overlay.classList.remove('d-none');
     overlay.classList.add('d-flex');   // zeigt Overlay + zentriert Card
     btn?.classList.add('is-active');   // Button optisch aktiv (grün)
 }
-
-
-
-// // Datei: game.js — Funktion: closeLangModal (NEU)
-// function closeLangModal() {
-//     const m = document.getElementById('langModal');
-//     const btn = document.getElementById('langToggle');
-//     m.classList.remove('d-flex');
-//     m.classList.add('d-none');       // nur über d-none/d-flex
-//     btn?.classList.remove('is-active');
-// }
 
 
 // Datei: game.js — Funktion: closeLangModal
@@ -329,16 +314,6 @@ function onLangOptionClick(e) {
     if (!btn) return;
     const lang = btn.getAttribute('data-lang');
     if (!lang) return;
-
-    // // vorhandene Sprachlogik wiederverwenden
-    // setLanguage ? setLanguage(lang) : (currentLanguage = lang);
-    // localStorage.setItem('language', currentLanguage);
-    // document.getElementById('langToggle').textContent = currentLanguage;
-
-    // // ggf. vorhandene applyTranslations() aufrufen
-    // if (typeof applyTranslations === 'function') applyTranslations();
-
-    // closeLangModal();
 
     // vorhandene Sprachlogik nutzen
     if (typeof setLanguage === 'function') setLanguage(lang);
@@ -438,15 +413,6 @@ function updateMobileControlsVisibility() {
 }
 
 
-// function addMobileButtonsFunction(params) {
-//     buttons.forEach(btn => {
-//         const el = document.getElementById(btn.id);
-//         el.addEventListener('touchstart', () => keyBaord[btn.key] = true);
-//         el.addEventListener('touchend', () => keyBaord[btn.key] = false);
-//     });
-// }
-
-
 function addMobileButtonsFunction() {
     buttons.forEach(btn => {
         const el = document.getElementById(btn.id);
@@ -462,10 +428,98 @@ function addMobileButtonsFunction() {
 }
 
 
+function toggleFullscreen() {
+    const el = document.getElementById('gameContainer');
+    if (document.fullscreenElement) {
+        document.exitFullscreen?.();
+    } else {
+        (el.requestFullscreen
+            || el.webkitRequestFullscreen
+            || el.msRequestFullscreen
+            || el.mozRequestFullScreen
+        )?.call(el);
+    }
+}
+
+
+// === Zentraler Fit für das Canvas (außerhalb von setupHiDPICanvas) ===
+function fitCanvasToCssSize() {
+    const c = document.getElementById('canvas');
+    const ctx = c.getContext('2d');
+    const BASE_W = 720, BASE_H = 480;
+
+    // sichtbare CSS-Größe (nicht per JS setzen!)
+    const dpr = Math.max(1, window.devicePixelRatio || 1);
+    const cssW = Math.round(c.clientWidth);
+    const cssH = Math.round(c.clientHeight);
+
+    // 🔒 vermeidet harte Resets bei transient 0px
+    if (!cssW || !cssH) return;
+
+    // physische Puffergröße
+    const pxW = cssW * dpr;
+    const pxH = cssH * dpr;
+
+    if (c.width !== pxW || c.height !== pxH) {
+        c.width = pxW;
+        c.height = pxH;
+    }
+
+    const scaleX = pxW / BASE_W;
+    const scaleY = pxH / BASE_H;
+    ctx.setTransform(scaleX, 0, 0, scaleY, 0, 0);
+    ctx.imageSmoothingEnabled = true;
+}
+
+
+// === Ein zentraler Handler für ALLE Viewport-Änderungen ===
+function handleViewportChange() {
+    // leicht debouncen, um Kaskaden bei Rotation/Resize zu glätten
+    if (_viewportRaf) return;
+    _viewportRaf = requestAnimationFrame(() => {
+        fitCanvasToCssSize();          // Canvas korrekt skalieren
+        updateMobileControlsVisibility(); // du hast das bereits implementiert
+        // checkOrientation();            // dein Overlay/Prüfung für Portrait vs. Landscape
+        _viewportRaf = null;
+    });
+}
+
+
+// function handleViewportChange() {
+//     if (_viewportTimer) clearTimeout(_viewportTimer);
+//     _viewportTimer = setTimeout(() => {
+//         if (_viewportRaf) cancelAnimationFrame(_viewportRaf);
+//         _viewportRaf = requestAnimationFrame(() => {
+//             fitCanvasToCssSize();
+//             updateMobileControlsVisibility();
+//             // checkOrientation();   // bleibt auskommentiert, wie du wolltest
+//             _viewportRaf = null;
+//         });
+//     }, 80); // 60–120ms funktioniert meist gut
+// }
+
+
+// === Deine bestehende Funktion wird auf die neue ausgelagert ===
+function setupHiDPICanvas() {
+    fitCanvasToCssSize(); // nur initial, alle Listener sind global
+}
+
+
+// window.addEventListener('resize', () => {
+//     updateMobileControlsVisibility();
+//     handleViewportChange();
+// });
+
+
+// window.addEventListener('orientationchange', () => {
+//     handleViewportChange();
+// });
+
+
 window.addEventListener('load', () => {
     applyTranslations();
+    handleViewportChange();
 
-    updateMobileControlsVisibility();
     addMobileButtonsFunction();
     document.getElementById('restartGame')?.addEventListener('click', restartGame);
 
@@ -507,55 +561,6 @@ window.addEventListener('load', () => {
 });
 
 
-window.addEventListener('resize', () => {
-    updateMobileControlsVisibility();
-});
-
-
-function toggleFullscreen() {
-    const el = document.getElementById('gameContainer');
-    if (document.fullscreenElement) {
-        document.exitFullscreen?.();
-    } else {
-        (el.requestFullscreen
-            || el.webkitRequestFullscreen
-            || el.msRequestFullscreen
-            || el.mozRequestFullScreen
-        )?.call(el);
-    }
-}
-
-
-function setupHiDPICanvas() {
-    const c = document.getElementById('canvas');
-    const ctx = c.getContext('2d');
-    const BASE_W = 720, BASE_H = 480;
-
-    function fit() {
-        const dpr = Math.max(1, window.devicePixelRatio || 1);
-        // sichtbare CSS-Größe des Canvas (nicht per JS setzen!)
-        const cssW = Math.round(c.clientWidth);
-        const cssH = Math.round(c.clientHeight);
-
-        // physische Puffergröße in Pixeln
-        const pxW = cssW * dpr;
-        const pxH = cssH * dpr;
-
-        // nur neu setzen wenn nötig (spart Arbeit)
-        if (c.width !== pxW || c.height !== pxH) {
-            c.width = pxW;
-            c.height = pxH;
-        }
-
-        // Koordinatensystem skalieren: 720x480 -> füllt cssW/cssH exakt
-        const scaleX = pxW / BASE_W;
-        const scaleY = pxH / BASE_H;
-        ctx.setTransform(scaleX, 0, 0, scaleY, 0, 0);
-        ctx.imageSmoothingEnabled = true;
-    }
-
-    window.addEventListener('resize', fit);
-    window.addEventListener('orientationchange', fit);
-    document.addEventListener('fullscreenchange', fit);
-    fit(); // initial
-}
+window.addEventListener('resize', handleViewportChange, { passive: true });
+window.addEventListener('orientationchange', handleViewportChange);
+document.addEventListener('fullscreenchange', handleViewportChange);
