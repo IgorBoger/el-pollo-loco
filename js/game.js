@@ -178,6 +178,18 @@ function restartGame() {
 }
 
 
+function openStoryOverlay() {
+    const overlay = document.getElementById('storyOverlay');
+    overlay.classList.remove('d-none');
+    overlay.classList.add('d-flex');
+}
+
+function closeStoryOverlay() {
+    const overlay = document.getElementById('storyOverlay');
+    overlay.classList.remove('d-flex');
+    overlay.classList.add('d-none');
+}
+
 function toggleBurgerMenu() {
     const menu = document.getElementById('burgerMenu');
     const isOpen = menu.classList.contains('open');
@@ -557,6 +569,14 @@ window.addEventListener('load', () => {
             e.stopPropagation(); // sicherheitshalber
         });
 
+
+    document.getElementById('aboutGame')?.addEventListener('click', openStoryOverlay);
+    document.getElementById('closeStory')?.addEventListener('click', closeStoryOverlay);
+    document.getElementById('storyOverlay')?.addEventListener('click', (e) => {
+        const card = document.querySelector('#storyOverlay .story-card'); // <— FIX
+        if (card && !card.contains(e.target)) closeStoryOverlay();
+        e.stopPropagation(); // <— verhindert Nebeneffekte
+    });
 
 });
 

@@ -66,11 +66,8 @@
 
         </canvas>
 
-        <!-- ⚙️ Zahnrad Button -->
-        <!-- <button id="settingsBtn" class="control-btn">⚙️</button> -->
-
         <!-- NEU: Hamburger-Button -->
-        <button id="burgerBtn" class="control-btn" aria-label="Menü">☰</button>
+        <button id="burgerBtn" class="burger-btn" aria-label="Menü">☰</button>
 
         <!-- Burger-Menü -->
         <div id="burgerMenu" class="burger-overlay d-none">
@@ -80,7 +77,7 @@
                     <img src="img/settings.png" alt="Settings" class="icon-img">
                 </button>
                 <!-- Back-Button: schließt Burger-Menü -->
-                <button id="burgerClose" class="settings-button" aria-label="Zurück">
+                <button id="burgerClose" class="close-btn" aria-label="Zurück">
                     <img src="img/arrow-right.png" alt="Zurück" class="icon-img">
                 </button>
             </div>
@@ -88,6 +85,7 @@
             <ul>
                 <li><button id="restartGame" class="menu-btn">Spiel neu starten</button></li>
                 <li><button id="showControls" class="menu-btn">Steuerung</button></li>
+                <!-- <li><button id="storyButton" class="menu-btn btn-primary">Story</button></li> -->
                 <li><button id="aboutGame" class="menu-btn">Über das Spiel</button></li>
                 <li><button id="rankingList" class="menu-btn">Rangliste</button></li>
             </ul>
@@ -97,7 +95,7 @@
         <div id="settingsOverlay" class="settings-overlay d-none">
             <div class="settings-header">
                 <h2 id="settingsTitle">Einstellungen</h2>
-                <button id="closeSettings" class="settings-button">
+                <button id="closeSettings" class="close-btn">
                     <img id="closeIcon" src="img/arrow-right.png" alt="Close" class="icon-img">
                 </button>
             </div>
@@ -122,6 +120,36 @@
             <button id="langToggle" class="language-btn">Deutsch</button>
         </div>
 
+
+        <!-- Story-Overlay -->
+        <div id="storyOverlay" class="story-overlay d-none">
+            <div class="story-card">
+                <div class="story-header">
+                    <h2 class="story-title">Die Geschichte</h2>
+                    <!-- <button id="closeStory" class="story-close">✖</button> -->
+                    <button id="closeStory" class="close-btn" aria-label="Schließen">
+                        <img src="img/arrow-right.png" alt="" class="icon-img" />
+                    </button>
+                </div>
+                <div class="story-content">
+                    <p>
+                        In einem ruhigen Dorf lebten die Hühner friedlich … bis eines Tages
+                        das Chaos hereinbrach. Jetzt musst du Pepe helfen, Ordnung
+                        wiederherzustellen und gegen den verrückten Endboss zu bestehen!
+                    </p>
+
+                    <ul>
+                        <li><strong>Ziel:</strong> Besiege den Endboss & sammle Münzen.</li>
+                        <li><strong>Steuerung:</strong> Pfeile/WASD, D = Werfen, Space = Springen.</li>
+                        <li><strong>Tipp:</strong> Achte auf Boss-Animationen und Timing.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+
+
+
         <!-- Fullscreen Button -->
         <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶</button>
 
@@ -140,7 +168,7 @@
                     <span id="langModalTitle" class="modal-title">Sprache</span>
 
                     <!-- <span class="modal-title">Sprache</span> -->
-                    <button id="langClose" class="settings-button" aria-label="Schließen">
+                    <button id="langClose" class="close-btn" aria-label="Schließen">
                         <img src="img/arrow-right.png" alt="Close" class="icon-img">
                     </button>
                 </div>
