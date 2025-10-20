@@ -12,18 +12,47 @@ let _viewportRaf = null;
 let isMusicMuted = localStorage.getItem('isMusicMuted') === 'true';
 let isSoundMuted = localStorage.getItem('isSoundMuted') === 'true';
 let currentLanguage = localStorage.getItem('language') || 'ES';
+// game.js – Top-Level
+let reopenBurgerAfterOverlay = false;
+
 
 
 // Datei: game.js — Block: I18N (NEU)
 // Datei: game.js — Block: I18N (ERGÄNZEN)
 const I18N = {
     DE: {
+        orientationCard: "📱 Bitte drehen Sie Ihr Gerät ins Querformat (Landscape), um zu spielen.",
+
         // titleGame: "El Pollo Loco",
         titleGame: "Das verrückte Huhn",
         startButton: "Spiel starten›",
         restartGame: "Spiel neu starten",
-        showControls: "Steuerung",
+        // showControls: "Steuerung",
+
         aboutGame: "Über das Spiel",
+        storyTitle: "Die Geschichte",
+        storyP1: "In einem ruhigen Dorf lebten die Hühner friedlich … bis eines Tages das Chaos hereinbrach. Jetzt musst du Pepe helfen, Ordnung wiederherzustellen und gegen den verrückten Endboss zu bestehen!",
+        storyLabelGoal: "Ziel:",
+        storyTextGoal: "Besiege den Endboss & sammle Münzen.",
+        storyLabelControls: "Steuerung:",
+        storyTextControls: "Pfeile/WASD, D = Werfen, Space = Springen.",
+        storyLabelTip: "Tipp:",
+        storyTextTip: "Achte auf Boss-Animationen und Timing.",
+
+        keyHelpButton: "Tastenbelegung",
+        keyHelpTitle: "Tastenbelegung",
+        keyHelpHeaderAction: "Aktion",
+        keyHelpHeaderKey: "Taste",
+        keyHelpHint: "Tipp: Drücke <strong>Esc</strong>, um zu schließen.",
+        keyActionMoveLeft: "Links bewegen",
+        keyActionMoveRight: "Rechts bewegen",
+        keyActionJump: "Springen",
+        keyActionThrow: "Werfen",
+        keyKeyMoveLeft: "Pfeil links",
+        keyKeyMoveRight: "Pfeil rechts",
+        keyKeyJump: "Leertaste",
+        keyKeyThrow: "D",
+
         rankingList: "Rangliste",
         labelMusic: "Musik",
         labelSound: "Ton",
@@ -35,11 +64,36 @@ const I18N = {
         mobileThrow: "Werfen",
     },
     ES: {
+        orientationCard: "📱 Gire su dispositivo al modo horizontal para jugar.",
         titleGame: "El Pollo Loco",
         startButton: "Iniciar juego ›",
         restartGame: "Reiniciar juego",
-        showControls: "Controles",
+        // showControls: "Controles",
+
         aboutGame: "Acerca del juego",
+        storyTitle: "La historia",
+        storyP1: "En un pueblo tranquilo las gallinas vivían en paz… hasta que llegó el caos. ¡Ahora debes ayudar a Pepe a restablecer el orden y enfrentarte al jefe final!",
+        storyLabelGoal: "Objetivo:",
+        storyTextGoal: "Derrota al jefe final y recoge monedas.",
+        storyLabelControls: "Controles:",
+        storyTextControls: "Flechas/WASD, D = lanzar, Espacio = saltar.",
+        storyLabelTip: "Consejo:",
+        storyTextTip: "Fíjate en las animaciones del jefe y el timing.",
+
+        keyHelpButton: "Asignación de teclas",
+        keyHelpTitle: "Asignación de teclas",
+        keyHelpHeaderAction: "Acción",
+        keyHelpHeaderKey: "Tecla",
+        keyHelpHint: "Consejo: Pulsa <strong>Esc</strong> para cerrar.",
+        keyActionMoveLeft: "Mover a la izquierda",
+        keyActionMoveRight: "Mover a la derecha",
+        keyActionJump: "Saltar",
+        keyActionThrow: "Lanzar",
+        keyKeyMoveLeft: "Flecha izquierda",
+        keyKeyMoveRight: "Flecha derecha",
+        keyKeyJump: "Espacio",
+        keyKeyThrow: "D",
+
         rankingList: "Clasificación",
         labelMusic: "Música",
         labelSound: "Sonido",
@@ -51,15 +105,41 @@ const I18N = {
         mobileThrow: "Tirar",
     },
     EN: {
+        orientationCard: "📱 Please rotate your device to landscape mode to play.",
+
         // titleGame: "El Pollo Loco",
         titleGame: "The Crazy Chicken",
         startButton: "Start Game ›",
         restartGame: "Restart Game",
-        showControls: "Controls",
+        // showControls: "Controls",
+
         aboutGame: "About",
+        storyTitle: "The story",
+        storyP1: "In a quiet village the chickens lived in peace… until chaos arrived. Now you must help Pepe restore order and face the crazy end boss!",
+        storyLabelGoal: "Goal:",
+        storyTextGoal: "Defeat the end boss & collect coins.",
+        storyLabelControls: "Controls:",
+        storyTextControls: "Arrows/WASD, D = throw, Space = jump.",
+        storyLabelTip: "Tip:",
+        storyTextTip: "Watch boss animations and timing.",
+
+        keyHelpButton: "Key bindings",
+        keyHelpTitle: "Key bindings",
+        keyHelpHeaderAction: "Action",
+        keyHelpHeaderKey: "Key",
+        keyHelpHint: "Tip: Press <strong>Esc</strong> to close.",
+        keyActionMoveLeft: "Move left",
+        keyActionMoveRight: "Move right",
+        keyActionJump: "Jump",
+        keyActionThrow: "Throw",
+        keyKeyMoveLeft: "Arrow Left",
+        keyKeyMoveRight: "Arrow Right",
+        keyKeyJump: "Space",
+        keyKeyThrow: "D",
+
         rankingList: "Leaderboard",
         labelMusic: "Music",
-        labelSound: "SFX",
+        labelSound: "Sound",
         labelLanguage: "Language",
         settingsTitle: "Settings",
         langName: "English",
@@ -70,31 +150,64 @@ const I18N = {
 };
 
 
-// function checkOrientation() {
-//     const warning = document.getElementById('orientationWarning');
-//     if (!warning) return; // ⬅️ Guard
+function checkOrientation() {
+    const warning = document.getElementById('orientationWarning');
+    if (!warning) return; // ⬅️ Guard
 
-//     if (window.innerHeight > window.innerWidth) {
-//         warning.classList.remove('d-none');
-//         warning.classList.add('d-flex');
-//     } else {
-//         warning.classList.remove('d-flex');
-//         warning.classList.add('d-none');
-//     }
-// }
+    if (window.innerHeight > window.innerWidth) {
+        warning.classList.remove('d-none');
+        warning.classList.add('d-flex');
+    } else {
+        warning.classList.remove('d-flex');
+        warning.classList.add('d-none');
+    }
+}
 
 
 // Datei: game.js — Funktion: applyTranslations (NEU)
 function applyTranslations() {
+    document.documentElement.lang = currentLanguage.toLowerCase(); // <- NEU
     const t = I18N[currentLanguage] || I18N.ES;
     const set = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
+
+    set('orientationCard', t.orientationCard);
 
     // Titel / Start / Menü
     set('titleGame', t.titleGame);
     set('startButton', t.startButton);
     set('restartGame', t.restartGame);
-    set('showControls', t.showControls);
+    // set('showControls', t.showControls);
     set('aboutGame', t.aboutGame);
+    // set('storyTitle', t.storyTitle);
+    /** STORY overlay **/
+    set('storyTitle', t.storyTitle); // <h2 id="storyTitle"> … </h2> ist schon da
+    // erster Absatz im Story-Overlay:
+    const storyP = document.querySelector('#storyOverlay .story-content > p');
+    if (storyP) storyP.textContent = t.storyP1;
+    // 3 Listeneinträge neu zusammenbauen
+    const lis = document.querySelectorAll('#storyOverlay .story-content ul li');
+    if (lis[0]) lis[0].innerHTML = `<strong>${t.storyLabelGoal}</strong> ${t.storyTextGoal}`;
+    if (lis[1]) lis[1].innerHTML = `<strong>${t.storyLabelControls}</strong> ${t.storyTextControls}`;
+    if (lis[2]) lis[2].innerHTML = `<strong>${t.storyLabelTip}</strong> ${t.storyTextTip}`;
+
+    set('keyHelpButton', t.keyHelpButton);
+    /** KEY-HELP overlay **/
+    set('keyHelpTitle', t.keyHelpTitle); // id existiert im H2
+    // Key-Help statische Zellen
+    set('keyActionMoveLeft', t.keyActionMoveLeft);
+    set('keyKeyMoveLeft', t.keyKeyMoveLeft);
+    set('keyActionMoveRight', t.keyActionMoveRight);
+    set('keyKeyMoveRight', t.keyKeyMoveRight);
+    set('keyActionJump', t.keyActionJump);
+    set('keyKeyJump', t.keyKeyJump);
+    set('keyActionThrow', t.keyActionThrow);
+    set('keyKeyThrow', t.keyKeyThrow);
+    // (falls IDs gesetzt)
+    set('keyHelpHeaderAction', t.keyHelpHeaderAction);
+    set('keyHelpHeaderKey', t.keyHelpHeaderKey);
+    const hint = document.getElementById('keyHelpHint');
+    if (hint) hint.innerHTML = t.keyHelpHint;
+
     set('rankingList', t.rankingList);
 
     // Settings-Bereich
@@ -115,10 +228,6 @@ function applyTranslations() {
     if (j) j.textContent = `⤴️ ${t.mobileJump}`;
     const th = document.getElementById('btnThrow');
     if (th) th.textContent = `🧴 ${t.mobileThrow}`;
-
-    // // Sprachcode auf dem grünen Button
-    // const langBtn = document.getElementById('langToggle');
-    // if (langBtn) langBtn.textContent = currentLanguage;
 }
 
 
@@ -180,15 +289,64 @@ function restartGame() {
 
 function openStoryOverlay() {
     const overlay = document.getElementById('storyOverlay');
+    if (!overlay) return;
+
+    const burger = document.getElementById('burgerMenu');
+    reopenBurgerAfterOverlay = burger?.classList.contains('open') || false;
+
+    if (reopenBurgerAfterOverlay) {
+        closeBurgerMenu(); // sanft nach rechts, wie gehabt
+    }
+
     overlay.classList.remove('d-none');
     overlay.classList.add('d-flex');
 }
 
+
 function closeStoryOverlay() {
     const overlay = document.getElementById('storyOverlay');
+    if (!overlay) return;
+
+    if (reopenBurgerAfterOverlay) {
+        toggleBurgerMenu(); // sanft nach links wieder auf
+        reopenBurgerAfterOverlay = false;
+    }
+
     overlay.classList.remove('d-flex');
     overlay.classList.add('d-none');
 }
+
+
+/* === KEY-HELP: öffnen/schließen === */
+function openKeyHelpOverlay() {
+    const overlay = document.getElementById('keyHelpOverlay');
+    if (!overlay) return;
+
+    const burger = document.getElementById('burgerMenu');
+    reopenBurgerAfterOverlay = burger?.classList.contains('open') || false;
+
+    if (reopenBurgerAfterOverlay) {
+        closeBurgerMenu(); // sanft nach rechts, wie gehabt
+    }
+
+    // renderKeyHelpTable();
+    overlay.classList.remove('d-none');
+    overlay.classList.add('d-flex');   // zentriert dank Flex
+}
+
+function closeKeyHelpOverlay() {
+    const overlay = document.getElementById('keyHelpOverlay');
+    if (!overlay) return;
+
+    if (reopenBurgerAfterOverlay) {
+        toggleBurgerMenu(); // sanft nach links wieder auf
+        reopenBurgerAfterOverlay = false;
+    }
+
+    overlay.classList.add('d-none');
+    overlay.classList.remove('d-flex');
+}
+
 
 function toggleBurgerMenu() {
     const menu = document.getElementById('burgerMenu');
@@ -247,9 +405,18 @@ function outsideCloseHandler(e) {
     const settings = document.getElementById('settingsOverlay');
     const burgerBtn = document.getElementById('burgerBtn');
     const langOv = document.getElementById('langOverlay');
+    const keyHelp = document.getElementById('keyHelpOverlay');
+    const storyOv = document.getElementById('storyOverlay');
 
-    // ✅ Wenn Sprach-Overlay offen ist → NICHTS anderes schließen
-    if (langOv && !langOv.classList.contains('d-none')) return;
+    // // ✅ Wenn Sprach-Overlay offen ist → NICHTS anderes schließen
+    // if (langOv && !langOv.classList.contains('d-none')) return;
+
+    // ✅ Wenn Sprach-ODER Tastenhilfe-Overlay offen ist → nichts anderes schließen
+    if ((langOv && !langOv.classList.contains('d-none')) ||
+        (keyHelp && !keyHelp.classList.contains('d-none')) ||
+        (storyOv && !storyOv.classList.contains('d-none'))) {
+        return;
+    }
 
     // 1) Settings offen? → Klick NICHT im Settings & NICHT auf Burger-Button ⇒ sanft schließen
     if (settings && settings.classList.contains('open')
@@ -403,6 +570,13 @@ document.addEventListener("keydown", function (event) {
         // console.log('throw is :' + keyBaord.THROW);
         // console .log(keyBaor d); 
     }
+
+    // if (e.key === 'Escape') closeKeyHelpOverlay();
+    if (event.key === "Escape") {
+        closeKeyHelpOverlay();
+        closeStoryOverlay();
+        closeLangModal(); // optional: Sprache auch schließen
+    }
 });
 
 
@@ -491,24 +665,10 @@ function handleViewportChange() {
     _viewportRaf = requestAnimationFrame(() => {
         fitCanvasToCssSize();          // Canvas korrekt skalieren
         updateMobileControlsVisibility(); // du hast das bereits implementiert
-        // checkOrientation();            // dein Overlay/Prüfung für Portrait vs. Landscape
+        checkOrientation();            // dein Overlay/Prüfung für Portrait vs. Landscape
         _viewportRaf = null;
     });
 }
-
-
-// function handleViewportChange() {
-//     if (_viewportTimer) clearTimeout(_viewportTimer);
-//     _viewportTimer = setTimeout(() => {
-//         if (_viewportRaf) cancelAnimationFrame(_viewportRaf);
-//         _viewportRaf = requestAnimationFrame(() => {
-//             fitCanvasToCssSize();
-//             updateMobileControlsVisibility();
-//             // checkOrientation();   // bleibt auskommentiert, wie du wolltest
-//             _viewportRaf = null;
-//         });
-//     }, 80); // 60–120ms funktioniert meist gut
-// }
 
 
 // === Deine bestehende Funktion wird auf die neue ausgelagert ===
@@ -576,6 +736,21 @@ window.addEventListener('load', () => {
         const card = document.querySelector('#storyOverlay .story-card'); // <— FIX
         if (card && !card.contains(e.target)) closeStoryOverlay();
         e.stopPropagation(); // <— verhindert Nebeneffekte
+    });
+
+
+
+    // 1) Menü-Button → click
+    document.getElementById('keyHelpButton')?.addEventListener('click', openKeyHelpOverlay);
+
+    // 2) Overlay-Schließen → click auf X
+    document.getElementById('keyHelpClose')?.addEventListener('click', closeKeyHelpOverlay);
+
+    // 3) Klick auf den dunklen Hintergrund schließt (und stoppt Bubbling,
+    //    damit dein globaler outsideCloseHandler nicht zusätzlich feuert)
+    document.getElementById('keyHelpOverlay')?.addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) closeKeyHelpOverlay();
+        e.stopPropagation();
     });
 
 });

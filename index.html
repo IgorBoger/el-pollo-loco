@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" translate="no">
+<!-- <html lang="en" translate="no"> -->
+<html lang="es" translate="no">
 
 <head>
     <meta name="google" content="notranslate">
@@ -51,7 +52,7 @@
 
         <!-- Orientation-Warnung -->
         <div id="orientationWarning" class="orientation-overlay d-none">
-            <div class="orientation-card">
+            <div id="orientationCard" class="orientation-card">
                 📱 Bitte drehen Sie Ihr Gerät ins Querformat (Landscape), um zu spielen.
             </div>
         </div>
@@ -84,9 +85,11 @@
 
             <ul>
                 <li><button id="restartGame" class="menu-btn">Spiel neu starten</button></li>
-                <li><button id="showControls" class="menu-btn">Steuerung</button></li>
+                <!-- <li><button id="showControls" class="menu-btn">Steuerung</button></li> -->
                 <!-- <li><button id="storyButton" class="menu-btn btn-primary">Story</button></li> -->
                 <li><button id="aboutGame" class="menu-btn">Über das Spiel</button></li>
+                <li><button id="keyHelpButton" class="menu-btn">Tastenbelegung</button>
+                </li>
                 <li><button id="rankingList" class="menu-btn">Rangliste</button></li>
             </ul>
         </div>
@@ -125,14 +128,14 @@
         <div id="storyOverlay" class="story-overlay d-none">
             <div class="story-card">
                 <div class="story-header">
-                    <h2 class="story-title">Die Geschichte</h2>
+                    <h2 id="storyTitle" class="story-title">Die Geschichte</h2>
                     <!-- <button id="closeStory" class="story-close">✖</button> -->
                     <button id="closeStory" class="close-btn" aria-label="Schließen">
                         <img src="img/arrow-right.png" alt="" class="icon-img" />
                     </button>
                 </div>
                 <div class="story-content">
-                    <p>
+                    <p id="storyP1">
                         In einem ruhigen Dorf lebten die Hühner friedlich … bis eines Tages
                         das Chaos hereinbrach. Jetzt musst du Pepe helfen, Ordnung
                         wiederherzustellen und gegen den verrückten Endboss zu bestehen!
@@ -146,6 +149,50 @@
                 </div>
             </div>
         </div>
+
+
+
+        <!-- NEU (nur Klassennamen mit Bindestrichen): -->
+        <div id="keyHelpOverlay" class="key-help-overlay d-none" role="dialog" aria-modal="true"
+            aria-labelledby="keyHelpTitle">
+            <div class="key-help-modal" role="document">
+                <div class="key-help-modal-header">
+                    <h2 id="keyHelpTitle" class="key-help-modal-title">Tastenbelegung</h2>
+                    <button id="keyHelpClose" class="key-help-close-button" aria-label="Schließen">×</button>
+                </div>
+                <div class="key-help-modal-body">
+                    <table class="key-help-keys-table" aria-describedby="keyHelpTitle">
+                        <thead>
+                            <tr>
+                                <th id="keyHelpHeaderAction" class="key-help-th">Aktion</th>
+                                <th id="keyHelpHeaderKey" class="key-help-th">Taste</th>
+                            </tr>
+                        </thead>
+                        <tbody id="keyHelpTbody">
+                            <tr>
+                                <td id="keyActionMoveLeft">Links bewegen</td>
+                                <td id="keyKeyMoveLeft">Pfeil links</td>
+                            </tr>
+                            <tr>
+                                <td id="keyActionMoveRight">Rechts bewegen</td>
+                                <td id="keyKeyMoveRight">Pfeil rechts</td>
+                            </tr>
+                            <tr>
+                                <td id="keyActionJump">Springen</td>
+                                <td id="keyKeyJump">Leertaste</td>
+                            </tr>
+                            <tr>
+                                <td id="keyActionThrow">Werfen</td>
+                                <td id="keyKeyThrow">D</td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+                    <p id="keyHelpHint" class="key-help-hint">Tipp: Drücke <strong>Esc</strong>, um zu schließen.</p>
+                </div>
+            </div>
+        </div>
+
 
 
 
@@ -182,14 +229,6 @@
 
 
     </div>
-
-
-    <!-- <div id="mobileControls" class="d-none">
-        <button class="control-btn" id="btnLeft">⬅️</button>
-        <button class="control-btn" id="btnRight">➡️</button>
-        <button class="control-btn" id="btnJump">⤴️ Springen</button>
-        <button class="control-btn" id="btnThrow">🧴 Werfen</button>
-    </div> -->
 
 </body>
 
