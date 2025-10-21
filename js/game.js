@@ -279,6 +279,11 @@ function startGame() {
 function restartGame() {
     closeBurgerMenu();
 
+    // Game-Over Overlay zu
+    document.getElementById('gameOverOverlay')?.classList.add('d-none');
+    document.getElementById('gameOverOverlay')?.classList.remove('d-flex');
+
+    // alte Welt sauber zerstören
     if (world && typeof world.destroy === "function") {
         world.destroy();
     }
@@ -628,6 +633,43 @@ function toggleFullscreen() {
 }
 
 
+// Datei: js/game.js — NEU
+function quickRestartGame() {
+    // Startscreen bleibt versteckt:
+    document.getElementById('startScreen')?.classList.add('d-none');
+
+    // Endscreen-Overlay schließen (falls noch offen)
+    document.getElementById('gameOverOverlay')?.classList.add('d-none');
+    document.getElementById('gameOverOverlay')?.classList.remove('d-flex');
+
+    // Alte Welt sauber zerstören
+    if (world && typeof world.destroy === 'function') {
+        world.destroy();
+    }
+
+    // Neu initialisieren (direkt ins Spiel)
+    if (!canvas) {
+        canvas = document.getElementById('canvas');
+        setupHiDPICanvas();
+    }
+    world = new World(canvas, keyBaord);
+
+    // Musik wie beim Start behandeln
+    if (world?.sounds?.background) {
+        const bg = world.sounds.background;
+        bg.loop = true;
+        bg.volume = 0.1;
+        bg.muted = isMusicMuted;
+        if (!isMusicMuted) {
+            bg.play().catch(e => console.warn('Musikstart fehlgeschlagen:', e));
+        }
+    }
+
+    handleViewportChange?.();
+}
+
+
+
 // === Zentraler Fit für das Canvas (außerhalb von setupHiDPICanvas) ===
 function fitCanvasToCssSize() {
     const c = document.getElementById('canvas');
@@ -658,34 +700,20 @@ function fitCanvasToCssSize() {
 }
 
 
-// === Ein zentraler Handler für ALLE Viewport-Änderungen ===
 function handleViewportChange() {
-    // leicht debouncen, um Kaskaden bei Rotation/Resize zu glätten
     if (_viewportRaf) return;
     _viewportRaf = requestAnimationFrame(() => {
-        fitCanvasToCssSize();          // Canvas korrekt skalieren
-        updateMobileControlsVisibility(); // du hast das bereits implementiert
-        checkOrientation();            // dein Overlay/Prüfung für Portrait vs. Landscape
+        fitCanvasToCssSize();
+        updateMobileControlsVisibility();
+        checkOrientation();
         _viewportRaf = null;
     });
 }
 
 
-// === Deine bestehende Funktion wird auf die neue ausgelagert ===
 function setupHiDPICanvas() {
-    fitCanvasToCssSize(); // nur initial, alle Listener sind global
+    fitCanvasToCssSize();
 }
-
-
-// window.addEventListener('resize', () => {
-//     updateMobileControlsVisibility();
-//     handleViewportChange();
-// });
-
-
-// window.addEventListener('orientationchange', () => {
-//     handleViewportChange();
-// });
 
 
 window.addEventListener('load', () => {
@@ -751,6 +779,19 @@ window.addEventListener('load', () => {
     document.getElementById('keyHelpOverlay')?.addEventListener('click', (e) => {
         if (e.target === e.currentTarget) closeKeyHelpOverlay();
         e.stopPropagation();
+    });
+
+
+    document.getElementById('restartBtn')?.addEventListener('click', () => {
+        quickRestartGame();
+    });
+
+    document.getElementById('homeBtn')?.addEventListener('click', () => {
+        // Home = Startseite: deinen vorhandenen Weg nutzen
+        // Schließt Overlay & zeigt Startscreen; Welt wird in restartGame() zerstört
+        document.getElementById('gameOverOverlay')?.classList.add('d-none');
+        document.getElementById('gameOverOverlay')?.classList.remove('d-flex');
+        restartGame(); // existiert bereits und zeigt den Startscreen wieder an
     });
 
 });

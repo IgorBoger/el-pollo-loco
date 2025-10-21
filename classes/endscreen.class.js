@@ -19,7 +19,13 @@ class Endscreen {
 
     show() {
         this.visible = true;
+        // vor dem Zeichnen sicher neutraler Kontext (falls von außen nicht neutral)
+        // this.ctx.setTransform(1, 0, 0, 1, 0, 0);
         this.draw();
+        // this.createButtons(); // <— Buttons hinzufügen
+        const ov = document.getElementById('gameOverOverlay');
+        ov?.classList.remove('d-none');
+        ov?.classList.add('d-flex');
     }
 
 
@@ -38,5 +44,8 @@ class Endscreen {
 
     hide() {
         this.visible = false;
+        const ov = document.getElementById('gameOverOverlay');
+        ov?.classList.remove('d-flex');
+        ov?.classList.add('d-none');
     }
 }

@@ -67,12 +67,22 @@ class World {
     }
 
 
+    // run() {
+    //     setInterval(() => {
+    //         this.checkCollisions();
+    //         this.checkThrowObject();
+    //         this.checkBottleOnGround();
+    //     }, 50); //  besser mit this.lastBottleThrow = now; in checkThrowObject()
+    // }
+
+
+    // NEU
     run() {
-        setInterval(() => {
+        this._runTimer = setInterval(() => {
             this.checkCollisions();
             this.checkThrowObject();
             this.checkBottleOnGround();
-        }, 50); //  besser mit this.lastBottleThrow = now; in checkThrowObject()
+        }, 50);
     }
 
 
@@ -281,6 +291,7 @@ class World {
         if (this.stopped) return;
         const start = performance.now();
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
         this.ctx.translate(this.camera_x, 0);
         this.addObjectsToMap(this.level.backgroundObjects);
         this.addObjectsToMap(this.level.clouds);
@@ -294,6 +305,7 @@ class World {
             this.backgroundTileCount++;
         }
         this.ctx.translate(-this.camera_x, 0);
+
         // ::::::::::Zeigen nach dem "camera_x" Reset zeichnen/Oder "statusBar" x = -100; - geben,
         this.addToMap(this.healthBar);
         this.addToMap(this.coinBar);
@@ -309,17 +321,17 @@ class World {
             this.lastDrawLogTime = now;
         }
 
-        let self = this;
-        requestAnimationFrame(function () {
-            self.draw();
-        });
-
         if (this.character.isDead()) {
             this.stopped = true;
             // this.ctx.setTransform(1, 0, 0, 1, 0, 0);
             this.endscreen.show();
             return;
         }
+
+        let self = this;
+        requestAnimationFrame(function () {
+            self.draw();
+        });
     }
 
 
@@ -369,6 +381,13 @@ class World {
         // alle Intervalle und Loops stoppen
         this.stopped = true;
 
+
+        // Run-Loop stoppen
+        if (this._runTimer) {
+            clearInterval(this._runTimer);
+            this._runTimer = null;
+        }
+
         // Sounds stoppen
         Object.values(this.sounds).forEach(s => {
             if (s instanceof Audio) {
@@ -377,6 +396,9 @@ class World {
             }
         });
 
+        // Endscreen (falls sichtbar) schließen
+        this.endscreen?.hide();
+
         // Gegner, Flaschen usw. zurücksetzen
         this.level.enemies = [];
         this.throwableObject = [];
@@ -384,6 +406,7 @@ class World {
         this.bottles = [];
 
         // Canvas leeren
+        // this.ctx.setTransform(1, 0, 0, 1, 0, 0);
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 }
