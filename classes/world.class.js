@@ -19,6 +19,7 @@ class World {
         // endbossAppear: new Audio('../audio/endboss_appear.mp3'),
         // endbossDead: new Audio('../audio/endboss_dead.mp3')
     };
+    // endscreen = new Endscreen(this.ctx, this.canvas);
     coins = [];
     bottles = [];
     throwableObject = [];
@@ -49,6 +50,7 @@ class World {
         this.sounds.background.loop = true;
         this.sounds.background.volume = 0.1;
         this.sounds.background.muted = isMusicMuted;
+        this.endscreen = new Endscreen(this.ctx, this.canvas); // ← HIER jetzt korrekt
     }
 
 
@@ -277,9 +279,7 @@ class World {
 
     draw() {
         if (this.stopped) return;
-
         const start = performance.now();
-
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.ctx.translate(this.camera_x, 0);
         this.addObjectsToMap(this.level.backgroundObjects);
@@ -310,12 +310,16 @@ class World {
         }
 
         let self = this;
-
-        // document.getElementById('frameTime').innerText = `draw: ${Math.round(duration)} ms`;
-
         requestAnimationFrame(function () {
             self.draw();
         });
+
+        if (this.character.isDead()) {
+            this.stopped = true;
+            // this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+            this.endscreen.show();
+            return;
+        }
     }
 
 
@@ -382,5 +386,4 @@ class World {
         // Canvas leeren
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
-
 }
