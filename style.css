@@ -424,6 +424,20 @@ h2 {
     position: absolute;
     bottom: 12px;
     /* z-index: 11; */
+    /* justify-content: space-around; */
+    justify-content: space-between;
+}
+
+
+.direction {
+    margin: 0 0 0 24px;
+}
+
+
+.attack {
+    /* width: 36px; */
+    /* height: 36px; */
+    margin: 0 64px 0 64px;
 }
 
 
@@ -437,12 +451,24 @@ h2 {
     border-radius: 8px;
     /* background-color: #ffa726; */
     background-color: rgb(255, 186, 0);
+    background-color: rgba(0, 0, 0, 0.2);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
     transition: background 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
     color: white;
     /* box-shadow: 0 3px 5px rgba(0, 0, 0, 0.3); */
     border: white 1px solid;
     cursor: pointer;
+}
+
+
+.control-btn img {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* width: 24px; */
+    /* height: 24px; */
+    width: 16px;
+    height: 16px;
 }
 
 

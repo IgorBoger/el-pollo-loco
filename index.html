@@ -52,11 +52,11 @@
     <div id="gameContainer">
 
         <!-- Orientation-Warnung -->
-        <div id="orientationWarning" class="orientation-overlay d-none">
+        <!-- <div id="orientationWarning" class="orientation-overlay d-none">
             <div id="orientationCard" class="orientation-card">
                 📱 Bitte drehen Sie Ihr Gerät ins Querformat (Landscape), um zu spielen.
             </div>
-        </div>
+        </div> -->
 
 
         <div id="startScreen">
@@ -80,7 +80,7 @@
                 </button>
                 <!-- Back-Button: schließt Burger-Menü -->
                 <button id="burgerClose" class="close-btn" aria-label="Zurück">
-                    <img src="img/arrow-right.png" alt="Zurück" class="icon-img">
+                    <img src="img/arrow-back.png" alt="Zurück" class="icon-img">
                 </button>
             </div>
 
@@ -100,7 +100,7 @@
             <div class="settings-header">
                 <h2 id="settingsTitle">Einstellungen</h2>
                 <button id="closeSettings" class="close-btn">
-                    <img id="closeIcon" src="img/arrow-right.png" alt="Close" class="icon-img">
+                    <img id="closeIcon" src="img/arrow-back.png" alt="Close" class="icon-img">
                 </button>
             </div>
 
@@ -132,7 +132,7 @@
                     <h2 id="storyTitle" class="story-title">Die Geschichte</h2>
                     <!-- <button id="closeStory" class="story-close">✖</button> -->
                     <button id="closeStory" class="close-btn" aria-label="Schließen">
-                        <img src="img/arrow-right.png" alt="" class="icon-img" />
+                        <img src="img/arrow-back.png" alt="" class="icon-img" />
                     </button>
                 </div>
                 <div class="story-content">
@@ -202,10 +202,27 @@
         <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶</button>
 
         <div id="mobileControls" class="d-none">
-            <button class="control-btn" id="btnLeft">⬅️</button>
-            <button class="control-btn" id="btnRight">➡️</button>
-            <button class="control-btn" id="btnJump">⤴️ Springen</button>
-            <button class="control-btn" id="btnThrow">🧴 Werfen</button>
+            <div class="direction">
+                <!-- <button class="control-btn" id="btnLeft">⬅️</button> -->
+                <button class="control-btn" id="btnLeft">
+                    <img src="../img/chevron-left.png" alt="">
+                </button>
+                <!-- <button class="control-btn" id="btnRight">➡️</button> -->
+                <button class="control-btn" id="btnRight">
+                    <img src="../img/chevron-right.png" alt="">
+                </button>
+            </div>
+
+            <div class="attack">
+                <!-- <button class="control-btn" id="btnJump">⤴️</button> -->
+                <button class="control-btn" id="btnJump">
+                    <img src="../img/chevron-up.png" alt="">
+                </button>
+                <!-- <button class="control-btn" id="btnThrow">🧴</button> -->
+                <button class="control-btn" id="btnThrow">
+                    <img src="../img/6_salsa_bottle/bottle_rotation/rotation_sequences.gif" alt="">
+                </button>
+            </div>
         </div>
 
         <!-- Datei: index.html — EIN Overlay mit zentrierter Karte -->
@@ -217,7 +234,7 @@
 
                     <!-- <span class="modal-title">Sprache</span> -->
                     <button id="langClose" class="close-btn" aria-label="Schließen">
-                        <img src="img/arrow-right.png" alt="Close" class="icon-img">
+                        <img src="img/arrow-back.png" alt="Close" class="icon-img">
                     </button>
                 </div>
                 <div class="modal-content">

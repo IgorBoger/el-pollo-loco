@@ -60,8 +60,8 @@ const I18N = {
         settingsTitle: "Einstellungen",
         langName: "Deutsch",
         langModalTitle: "Sprache",
-        mobileJump: "Springen",
-        mobileThrow: "Werfen",
+        // mobileJump: "Springen",
+        // mobileThrow: "Werfen",
     },
     ES: {
         orientationCard: "📱 Gire su dispositivo al modo horizontal para jugar.",
@@ -101,8 +101,8 @@ const I18N = {
         settingsTitle: "Ajustes",
         langName: "Español",
         langModalTitle: "Idioma",
-        mobileJump: "Saltar",
-        mobileThrow: "Tirar",
+        // mobileJump: "Saltar",
+        // mobileThrow: "Tirar",
     },
     EN: {
         orientationCard: "📱 Please rotate your device to landscape mode to play.",
@@ -144,8 +144,8 @@ const I18N = {
         settingsTitle: "Settings",
         langName: "English",
         langModalTitle: "Language",
-        mobileJump: "Jump",
-        mobileThrow: "Throw",
+        // mobileJump: "Jump",
+        // mobileThrow: "Throw",
     }
 };
 
@@ -225,9 +225,9 @@ function applyTranslations() {
 
     // Mobile Controls (mit Emoji davor)
     const j = document.getElementById('btnJump');
-    if (j) j.textContent = `⤴️ ${t.mobileJump}`;
+    // if (j) j.textContent = `⤴️ ${t.mobileJump}`;
     const th = document.getElementById('btnThrow');
-    if (th) th.textContent = `🧴 ${t.mobileThrow}`;
+    // if (th) th.textContent = `🧴 ${t.mobileThrow}`;
 }
 
 
