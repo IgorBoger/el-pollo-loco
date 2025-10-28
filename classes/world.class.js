@@ -23,6 +23,7 @@ class World {
     coins = [];
     bottles = [];
     throwableObject = [];
+    // ALT
     level = level1;
     backgroundTileCount = 1;
     canvas;
@@ -35,9 +36,11 @@ class World {
 
 
     constructor(canvas, keyBaord) {
+        this.level = this.cloneLevel(level1); // NEU
         this.ctx = canvas.getContext("2d");
         this.canvas = canvas;
         this.keyBaord = keyBaord;
+        this.stopped = false;                     // ← sauberer Startzustand
         this.backgroundObjects = [];
         this.initBackground();
         // this.draw();
@@ -54,11 +57,24 @@ class World {
     }
 
 
+    cloneLevel(level) {
+        const enemies = level.enemies.map(e => new e.constructor());
+        const clouds = level.clouds.map(c => new c.constructor());
+
+        const backgroundObjects = [];
+
+        const layers = [...level.layers];
+        const altLayers = [...level.altLayers];
+
+        return new Level(enemies, clouds, backgroundObjects, layers, altLayers);
+    }
+
+
     setWorld() {
         this.character.world = this;
         this.throwableObject.world = this;
 
-        this.character.animate();
+        // this.character.animate();
 
         this.level.enemies.forEach(enemy => {
             enemy.world = this;
@@ -67,18 +83,9 @@ class World {
     }
 
 
-    // run() {
-    //     setInterval(() => {
-    //         this.checkCollisions();
-    //         this.checkThrowObject();
-    //         this.checkBottleOnGround();
-    //     }, 50); //  besser mit this.lastBottleThrow = now; in checkThrowObject()
-    // }
-
-
     // NEU
     run() {
-        this._runTimer = setInterval(() => {
+        this.runTimer = setInterval(() => {
             this.checkCollisions();
             this.checkThrowObject();
             this.checkBottleOnGround();
@@ -383,9 +390,9 @@ class World {
 
 
         // Run-Loop stoppen
-        if (this._runTimer) {
-            clearInterval(this._runTimer);
-            this._runTimer = null;
+        if (this.runTimer) {
+            clearInterval(this.runTimer);
+            this.runTimer = null;
         }
 
         // Sounds stoppen
@@ -400,7 +407,7 @@ class World {
         this.endscreen?.hide();
 
         // Gegner, Flaschen usw. zurücksetzen
-        this.level.enemies = [];
+        // this.level.enemies = [];
         this.throwableObject = [];
         this.coins = [];
         this.bottles = [];
