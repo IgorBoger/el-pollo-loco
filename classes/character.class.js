@@ -75,6 +75,12 @@ class Character extends MovableObject {
     deadSoundPlayed = false;
     hurtSoundPlayed = false;
 
+    coyoteTimeMs = 120;
+    jumpBufferMs = 120;
+    lastGroundedAt = 0;
+    lastJumpPressedAt = -Infinity;
+    prevSpace = false;
+    isJumping = false;
 
 
     constructor() {
@@ -88,19 +94,18 @@ class Character extends MovableObject {
         this.applyGravity();
         this.animate();
 
-        // Wird nur für Colisionberechnung gezeichnet, danach muss weg!!!
         this.frameOffsetX = 20;
         this.frameWidth = this.width - 40;
 
         this.frameOffsetY = 100;
         this.frameHeight = this.height - 110;
 
-        this.bottle = 100; // 🧴 Flaschen-Vorrat immer voll beim Start
+        this.bottle = 100;
     }
 
 
     animate() {
-        setInterval((minX) => {
+        setInterval(() => {
             if (this.world.keyBaord.RIGHT || this.world.keyBaord.LEFT) {
                 if (this.world?.sounds?.walk?.paused) {
                     this.world.sounds.walk.loop = true;
@@ -118,19 +123,19 @@ class Character extends MovableObject {
                 this.moveLeft();
                 this.otherDirection = true;
             }
-            if (this.world.keyBaord.SPACE && !this.isAboveGround()) { // Taste "Space" gedrückt und(&&) Charackter ist auf dem Boden
-                this.jump();
-            }
+            // if (this.world.keyBaord.SPACE && !this.isAboveGround()) {
+            //     this.jump();
+            // }
+
+            const now = performance.now();
+            this.handleJumpInput(now);
 
             this.world.camera_x = -this.x + 100;
-            // this.world.camera_x = Math.round(-this.x);
-
         }, 1000 / 60);
 
 
         setInterval(() => {
             if (this.isDead()) {
-                // console.log("isDead:", this.isDead());
                 this.playAnimation(this.IMAGES_DEAD);
                 this.img = this.imageCache[this.IMAGES_DEAD[this.IMAGES_DEAD.length - 1]];
                 if (!this.deadSoundPlayed) {
@@ -145,21 +150,23 @@ class Character extends MovableObject {
                     this.hurtSoundPlayed = true;
                 }
             } else if (this.isAboveGround()) {
-                this.playAnimation(this.IMAGES_JUMPING);
+                // this.playAnimation(this.IMAGES_JUMPING);
+                this.updateJumpAnimation();
                 this.hurtSoundPlayed = false;
             } else {
+
+                if (this.isJumping) {
+                    // this.img = this.imageCache[this.IMAGES_JUMPING[this.IMAGES_JUMPING.length - 1]];
+                    this.img = this.imageCache[this.IMAGES_JUMPING[0]];
+                    this.isJumping = false;
+                }
+
                 if (this.world.keyBaord.RIGHT || this.world.keyBaord.LEFT) {
                     this.playAnimation(this.IMAGES_WALKING);
-
-                    // ::::::: Ab HIER werden alle Animationen nur TESTEN ausgeführt!!
-                    // this.playAnimation(this.IMAGES_IDLE);
-                    // this.playAnimation(this.IMAGES_LONG_IDLE);
                     this.hurtSoundPlayed = false;
                 } else {
-                    // Am Boden und keine Taste gedrückt → letztes Sprungbild auch der Charakter immer 
-                    //  „ordentlich“ auf dem Boden steht, ohne dass er in einem falschen Frame einfriert.
-                    this.img = this.imageCache[this.IMAGES_JUMPING[this.IMAGES_JUMPING.length - 1]];
-                    // oder nur 8 - "this.IMAGES_JUMPING.length/9 - 1 = 8" 
+                    // this.img = this.imageCache[this.IMAGES_JUMPING[this.IMAGES_JUMPING.length - 1]];
+                    this.img = this.imageCache[this.IMAGES_JUMPING[0]];
                     this.hurtSoundPlayed = false;
                 }
             }
@@ -170,6 +177,56 @@ class Character extends MovableObject {
 
     jump() {
         this.speedY = 27.5;
+        this.isJumping = true;
         this.world.playEffectSound(this.world.sounds.jump);
     }
+
+
+    updateJumpAnimation() {
+        const up_fast = 0; 
+        const up_mid = 2; 
+        const up_slow = 3; 
+        const apex = 4; 
+        const down_slow = 5; 
+        const down_mid = 6; 
+        const down_fast = 8; 
+
+        const vy = this.speedY;
+        let idx;
+
+        if (vy > 12) idx = up_fast; 
+        else if (vy > 6) idx = up_mid; 
+        else if (vy > 2) idx = up_slow;
+        else if (vy > -2) idx = apex;
+        else if (vy > -8) idx = down_slow; 
+        else if (vy > -14) idx = down_mid;
+        else idx = down_fast;
+
+        const path = this.IMAGES_JUMPING[idx];
+        this.img = this.imageCache[path];
+    }
+
+
+    handleJumpInput(now) {
+        const space = !!this.world?.keyBaord?.SPACE;
+        if (space && !this.prevSpace) {
+            this.lastJumpPressedAt = now;
+        }
+        this.prevSpace = space;
+        const grounded = !this.isAboveGround();
+        if (grounded) {
+            this.lastGroundedAt = now;
+        }
+        const withinCoyote = (now - this.lastGroundedAt) <= this.coyoteTimeMs;
+        const withinBuffer = (now - this.lastJumpPressedAt) <= this.jumpBufferMs;
+        if (withinBuffer && withinCoyote && !this.isDead()) {
+            this.jump();
+            this.lastJumpPressedAt = -Infinity;
+            this.isJumping = true;
+        }
+        if (grounded && this.isJumping && this.speedY === 0) {
+            this.isJumping = false;
+        }
+    }
+
 }
