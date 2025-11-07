@@ -106,10 +106,40 @@ class World {
         this.level.enemies.forEach((enemy) => {
             if (enemy.isDead() || this.character.isDead()) return;
             const now = new Date().getTime();
+
             if (this.character.isColliding(enemy)) {
-                if (
-                    this.character.isCollidingFromTop(enemy) &&
-                    (enemy instanceof Chicken || enemy instanceof SmallChicken)
+
+                // ⬅︎ NEU: Reset, wenn eine neue Attacke gestartet hat
+                if (enemy instanceof Endboss) {
+                    enemy._lastAttackUntil = enemy._lastAttackUntil || 0;
+                    if (enemy.currentAnimation === 'attack' && enemy.attackUntil !== enemy._lastAttackUntil) {
+                        enemy._lastAttackUntil = enemy.attackUntil;
+                        enemy._knockAppliedForThisAttack = false;   // pro Attacke genau 1 Knockback
+                    }
+                }
+
+                // 💥 Knockback: einmal pro Boss-Attacke, immer gleich stark
+                if (enemy instanceof Endboss &&
+                    enemy.currentAnimation === 'attack' &&
+                    enemy._knockAppliedForThisAttack === false) {
+
+                    const dir = (this.character.x < enemy.x) ? -1 : 1; // weg vom Boss
+                    const KNOCK_X = 40;   // fester, immer gleicher Schubs
+                    const KNOCK_Y = 15;   // sichtbarer Hop
+
+                    this.character.x += dir * KNOCK_X;
+                    this.character.speedY = KNOCK_Y;
+
+                    // kleiner Sicherheits-Nudge, falls die Hitbox noch überlappt
+                    if (this.character.isColliding(enemy)) {
+                        this.character.x += dir * 6;
+                    }
+
+                    enemy._knockAppliedForThisAttack = true;
+                }
+
+                if (this.character.isCollidingFromTop(enemy)
+                    && (enemy instanceof Chicken || enemy instanceof SmallChicken)
                 ) {
                     enemy.energy = 0;
                     enemy.hit();
