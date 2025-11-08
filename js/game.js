@@ -15,10 +15,6 @@ let currentLanguage = localStorage.getItem('language') || 'ES';
 // game.js – Top-Level
 let reopenBurgerAfterOverlay = false;
 
-
-
-// Datei: game.js — Block: I18N (NEU)
-// Datei: game.js — Block: I18N (ERGÄNZEN)
 const I18N = {
     DE: {
         orientationCard: "📱 Bitte drehen Sie Ihr Gerät ins Querformat (Landscape), um zu spielen.",
@@ -152,8 +148,7 @@ const I18N = {
 
 function checkOrientation() {
     const warning = document.getElementById('orientationWarning');
-    if (!warning) return; // ⬅️ Guard
-
+    if (!warning) return;
     if (window.innerHeight > window.innerWidth) {
         warning.classList.remove('d-none');
         warning.classList.add('d-flex');
@@ -164,14 +159,11 @@ function checkOrientation() {
 }
 
 
-// Datei: game.js — Funktion: applyTranslations (NEU)
 function applyTranslations() {
-    document.documentElement.lang = currentLanguage.toLowerCase(); // <- NEU
+    document.documentElement.lang = currentLanguage.toLowerCase();
     const t = I18N[currentLanguage] || I18N.ES;
     const set = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
-
     set('orientationCard', t.orientationCard);
-
     // Titel / Start / Menü
     set('titleGame', t.titleGame);
     set('startButton', t.startButton);
@@ -404,6 +396,36 @@ function closeSettingsOverlay() {
 }
 
 
+function openImpressumOverlay() {
+    const overlay = document.getElementById('impressumOverlay');
+    if (!overlay) return;
+
+    const burger = document.getElementById('burgerMenu');
+    window._reopenBurgerAfterImpressum = burger?.classList.contains('open') || false;
+
+    if (window._reopenBurgerAfterImpressum) {
+        closeBurgerMenu();
+    }
+
+    overlay.classList.remove('d-none');
+    overlay.classList.add('d-flex');
+}
+
+function closeImpressumOverlay() {
+    const overlay = document.getElementById('impressumOverlay');
+    if (!overlay) return;
+
+    if (window._reopenBurgerAfterImpressum) {
+        toggleBurgerMenu();
+        window._reopenBurgerAfterImpressum = false;
+    }
+
+    overlay.classList.remove('d-flex');
+    overlay.classList.add('d-none');
+}
+
+
+
 // Datei: game.js — Funktion: outsideCloseHandler (NEU)
 function outsideCloseHandler(e) {
     const burger = document.getElementById('burgerMenu');
@@ -412,14 +434,22 @@ function outsideCloseHandler(e) {
     const langOv = document.getElementById('langOverlay');
     const keyHelp = document.getElementById('keyHelpOverlay');
     const storyOv = document.getElementById('storyOverlay');
+    const impressum = document.getElementById('impressumOverlay');
 
     // // ✅ Wenn Sprach-Overlay offen ist → NICHTS anderes schließen
     // if (langOv && !langOv.classList.contains('d-none')) return;
 
     // ✅ Wenn Sprach-ODER Tastenhilfe-Overlay offen ist → nichts anderes schließen
+    // if ((langOv && !langOv.classList.contains('d-none')) ||
+    //     (keyHelp && !keyHelp.classList.contains('d-none')) ||
+    //     (storyOv && !storyOv.classList.contains('d-none'))) {
+    //     return;
+    // }
+
     if ((langOv && !langOv.classList.contains('d-none')) ||
         (keyHelp && !keyHelp.classList.contains('d-none')) ||
-        (storyOv && !storyOv.classList.contains('d-none'))) {
+        (storyOv && !storyOv.classList.contains('d-none')) ||
+        (impressum && !impressum.classList.contains('d-none'))) {
         return;
     }
 
@@ -581,6 +611,7 @@ document.addEventListener("keydown", function (event) {
         closeKeyHelpOverlay();
         closeStoryOverlay();
         closeLangModal(); // optional: Sprache auch schließen
+        closeImpressumOverlay();
     }
 });
 
@@ -793,6 +824,20 @@ window.addEventListener('load', () => {
         document.getElementById('gameOverOverlay')?.classList.remove('d-flex');
         restartGame(); // existiert bereits und zeigt den Startscreen wieder an
     });
+
+
+    // Impressum
+    document.getElementById('impressumButton')?.addEventListener('click', openImpressumOverlay);
+    document.getElementById('impressumClose')?.addEventListener('click', closeImpressumOverlay);
+
+    document.getElementById('impressumOverlay')?.addEventListener('click', (e) => {
+        const card = document.querySelector('#impressumOverlay .impressum-card');
+        if (card && !card.contains(e.target)) {
+            closeImpressumOverlay();
+        }
+        e.stopPropagation();
+    });
+
 
 });
 

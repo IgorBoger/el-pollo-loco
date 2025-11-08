@@ -789,6 +789,52 @@ h2 {
 }
 
 
+.impressum-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.impressum-card {
+    width: min(92vw, 640px);
+    max-height: 80vh;
+    overflow-y: auto;
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    padding: 18px 18px 20px;
+    box-sizing: border-box;
+    font-family: system-ui, sans-serif;
+    text-transform: none;
+}
+
+.impressum-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #eee;
+}
+
+.impressum-title {
+    margin: 0;
+    font-size: 20px;
+    letter-spacing: 0.5px;
+}
+
+.impressum-body p {
+    margin: 6px 0 10px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #222;
+}
+
+
 
 
 
@@ -825,6 +871,10 @@ h2 {
     /* .story-card {
         height: 100svh;
     } */
+
+    .burger-overlay.open {
+        gap: 8px;
+    }
 }
 
 /* ::::: HEIGHT ::::::: */
