@@ -108,291 +108,242 @@ class Endboss extends MovableObject {
 
     constructor() {
         super().loadImage(this.IMAGES_WALKING[0]);
-        this.loadImages(this.IMAGES_WALKING);
-        this.loadImages(this.IMAGES_ALERT);
-        this.loadImages(this.IMAGES_ATTACK);
-        this.loadImages(this.IMAGES_HURT);
-        this.loadImages(this.IMAGES_DEAD);
-
-        // Alert-Dauer passend zu Frames × Framezeit
+        [this.IMAGES_WALKING, this.IMAGES_ALERT, this.IMAGES_ATTACK,
+        this.IMAGES_HURT, this.IMAGES_DEAD].forEach(imgs => this.loadImages(imgs));
         this.alertDurationMs = (this.alertFrameMs * this.IMAGES_ALERT.length) + 60;
-        console.log('🔧 Alert-Dauer automatisch berechnet:', this.alertDurationMs, 'ms');
-
-        // Attack-Dauer passend zu Frames × Framezeit
+        // console.log('🔧 Alert-Dauer automatisch berechnet:', this.alertDurationMs, 'ms');
         this.attackDurationMs = (this.attackFrameMs * this.IMAGES_ATTACK.length) + 60;
-
         this.energy = 100; // Neu: Energie wie andere Gegner
-
-        // Startzustand: Walking
         this.currentAnimation = 'walk';
         this.targetSpeed = this.baseWalkSpeed * this.patrolDir;
-
         this.animate();
-
-        // Wird nur für Colisionberechnung gezeichnet, danach muss weg!!!
-        this.frameOffsetX = 30;
-        this.frameWidth = this.width - 40;
-
-        this.frameOffsetY = 70;
-        this.frameHeight = this.height - 90;
+        this.setFrameBounds(30, 70, 40, 90);
     }
 
 
-    // animate() {
-    //     this.animationInterval = setInterval(() => {
-    //         if (this.isDead()) {
-    //             this.playAnimation(this.IMAGES_DEAD);
-
-    //             // Nach 2 Sekunde: Endboss entfernen
-    //             setTimeout(() => {
-    //                 if (this.world) {
-    //                     this.world.level.enemies = this.world.level.enemies.filter(e => e !== this);
-    //                 }
-    //                 clearInterval(this.animationInterval); // Stoppe Animation nach Tod
-    //             }, 2000);
-
-    //         } else if (this.isHurt()) {
-    //             this.playAnimation(this.IMAGES_HURT);
-    //         } else {
-    //             this.playAnimation(this.IMAGES_WALKING);
-    //         }
-    //     }, 200);
-    // }
+    setFrameBounds(offsetX, offsetY, widthDiff, heightDiff) {
+        this.frameOffsetX = offsetX;
+        this.frameWidth = this.width - widthDiff;
+        this.frameOffsetY = offsetY;
+        this.frameHeight = this.height - heightDiff;
+    }
 
 
     animate() {
-        // --- A) Bewegung / AI: 60 FPS ---
         this.aiInterval = setInterval(() => {
-
-            if (this.isDead()) {
-                this.setAnimation('dead');
-                this.currentSpeed = 0;
-
-                // Nach 2 Sek. aus Welt entfernen
-                setTimeout(() => {
-                    if (this.world) {
-                        this.world.level.enemies = this.world.level.enemies.filter(e => e !== this);
-                    }
-                    clearInterval(this.aiInterval);
-                    clearInterval(this.animationInterval);
-                }, 2000);
-                return; // Rest der AI überspringen
-            }
-
-
-            const now = performance.now();
+            if (this.handleDeath()) return;
             if (!this.world || !this.world.character) return;
+            const now = performance.now();
             const pepeX = this.world.character.x;
             const dist = Math.abs(pepeX - this.x);
-
-            // ⬅️ NEU: Erholungsfenster nach Attacke – Boss wartet kurz
-            if (now < this.recoverUntil) {
-                this.setAnimation('walk');        // neutrale Idle/Walk-Frames ok
-                this.targetSpeed = 0;
-                this.currentSpeed += (0 - this.currentSpeed) * 0.25; // sanft ausrollen
-                // keine Chase/Alert-Entscheidungen in der Pause
+            if (this.isInRecovery(now)) {
+                this.applyRecovery();
             } else {
-                // ... dein bestehender Code (Patrouille / Alert / Chase / Attack) läuft hier
+                this.updateAI(now, pepeX, dist);
             }
-
-
-            // Aggro halten/verlieren
-            if (this.aggro) {
-                if (dist > this.aggroLoseRange) {
-                    // Kampf abbrechen → normal patrouillieren
-                    this.aggro = false;
-                    this.isChasing = false;
-                    this.chaseUntil = 0;
-                } else if (
-                    this.currentAnimation !== 'alert' &&
-                    this.currentAnimation !== 'attack' &&
-                    performance.now() >= this.recoverUntil            // ⬅️ NEU: keine Verfolgung während Erholung
-                ) {
-                    // this.isChasing = true;
-                }
-            }
-
-
-            if (this.isHurt()) {
-                this.setAnimation('hurt');
-                this.currentSpeed = 0;
-                setTimeout(() => {
-                    if (!this.isDead()) this.setAnimation('walk');
-                }, 400);
-            }
-
-
-            // Patrouillenrichtung wechseln
-            if (this.x <= this.patrolLeft) this.patrolDir = 1;
-            if (this.x >= this.patrolRight) this.patrolDir = -1;
-
-            // Patrouille NUR wenn NICHT alert/attack/chase/aggro
-            if (this.currentAnimation !== 'alert'
-                && this.currentAnimation !== 'attack'
-                && !this.isChasing && !this.aggro) {
-                this.targetSpeed = this.baseWalkSpeed * this.patrolDir;
-                this.currentSpeed += (this.targetSpeed - this.currentSpeed) * 0.12;
-                // an den Kanten vor dem Dir-Switch kurz Tempo reduzieren
-                const atLeftEdge = this.x <= this.patrolLeft;
-                const atRightEdge = this.x >= this.patrolRight;
-                if (atLeftEdge || atRightEdge) {
-                    // leichtes Ausrollen
-                    this.currentSpeed *= 0.85;
-                }
-            }
-
-            // Während „chase“: gezielt auf Pepe zulaufen (Patrouille ignorieren)
-            if (now < this.chaseUntil && this.currentAnimation !== 'attack') {
-                const dir = (pepeX > this.x) ? 1 : -1;
-                this.targetSpeed = this.chaseSpeed * dir;
-                // keine Kantenbremse hier – wir überschreiben das Tempo bewusst
-
-                // 🔧 NEU: auch im Chase Richtung zeigen + Geschwindigkeit lerpen
-                this.otherDirection = (pepeX > this.x);
-                this.currentSpeed += (this.targetSpeed - this.currentSpeed) * 0.18;  // sanft beschleunigen
-                // Alternativ hart setzen (ohne Lerp):
-                // this.currentSpeed = this.targetSpeed;
-            }
-
-            // während „chase“ Übergänge prüfen
-            if (this.isChasing && this.currentAnimation !== 'attack') {
-                // Attack starten, sobald nah genug
-                if (dist <= this.attackRange) {
-                    this.isChasing = false;
-                    this.chaseUntil = 0;
-                    this.setAnimation('attack');
-                    this.attackUntil = now + this.attackDurationMs;
-                    const dir = (pepeX > this.x) ? 1 : -1;
-                    this.otherDirection = (pepeX > this.x);
-                    this.currentSpeed = 0;
-                    this.targetSpeed = this.attackDashSpeed * dir;
-                }
-                // Abbrechen, wenn Pepe wieder deutlich weg ist
-                else if (dist > this.alertRange) {
-                    this.isChasing = false;
-                    this.chaseUntil = 0;
-                    this.setAnimation('walk');
-                    this.postAlertCooldownUntil = now + 300; // kleiner Puffer
-                }
-            }
-
-
-            const speedRef = Math.abs(this.currentSpeed) > 0.2 ? this.currentSpeed : this.targetSpeed;
-            const desiredFacing = (speedRef >= 0) ? 1 : -1;
-
-            // Gleitend an Ziel-Blickrichtung annähern
-            this.facing += (desiredFacing - this.facing) * this.facingLerp;
-
-            // Erst flippen, wenn die geglättete Richtung „weit genug“ in eine Seite kippt
-            if (this.facing > this.facingThreshold) {
-                this.otherDirection = true; // schaut nach links
-            } else if (this.facing < -this.facingThreshold) {
-                this.otherDirection = false;  // schaut nach rechts
-            }
-
-            if (dist <= this.alertRange
-                && dist > this.attackRange            // nicht schon kurz vor Attack
-                && !this.isChasing                    // während „chase“ kein Alert
-                && this.currentAnimation !== 'alert'
-                && now >= this.postAlertCooldownUntil) {
-
-
-                // console.log("Pepe befindet sich  bei -", pepeX);
-                // console.log("Endboss befindet sich  bei -", this.x);
-                // console.log(dist);
-                // console.log('⚠️ ALERT ausgelöst bei Distanz:', dist);
-                this.setAnimation('alert');
-                this.aggro = true; // ab jetzt im Kampf
-
-                // // NEU – Dauer dynamisch passend zu (Anzahl Frames × Framezeit)
-                this.alertUntil = now + (this.alertFrameMs * this.IMAGES_ALERT.length) + 60; // +60 ms Puffer
-            }
-
-            // b) Während Alert: auf der Stelle bleiben, nach Ablauf zurück zu Walk
-            if (this.currentAnimation === 'alert') {
-                // Richtung zum Spieler „anschauen“ (optional)
-                this.otherDirection = (pepeX > this.x); // Endboss schaut standardmäßig nach links
-                // console.log(this.otherDirection);
-
-                this.currentSpeed = 0;             // ⬅︎ NEU: sofortiger Stopp
-                // (die bisherige Lerp-Zeile zu 0 kannst du entfernen oder lassen – sie wirkt dann eh nicht mehr)
-
-                if (now >= this.alertUntil) {
-                    console.log(now);
-                    console.log(this.alertUntil);
-                    if (dist <= this.attackRange) {
-                        // → Attack starten
-                        this.setAnimation('attack');
-                        this.attackUntil = now + this.attackDurationMs;
-                        const dir = (pepeX > this.x) ? 1 : -1;
-                        this.otherDirection = (pepeX > this.x);
-                        this.currentSpeed = 0;
-                        this.targetSpeed = this.attackDashSpeed * dir;
-                    } else {
-                        // → Verfolgung starten, bis Attack-Range erreicht ODER Pepe wieder weit weg ist
-                        this.setAnimation('walk');
-                        this.isChasing = true;
-                        // this.chaseUntil = Number.POSITIVE_INFINITY;  // läuft bis Abbruchbedingung
-                        this.chaseUntil = now + 900;   // ~0.9 s Verfolgung, dann neu bewerten
-                    }
-
-
-                }
-            }
-
-
-            // === ATTACK-Logik ===
-            if (this.currentAnimation === 'attack') {
-                // während Attack nicht patrouillieren
-                const dir = (pepeX > this.x) ? 1 : -1;
-                this.otherDirection = (pepeX > this.x);
-
-                // zügig auf Dash-Speed lerpen
-                this.currentSpeed += (this.attackDashSpeed * dir - this.currentSpeed) * 0.25;
-
-                if (now >= this.attackUntil) {
-                    this.currentSpeed = 0;
-
-                    // ⬅️ NEU: Cooldown/Erholung nach Attack
-                    this.recoverUntil = now + this.recoveryAfterAttackMs;
-                    this.postAlertCooldownUntil = this.recoverUntil;  // in der Pause auch kein neuer Alert
-                    this.isChasing = false;
-                    this.chaseUntil = 0;
-
-                    this.setAnimation('walk');    // bleibt stehen / neutral
-                }
-            }
-
-
-            // Position aktualisieren
+            this.updateFacing();
             this.x += this.currentSpeed;
         }, 1000 / 60);
-
-        // --- B) Animations-Frames: ~20 Hz ---
         this.animationInterval = setInterval(() => {
-            // --- Frames je nach aktueller Animation ---
-            const now = performance.now();
-            let imgs, frameMs;
-
-            if (this.currentAnimation === 'alert') {
-                imgs = this.IMAGES_ALERT;
-                frameMs = this.alertFrameMs;
-            } else if (this.currentAnimation === 'attack') {
-                imgs = this.IMAGES_ATTACK;
-                frameMs = this.attackFrameMs;
-            } else {
-                imgs = this.IMAGES_WALKING;
-                frameMs = this.walkFrameMs;
-            }
-
-
-            this.maybeAdvance(imgs, now, frameMs);
-
+            this.updateFrames();
         }, 50);
     }
 
 
-    faceTo(targetX) { this.otherDirection = (targetX < this.x); }
+    animate() {
+        this.aiInterval = setInterval(() => {
+            if (this.handleDeath() || !this.world?.character) return;
+            const now = performance.now();
+            const pepeX = this.world.character.x;
+            const dist = Math.abs(pepeX - this.x);
+            this.isInRecovery(now)
+                ? this.applyRecovery()
+                : this.updateAI(now, pepeX, dist);
+            this.updateFacing();
+            this.x += this.currentSpeed;
+        }, 1000 / 60);
+        this.animationInterval = setInterval(() => this.updateFrames(), 50);
+    }
+
+
+    handleDeath() {
+        if (!this.isDead()) return false;
+        this.setAnimation('dead');
+        this.currentSpeed = 0;
+        setTimeout(() => {
+            if (this.world) {
+                this.world.level.enemies = this.world.level.enemies.filter(e => e !== this);
+            }
+            clearInterval(this.aiInterval);
+            clearInterval(this.animationInterval);
+        }, 2000);
+        return true;
+    }
+
+
+    isInRecovery(now) {
+        return now < this.recoverUntil;
+    }
+
+    applyRecovery() {
+        this.setAnimation('walk');        // neutrale Idle/Walk-Frames
+        this.targetSpeed = 0;
+        this.currentSpeed += (0 - this.currentSpeed) * 0.25; // sanft ausrollen
+    }
+
+
+    updateAI(now, pepeX, dist) {
+        this.updateAggro(dist);
+        if (this.handleHurtState()) return;
+        this.updatePatrol();
+        this.updateChaseMovement(now, pepeX);
+        this.updateChaseTransitions(now, pepeX, dist);
+        this.tryStartAlert(now, pepeX, dist);
+        this.updateAlertState(now, pepeX, dist);
+        this.updateAttackState(now, pepeX);
+    }
+
+
+    updateAggro(dist) {
+        if (!this.aggro) return;
+        if (dist > this.aggroLoseRange) {
+            this.aggro = false;
+            this.isChasing = false;
+            this.chaseUntil = 0;
+        }
+    }
+
+
+    handleHurtState() {
+        if (!this.isHurt()) return false;
+        this.setAnimation('hurt');
+        this.currentSpeed = 0;
+        setTimeout(() => {
+            if (!this.isDead()) this.setAnimation('walk');
+        }, 400);
+        return true;
+    }
+
+
+    updatePatrol() {
+        if (this.isChasing || this.aggro ||
+            this.currentAnimation === 'alert' ||
+            this.currentAnimation === 'attack') return;
+        this.targetSpeed = this.baseWalkSpeed * this.patrolDir;
+        this.currentSpeed += (this.targetSpeed - this.currentSpeed) * 0.12;
+        if (this.x <= this.patrolLeft || this.x >= this.patrolRight) {
+            this.patrolDir *= -1;
+            this.currentSpeed *= 0.85;
+        }
+    }
+
+
+    updateChaseMovement(now, pepeX) {
+        if (now >= this.chaseUntil || this.currentAnimation === 'attack') return;
+        const dir = pepeX > this.x ? 1 : -1;
+        this.targetSpeed = this.chaseSpeed * dir;
+        this.otherDirection = pepeX > this.x;
+        this.currentSpeed += (this.targetSpeed - this.currentSpeed) * 0.18;
+    }
+
+
+    updateChaseTransitions(now, pepeX, dist) {
+        if (!this.isChasing || this.currentAnimation === 'attack') return;
+        if (dist <= this.attackRange) {
+            this.startAttack(now, pepeX);
+        } else if (dist > this.alertRange) {
+            this.isChasing = false;
+            this.chaseUntil = 0;
+            this.setAnimation('walk');
+            this.postAlertCooldownUntil = now + 300;
+        }
+    }
+
+
+    startAttack(now, pepeX) {
+        this.isChasing = false;
+        this.chaseUntil = 0;
+        this.setAnimation('attack');
+        this.attackUntil = now + this.attackDurationMs;
+        const dir = pepeX > this.x ? 1 : -1;
+        this.otherDirection = pepeX > this.x;
+        this.currentSpeed = 0;
+        this.targetSpeed = this.attackDashSpeed * dir;
+    }
+
+
+    tryStartAlert(now, pepeX, dist) {
+        if (dist > this.alertRange || dist <= this.attackRange) return;
+        if (this.isChasing || this.currentAnimation === 'alert') return;
+        if (now < this.postAlertCooldownUntil) return;
+        this.setAnimation('alert');
+        this.aggro = true;
+        this.alertUntil =
+            now + this.alertFrameMs * this.IMAGES_ALERT.length + 60;
+    }
+
+
+    updateAlertState(now, pepeX, dist) {
+        if (this.currentAnimation !== 'alert') return;
+        this.otherDirection = pepeX > this.x;
+        this.currentSpeed = 0;
+        if (now < this.alertUntil) return;
+        if (dist <= this.attackRange) {
+            this.startAttack(now, pepeX);
+        } else {
+            this.setAnimation('walk');
+            this.isChasing = true;
+            this.chaseUntil = now + 900;
+        }
+    }
+
+
+    updateAttackState(now, pepeX) {
+        if (this.currentAnimation !== 'attack') return;
+        const dir = pepeX > this.x ? 1 : -1;
+        this.otherDirection = pepeX > this.x;
+        this.currentSpeed +=
+            (this.attackDashSpeed * dir - this.currentSpeed) * 0.25;
+        if (now < this.attackUntil) return;
+        this.currentSpeed = 0;
+        this.recoverUntil = now + this.recoveryAfterAttackMs;
+        this.postAlertCooldownUntil = this.recoverUntil;
+        this.isChasing = false;
+        this.chaseUntil = 0;
+        this.setAnimation('walk');
+    }
+
+
+    updateFacing() {
+        const speedRef = Math.abs(this.currentSpeed) > 0.2
+            ? this.currentSpeed
+            : this.targetSpeed;
+        const desired = speedRef >= 0 ? 1 : -1;
+        this.facing += (desired - this.facing) * this.facingLerp;
+        if (this.facing > this.facingThreshold) this.otherDirection = true;
+        else if (this.facing < -this.facingThreshold) this.otherDirection = false;
+    }
+
+
+    updateFrames() {
+        const now = performance.now();
+        let imgs = this.IMAGES_WALKING;
+        let frameMs = this.walkFrameMs;
+        if (this.currentAnimation === 'alert') {
+            imgs = this.IMAGES_ALERT;
+            frameMs = this.alertFrameMs;
+        } else if (this.currentAnimation === 'attack') {
+            imgs = this.IMAGES_ATTACK;
+            frameMs = this.attackFrameMs;
+        }
+        this.maybeAdvance(imgs, now, frameMs);
+    }
+
+
+    faceTo(targetX) {
+        this.otherDirection = (targetX < this.x);
+    }
+
 
     setAnimation(name) {
         if (this.currentAnimation !== name) {
