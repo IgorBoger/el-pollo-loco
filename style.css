@@ -779,6 +779,10 @@ h2 {
     box-shadow: 0 4px 6px rgba(0, 0, 0, .3);
     cursor: pointer;
     transition: background .3s, box-shadow .3s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
 }
 
 .game-over-btn:hover,
@@ -786,6 +790,11 @@ h2 {
     background-color: rgb(227, 166, 2);
     box-shadow: 0 6px 8px rgba(0, 0, 0, .4);
     outline: none;
+}
+
+.game-over-btn img {
+    width: 36px;
+    height: 36px;
 }
 
 
@@ -863,9 +872,15 @@ h2 {
     #startButton,
     .burger-btn,
     .control-btn,
-    #fullscreenBtn {
+    #fullscreenBtn,
+    .game-over-btn {
         padding: 6px 10px;
         font-size: 16px;
+    }
+
+    .game-over-btn img {
+        width: 30px;
+        height: 30px;
     }
 
     /* .story-card {
