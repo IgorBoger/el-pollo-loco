@@ -21,7 +21,7 @@ const I18N = {
 
         // titleGame: "El Pollo Loco",
         titleGame: "Das verrückte Huhn",
-        startButton: "Spiel starten›",
+        startGame: "Spiel starten",
         restartGame: "Spiel neu starten",
         // showControls: "Steuerung",
 
@@ -62,7 +62,7 @@ const I18N = {
     ES: {
         orientationCard: "📱 Gire su dispositivo al modo horizontal para jugar.",
         titleGame: "El Pollo Loco",
-        startButton: "Iniciar juego ›",
+        startGame: "Iniciar juego",
         restartGame: "Reiniciar juego",
         // showControls: "Controles",
 
@@ -105,7 +105,7 @@ const I18N = {
 
         // titleGame: "El Pollo Loco",
         titleGame: "The Crazy Chicken",
-        startButton: "Start Game ›",
+        startGame: "Start Game",
         restartGame: "Restart Game",
         // showControls: "Controls",
 
@@ -166,7 +166,7 @@ function applyTranslations() {
     set('orientationCard', t.orientationCard);
     // Titel / Start / Menü
     set('titleGame', t.titleGame);
-    set('startButton', t.startButton);
+    set('startGame', t.startGame);
     set('restartGame', t.restartGame);
     // set('showControls', t.showControls);
     set('aboutGame', t.aboutGame);

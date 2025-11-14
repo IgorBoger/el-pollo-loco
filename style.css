@@ -100,39 +100,6 @@ canvas {
 }
 
 
-#startScreen {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 10;
-    /* width: 720px; */
-    /* height: 480px; */
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-
-#startButton {
-    padding: 10px 14px;
-    font-size: 20px;
-    cursor: pointer;
-    color: #fff;
-    background-color: rgb(255, 186, 0);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-    font-family: "Bungee Spice", sans-serif;
-    border: none;
-    border: white 1px solid;
-    border-radius: 8px;
-    transition: background 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-    position: absolute;
-    top: 12px;
-}
-
-
 .burger-btn {
     position: absolute;
     top: 12px;
@@ -354,6 +321,7 @@ h2 {
 
 #fullscreenBtn:hover,
 #startButton:hover,
+.game-over-btn:hover,
 .burger-btn:hover,
 .toggle-btn:hover,
 .settings-button:hover,
@@ -369,6 +337,7 @@ h2 {
 /* Datei: style.css — Hover-Optik auch bei Tastaturfokus */
 #fullscreenBtn:focus-visible,
 #startButton:focus-visible,
+.game-over-btn:focus-visible,
 .burger-btn:focus-visible,
 .toggle-btn:focus-visible,
 .settings-button:focus-visible,
@@ -384,6 +353,7 @@ h2 {
 
 #fullscreenBtn:active,
 #startButton:active,
+.game-over-btn:active,
 .burger-btn:active,
 .toggle-btn:active,
 .settings-button:active,
@@ -706,35 +676,29 @@ h2 {
 }
 
 
-
-/* .game-over-buttons {
+#startScreen {
     position: absolute;
-    bottom: 40px;
-    left: 50%;
-    transform: translateX(-50%);
-    gap: 20px;
-    z-index: 1000;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
-.game-over-btn {
-    font-family: "Bungee Spice", sans-serif;
-    font-size: 20px;
-    padding: 10px 16px;
-    color: #fff;
-    background-color: rgb(255, 186, 0);
-    border: 1px solid #fff;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-    cursor: pointer;
-    transition: background 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+
+#startButton {
+    position: absolute;
+    top: 12px;
 }
 
-.game-over-btn:hover,
-.game-over-btn:focus-visible {
-    background-color: rgb(227, 166, 2);
-    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.4);
-    outline: none;
-} */
+
+#startGame {
+    margin: 0;
+}
 
 
 .game-over-overlay {
@@ -768,33 +732,31 @@ h2 {
     justify-content: center;
 }
 
-.game-over-btn {
+.game-over-btn,
+#startButton {
     font-family: "Bungee Spice", sans-serif;
-    font-size: 18px;
-    padding: 10px 16px;
+    font-size: 20px;
+    padding: 10px 14px;
+    cursor: pointer;
     color: #fff;
     background-color: rgb(255, 186, 0);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, .3);
     border: 1px solid #fff;
     border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, .3);
-    cursor: pointer;
-    transition: background .3s, box-shadow .3s;
+    transition: background 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 8px;
 }
 
-.game-over-btn:hover,
-.game-over-btn:focus-visible {
-    background-color: rgb(227, 166, 2);
-    box-shadow: 0 6px 8px rgba(0, 0, 0, .4);
-    outline: none;
-}
 
-.game-over-btn img {
+.game-over-btn img,
+#startButton img {
     width: 36px;
     height: 36px;
+    pointer-events: none;
+    /* ⬅️ NEU: Klick landet immer auf dem Button */
 }
 
 
