@@ -16,10 +16,11 @@ class World {
         throw: new Audio('../audio/bottle-throw.mp3'),          //  Sound-OK
         chicken: new Audio('../audio/chicken.mp3'),
 
+        // pepeSnoring: new Audio('../audio/pepe-snoring.mp3'),
+
         // endbossAppear: new Audio('../audio/endboss_appear.mp3'),
         // endbossDead: new Audio('../audio/endboss_dead.mp3')
     };
-    // endscreen = new Endscreen(this.ctx, this.canvas);
     coins = [];
     bottles = [];
     throwableObject = [];
@@ -36,14 +37,13 @@ class World {
 
 
     constructor(canvas, keyBaord) {
-        this.level = this.cloneLevel(level1); // NEU
+        this.level = this.cloneLevel(level1);
         this.ctx = canvas.getContext("2d");
         this.canvas = canvas;
         this.keyBaord = keyBaord;
-        this.stopped = false;                     // ← sauberer Startzustand
+        this.stopped = false;
         this.backgroundObjects = [];
         this.initBackground();
-        // this.draw();
         setTimeout(() => this.draw(), 100);
         this.setWorld();
         this.updateBottleStatusBar();
@@ -53,7 +53,7 @@ class World {
         this.sounds.background.loop = true;
         this.sounds.background.volume = 0.1;
         this.sounds.background.muted = isMusicMuted;
-        this.endscreen = new Endscreen(this.ctx, this.canvas); // ← HIER jetzt korrekt
+        this.endscreen = new Endscreen(this.ctx, this.canvas);
     }
 
 
@@ -74,8 +74,6 @@ class World {
         this.character.world = this;
         this.throwableObject.world = this;
 
-        // this.character.animate();
-
         this.level.enemies.forEach(enemy => {
             enemy.world = this;
             enemy.animate?.();
@@ -83,7 +81,6 @@ class World {
     }
 
 
-    // NEU
     run() {
         this.runTimer = setInterval(() => {
             this.checkCollisions();
@@ -106,59 +103,80 @@ class World {
         this.level.enemies.forEach((enemy) => {
             if (enemy.isDead() || this.character.isDead()) return;
             const now = new Date().getTime();
-
-            if (this.character.isColliding(enemy)) {
-
-                // ⬅︎ NEU: Reset, wenn eine neue Attacke gestartet hat
-                if (enemy instanceof Endboss) {
-                    enemy._lastAttackUntil = enemy._lastAttackUntil || 0;
-                    if (enemy.currentAnimation === 'attack' && enemy.attackUntil !== enemy._lastAttackUntil) {
-                        enemy._lastAttackUntil = enemy.attackUntil;
-                        enemy._knockAppliedForThisAttack = false;   // pro Attacke genau 1 Knockback
-                    }
-                }
-
-                // 💥 Knockback: einmal pro Boss-Attacke, immer gleich stark
-                if (enemy instanceof Endboss &&
-                    enemy.currentAnimation === 'attack' &&
-                    enemy._knockAppliedForThisAttack === false) {
-
-                    const dir = (this.character.x < enemy.x) ? -1 : 1; // weg vom Boss
-                    const KNOCK_X = 40;   // fester, immer gleicher Schubs
-                    const KNOCK_Y = 15;   // sichtbarer Hop
-
-                    this.character.x += dir * KNOCK_X;
-                    this.character.speedY = KNOCK_Y;
-
-                    // kleiner Sicherheits-Nudge, falls die Hitbox noch überlappt
-                    if (this.character.isColliding(enemy)) {
-                        this.character.x += dir * 6;
-                    }
-
-                    enemy._knockAppliedForThisAttack = true;
-                }
-
-                if (this.character.isCollidingFromTop(enemy)
-                    && (enemy instanceof Chicken || enemy instanceof SmallChicken)
-                ) {
-                    enemy.energy = 0;
-                    enemy.hit();
-                    console.warn(`☠️ Gegner ${enemy.constructor.name} bei X=${enemy.x} wurde durch STOMP getötet`);
-                    enemy._killedByStomp = true;
-                } else if (!enemy.lastHit || now - enemy.lastHit > 4000) {
+            if (!this.character.isColliding(enemy)) return;
+            if (enemy instanceof Endboss && enemy.currentAnimation === 'attack') {
+                const nowPerf = performance.now();
+                const dir = (this.character.x < enemy.x) ? -1 : 1; 
+                const knockY = 15;
+                this.character.speedY = knockY;
+                this.keepCharacterInsideBounds();
+                if (!enemy.lastHitOnCharacter || now - enemy.lastHitOnCharacter > 600) {
                     this.character.hit(enemy);
-                    enemy.lastHit = now;
+                    enemy.lastHitOnCharacter = now;
                     this.updateHealthStatusBar();
                 }
+                enemy.currentSpeed = 0;
+                enemy.targetSpeed = 0;
+                enemy.recoverUntil = nowPerf + enemy.recoveryAfterAttackMs;
+                enemy.postAlertCooldownUntil = enemy.recoverUntil;
+                enemy.isChasing = false;
+                enemy.chaseUntil = 0;
+                enemy.setAnimation('walk');
+                this.adjustEndbossAtLeftEdge(enemy);
+                return;
             }
+
+            if (
+                this.character.isCollidingFromTop(enemy) &&
+                (enemy instanceof Chicken || enemy instanceof SmallChicken)
+            ) {
+                enemy.energy = 0;
+                enemy.hit();
+                console.warn(`☠️ Gegner ${enemy.constructor.name} bei X=${enemy.x} wurde durch STOMP getötet`);
+                return;
+            }
+
+            if (enemy instanceof Endboss) {
+                const nowPerf = performance.now();
+                if (nowPerf < (enemy.postAlertCooldownUntil || 0)) return; // kurze Body-Hit-Sperre nach Hurt/Stun
+            }
+
+            if (!enemy.lastHitOnCharacter || now - enemy.lastHitOnCharacter > 4000) {
+                this.character.hit(enemy);
+                enemy.lastHitOnCharacter = now;
+                this.updateHealthStatusBar();
+            }
+
         });
+    }
+
+
+    keepCharacterInsideBounds() {
+        const c = this.character;
+        if (!c) return;
+        const minX = typeof c.minX === 'number' ? c.minX : -Infinity;
+        const level = this.level;
+        const maxX = level?.level_end_x ?? Infinity;
+        if (c.x < minX) c.x = minX;
+        if (c.x > maxX) c.x = maxX;
+    }
+
+
+    adjustEndbossAtLeftEdge(enemy) {
+        const char = this.character;
+        if (!char || !(enemy instanceof Endboss)) return;
+        const minX = (typeof char.minX === 'number') ? char.minX : 0;
+        const charAtEdge = char.x <= minX + 1;
+        const charRight = char.x + (char.frameWidth || char.width);
+        const gap = 30;
+        const desiredBossX = charRight + gap;
+        if (enemy.x < desiredBossX) enemy.x = desiredBossX;
     }
 
 
     collisionWithCollectable(array, propertyName, updateStatusBarCallback) {
         const index = array.findIndex(item => this.character.isColliding(item));
         if (index !== -1) {
-            // console.log(`propertyName ist aktuell: "${propertyName}"`);
             this.character[propertyName] += 20;
             if (this.character[propertyName] > 100) this.character[propertyName] = 100;
             updateStatusBarCallback.call(this);
@@ -177,27 +195,19 @@ class World {
         const now = new Date().getTime();
 
         this.level.enemies.forEach(enemy => {
-            if (enemy.isDead()) return; // 🛡️ NEU: tote Gegner ignorieren
+            if (enemy.isDead()) return;
 
             this.throwableObject.forEach(bottle => {
                 if (!bottle.isSplashed && bottle.isColliding(enemy)) {
-
                     if (enemy instanceof Endboss) {
-
-                        console.log('💥 Flasche trifft Endboss!'); // 🟡 HIER DEBUG-ZEILE
-
-                        if (!enemy.lastHit || now - enemy.lastHit > 500) {
-                            enemy.hit();
+                        const cd = 250;
+                        enemy.stun(700);                       
+                        if (!enemy.lastHit || now - enemy.lastHit > cd) {
+                            enemy.hit();                        
                             enemy.lastHit = now;
                             this.updateEndbossStatusBar(enemy);
-                            bottle.splash();
                         }
-                    }
-
-                    else if (enemy instanceof Chicken || enemy instanceof SmallChicken) {
-                        enemy.energy = 0;
-                        enemy.hit();
-                        bottle.splash();
+                        bottle.splash();                      
                     }
                 }
             });
@@ -210,7 +220,6 @@ class World {
 
         const isBackground = sound === this.sounds?.background;
 
-        // Mute-Regeln anwenden
         if (isBackground && isMusicMuted) return;
         if (!isBackground && isSoundMuted) return;
 
@@ -228,7 +237,6 @@ class World {
             console.warn('Fehler beim Abspielen des Sounds:', e);
         }
 
-        // Hintergrundlautstärke fixieren
         if (this.sounds.background) {
             this.sounds.background.volume = 0.1;
         }
@@ -305,9 +313,6 @@ class World {
     }
 
 
-    /**
-    * Initialisiert die Hintergrund-Objekte für den Parallax-Effekt.
-    */
     initBackground() {
         for (let i = -1; i < this.backgroundTileCount; i++) { // var -2
             const xPos = i * 720;
@@ -359,11 +364,19 @@ class World {
         }
 
         if (this.character.isDead()) {
-            this.stopped = true;
-            // this.ctx.setTransform(1, 0, 0, 1, 0, 0);
-            this.endscreen.show();
-            return;
+            if (!this.gameOverScheduled) {
+                this.gameOverScheduled = true;
+                const boss = this.level.enemies.find(e => e instanceof Endboss);
+                const restBoss = (boss?.currentAnimation === 'attack')
+                    ? Math.max(0, (boss.attackUntil || 0) - performance.now())
+                    : 0;
+                setTimeout(() => {
+                    this.stopped = true;
+                    this.endscreen.show();
+                }, Math.min(1200, restBoss + 500)); 
+            }
         }
+
 
         let self = this;
         requestAnimationFrame(function () {
@@ -372,10 +385,6 @@ class World {
     }
 
 
-    /**
-    * Fügt eine neue Hintergrund-Kachel an der gegebenen Position hinzu.
-    * @param {number} tileIndex - Der Index der neuen Kachel
-    */
     addBackgroundTile(tileIndex) {
         const xPos = tileIndex * 720;
         const currentLayers = tileIndex % 2 === 0 ? this.level.layers : this.level.altLayers;
@@ -415,35 +424,21 @@ class World {
 
 
     destroy() {
-        // alle Intervalle und Loops stoppen
         this.stopped = true;
-
-
-        // Run-Loop stoppen
         if (this.runTimer) {
             clearInterval(this.runTimer);
             this.runTimer = null;
         }
-
-        // Sounds stoppen
         Object.values(this.sounds).forEach(s => {
             if (s instanceof Audio) {
                 s.pause();
                 s.currentTime = 0;
             }
         });
-
-        // Endscreen (falls sichtbar) schließen
         this.endscreen?.hide();
-
-        // Gegner, Flaschen usw. zurücksetzen
-        // this.level.enemies = [];
         this.throwableObject = [];
         this.coins = [];
         this.bottles = [];
-
-        // Canvas leeren
-        // this.ctx.setTransform(1, 0, 0, 1, 0, 0);
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 }

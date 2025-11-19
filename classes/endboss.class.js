@@ -171,10 +171,11 @@ class Endboss extends MovableObject {
 
 
     applyRecovery() {
-        // this.setAnimation('walk');        // neutrale Idle/Walk-Frames
-        this.setAnimation('alert');          // steht wachsam, kein Lauf
+        if (this.currentAnimation !== 'hurt') {
+            this.setAnimation('alert');
+        }
         this.targetSpeed = 0;
-        this.currentSpeed += (0 - this.currentSpeed) * 0.25; // sanft ausrollen
+        this.currentSpeed += (0 - this.currentSpeed) * 0.25;
     }
 
 
@@ -204,11 +205,32 @@ class Endboss extends MovableObject {
         if (!this.isHurt()) return false;
         this.setAnimation('hurt');
         this.currentSpeed = 0;
+
+        // KI pausieren für Dauer des Hurt-Zustands
+        const until = performance.now() + 1000;
+        this.recoverUntil = until;                 // KI pausiert
+        this.postAlertCooldownUntil = until;       // keine neuen Alerts
+        this.isChasing = false;
+        this.chaseUntil = 0;
         setTimeout(() => {
-            if (!this.isDead()) this.setAnimation('walk');
-        }, 400);
+            if (!this.isDead()) {
+                const now2 = performance.now();
+                const pepeX = this.world?.character?.x ?? this.x;
+                const dir = pepeX > this.x ? 1 : -1;
+
+                // Sichtbar in Lauf übergehen und SOFORT wieder bewegen
+                this.setAnimation('walk');
+                this.chaseUntil = now2 + 900;
+
+                // wichtig: Tempo direkt setzen, nicht warten
+                this.targetSpeed = this.chaseSpeed * dir;
+                this.currentSpeed = this.targetSpeed;
+            }
+        }, 1000);
+
         return true;
     }
+
 
 
     updatePatrol() {
@@ -247,53 +269,58 @@ class Endboss extends MovableObject {
 
 
     startAttack(now, pepeX) {
-        this.isChasing = false;
-        this.chaseUntil = 0;
+        if (this.isInRecovery(now) || now < this.postAlertCooldownUntil) return;
+        if (now < (this.forceAlertUntil || 0) || this.currentAnimation === 'hurt') return;
+        this.isChasing = false; this.chaseUntil = 0;
         this.setAnimation('attack');
         this.attackUntil = now + this.attackDurationMs;
         const dir = pepeX > this.x ? 1 : -1;
         this.otherDirection = pepeX > this.x;
-        this.currentSpeed = 0;
-        this.targetSpeed = this.attackDashSpeed * dir;
-        this.attackHitAllowedAt = now + this.attackHitDelayMs; // 🆕
+        this.currentSpeed = 0; this.targetSpeed = this.attackDashSpeed * dir;
+        this.attackHitAllowedAt = now + this.attackHitDelayMs;
         this.hasHitInCurrentAttack = false;
     }
 
 
     tryStartAlert(now, pepeX, dist) {
+        const inCd = this.isInRecovery(now) || now < this.postAlertCooldownUntil;
+        if (inCd || this.isHurt?.() || this.isChasing) return;
         if (this.currentAnimation === 'alert' || this.currentAnimation === 'attack') return;
-        if (this.isChasing) return;
-        if (now < this.postAlertCooldownUntil) return;
-        if (dist <= this.attackRange) {
-            this.aggro = true;
-            this.startAttack(now, pepeX);
-            return;
-        }
         if (dist > this.alertRange) return;
-        this.setAnimation('alert');
-        this.aggro = true;
+        this.setAnimation('alert'); this.aggro = true;
         this.alertUntil = now + this.alertFrameMs * this.IMAGES_ALERT.length + 60;
+        this.forceAlertUntil = Math.max(this.forceAlertUntil || 0, now + 300);
     }
 
 
     updateAlertState(now, pepeX, dist) {
-        if (dist < 80) this.currentImage = 5;
         if (this.currentAnimation !== 'alert') return;
         this.otherDirection = pepeX > this.x;
         this.currentSpeed = 0;
+        if (now < (this.forceAlertUntil || 0)) return;
         if (now < this.alertUntil) return;
-        if (dist <= this.attackRange + 40) {
-            this.startAttack(now, pepeX);
-        } else {
-            this.setAnimation('walk');
-            this.isChasing = true;
-            this.chaseUntil = now + 900;
-        }
+        if (dist <= this.attackRange + 40) { this.startAttack(now, pepeX); return; }
+        this.setAnimation('walk');
+        this.isChasing = true;
+        this.chaseUntil = now + 900;
+
+        // ➜ Sofort auf volle Laufgeschwindigkeit gehen (keine Anlaufphase)
+        const dir = pepeX > this.x ? 1 : -1;
+        this.otherDirection = pepeX > this.x;     // Blickrichtung korrekt setzen (optional, aber sauber)
+        this.targetSpeed = this.chaseSpeed * dir;
+        this.currentSpeed = this.targetSpeed;     // sofort gleiche Geschwindigkeit wie zu Beginn
     }
+
 
 
     updateAttackState(now, pepeX) {
         if (this.currentAnimation !== 'attack') return;
+
+        if (this.isInRecovery(now) || now < this.postAlertCooldownUntil) {
+            this.currentSpeed = 0; this.targetSpeed = 0;
+            this.setAnimation('alert'); return;
+        }
+
         const dir = this.targetSpeed >= 0 ? 1 : -1;
         this.currentSpeed += (this.attackDashSpeed * dir - this.currentSpeed) * 0.25;
         if (now < this.attackUntil) return;
@@ -326,17 +353,18 @@ class Endboss extends MovableObject {
 
 
     applyWalkBob(now) {
-        // Basis-Y nur einmal merken
         if (!this.baseY) {
             this.baseY = this.y;
         }
-        // Nur beim normalen Gehen leicht wippen lassen
-        if (this.currentAnimation !== 'walk' || Math.abs(this.currentSpeed) < 0.2) {
+ 
+        const speedRef = Math.abs(this.currentSpeed) > 0.2 ? this.currentSpeed : this.targetSpeed;
+        if (this.currentAnimation !== 'walk' || Math.abs(speedRef) < 0.2) {
             this.y = this.baseY;
             return;
         }
+
         const cycleMs = 300;      // Dauer eines Schrittzyklus (anpassen nach Gefühl)
-        const amplitude = 1.0;    // Höhe der Bewegung in Pixeln (2–3 ist dezent)
+        const amplitude = 1.2;    // Höhe der Bewegung in Pixeln (2–3 ist dezent)
         const t = (now % cycleMs) / cycleMs * Math.PI * 2;
         this.y = this.baseY + Math.sin(t) * amplitude;
     }
@@ -359,14 +387,7 @@ class Endboss extends MovableObject {
             images = this.IMAGES_ATTACK;
             frameMs = this.attackFrameMs;
         }
-
-        // // 🆕 Dynamische Lauf-Animation: schneller laufen = schnellere Frames
-        // if (images === this.IMAGES_WALKING) {
-        //     const speedFactor = Math.abs(this.currentSpeed) / this.baseWalkSpeed || 0;
-        //     const clamped = Math.max(0.6, Math.min(speedFactor, 2.0));
-        //     frameMs = this.walkFrameMs / clamped;
-        // }
-
+        if (images === this.IMAGES_WALKING) frameMs = this.walkFrameMs;
         this.maybeAdvance(images, now, frameMs);
     }
 
@@ -390,6 +411,34 @@ class Endboss extends MovableObject {
             this.playAnimation(images);
             this.lastAnimAt = now;
         }
+    }
+
+
+    hurtFlash() {
+        if (this.currentAnimation === 'dead') return;
+        this.setAnimation('hurt');
+        this.currentSpeed = 0;
+        const until = performance.now() + 320;
+        this.recoverUntil = Math.max(this.recoverUntil, until);
+        this.postAlertCooldownUntil = Math.max(this.postAlertCooldownUntil, until);
+        this.isChasing = false; this.chaseUntil = 0;
+        setTimeout(() => {
+            if (!this.isDead() && this.isInRecovery(performance.now()))
+                this.setAnimation('alert');
+        }, 320);
+    }
+
+    
+    stun(ms = 700) {
+        const now = performance.now();
+        this.setAnimation('hurt');
+        this.currentSpeed = 0; this.targetSpeed = 0;
+        this.attackUntil = now;                  // Attack sofort abbrechen
+        this.isChasing = false; this.chaseUntil = 0;
+        const until = now + ms;
+        const grace = until + 250;               // 🆕 kleine Pause NACH Hurt
+        this.recoverUntil = until;               // KI pausiert (keine Moves)
+        this.postAlertCooldownUntil = grace;     // keine Alerts/Attacks starten
     }
 
 }
