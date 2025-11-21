@@ -45,7 +45,8 @@ class ThrowableObject extends MovableObject {
         this.applyGravity();
 
         this.throwInterval = setInterval(() => {
-            this.x += 15 * this.direction; // Flug nach rechts/links
+            if (isGamePaused) return;
+            this.x += 15 * this.direction;
         }, 25);
     }
 
@@ -64,6 +65,7 @@ class ThrowableObject extends MovableObject {
 
     animate() {
         setInterval(() => {
+            if (isGamePaused) return;
             if (this.isSplashed) {
                 this.playAnimation(this.IMAGES_SPLASHES); // 3) Die Pfade werden nacheinander animiert!
             } else {

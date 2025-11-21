@@ -83,6 +83,7 @@ class World {
 
     run() {
         this.runTimer = setInterval(() => {
+            if (isGamePaused) return;
             this.checkCollisions();
             this.checkThrowObject();
             this.checkBottleOnGround();
@@ -106,7 +107,7 @@ class World {
             if (!this.character.isColliding(enemy)) return;
             if (enemy instanceof Endboss && enemy.currentAnimation === 'attack') {
                 const nowPerf = performance.now();
-                const dir = (this.character.x < enemy.x) ? -1 : 1; 
+                const dir = (this.character.x < enemy.x) ? -1 : 1;
                 const knockY = 15;
                 this.character.speedY = knockY;
                 this.keepCharacterInsideBounds();
@@ -201,13 +202,13 @@ class World {
                 if (!bottle.isSplashed && bottle.isColliding(enemy)) {
                     if (enemy instanceof Endboss) {
                         const cd = 250;
-                        enemy.stun(700);                       
+                        enemy.stun(700);
                         if (!enemy.lastHit || now - enemy.lastHit > cd) {
-                            enemy.hit();                        
+                            enemy.hit();
                             enemy.lastHit = now;
                             this.updateEndbossStatusBar(enemy);
                         }
-                        bottle.splash();                      
+                        bottle.splash();
                     }
                 }
             });
@@ -373,7 +374,7 @@ class World {
                 setTimeout(() => {
                     this.stopped = true;
                     this.endscreen.show();
-                }, Math.min(1200, restBoss + 500)); 
+                }, Math.min(1200, restBoss + 500));
             }
         }
 

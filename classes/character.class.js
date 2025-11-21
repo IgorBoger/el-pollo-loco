@@ -33,7 +33,8 @@ class Character extends MovableObject {
         '../img/2_character_pepe/5_dead/D-53.png',
         '../img/2_character_pepe/5_dead/D-54.png',
         '../img/2_character_pepe/5_dead/D-55.png',
-        '../img/2_character_pepe/5_dead/D-56.png'
+        '../img/2_character_pepe/5_dead/D-56.png',
+        '../img/2_character_pepe/5_dead/D-57.png'
     ];
 
     IMAGES_IDLE = [
@@ -117,6 +118,7 @@ class Character extends MovableObject {
 
     animate() {
         setInterval(() => {
+            if (isGamePaused) return;
             if (this.world.keyBaord.RIGHT || this.world.keyBaord.LEFT) {
                 if (this.world?.sounds?.walk?.paused) {
                     this.world.sounds.walk.loop = true;
@@ -158,6 +160,7 @@ class Character extends MovableObject {
 
 
         setInterval(() => {
+            if (isGamePaused) return;
             const now = performance.now();
 
             if (this.isDead()) {

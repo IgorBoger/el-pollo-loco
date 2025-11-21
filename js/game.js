@@ -14,6 +14,10 @@ let isSoundMuted = localStorage.getItem('isSoundMuted') === 'true';
 let currentLanguage = localStorage.getItem('language') || 'ES';
 // game.js – Top-Level
 let reopenBurgerAfterOverlay = false;
+let isGamePaused = false;
+console.log(isGamePaused);
+
+
 
 const I18N = {
     DE: {
@@ -253,6 +257,13 @@ function init() {
 
 function startGame() {
     console.log('gecklickt');
+    isGamePaused = false;
+    console.log(isGamePaused);
+
+    document.getElementById('pauseBtn').classList.remove('d-none'); const btn = document.getElementById('pauseBtn');
+    btn.classList.remove('d-none');
+    btn.textContent = 'Pause ❚❚';
+
     document.getElementById('startScreen').classList.add('d-none');
     init();
     if (world?.sounds?.background) {
@@ -271,6 +282,9 @@ function startGame() {
 function restartGame() {
     closeBurgerMenu();
 
+    console.log(isGamePaused);
+
+    document.getElementById('pauseBtn')?.classList.add('d-none');
     // Game-Over Overlay zu
     document.getElementById('gameOverOverlay')?.classList.add('d-none');
     document.getElementById('gameOverOverlay')?.classList.remove('d-flex');
@@ -621,6 +635,7 @@ function updateMobileControlsVisibility() {
     const mobileControls = document.getElementById('mobileControls');
     const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     const isSmallScreen = window.innerWidth < 800;
+    if (!mobileControls) return;
 
     if (isMobile || isSmallScreen) {
         // console.log('display ist unter 800px ODER mobil');
@@ -664,6 +679,24 @@ function toggleFullscreen() {
 }
 
 
+function togglePause() {
+    console.log(isGamePaused);
+
+    if (!world) return;
+    isGamePaused = !isGamePaused;
+    const btn = document.getElementById('pauseBtn');
+    if (btn) btn.textContent = isGamePaused ? 'Play ▶' : 'Pause ❚❚';
+    const bg = world.sounds?.background;
+    if (!bg || isMusicMuted) return;
+    if (isGamePaused) {
+        bg.pause();
+        return;
+    }
+    bg.play().catch(() => { });
+}
+
+
+
 // Datei: js/game.js — NEU
 function quickRestartGame() {
     // Startscreen bleibt versteckt:
@@ -704,6 +737,7 @@ function quickRestartGame() {
 // === Zentraler Fit für das Canvas (außerhalb von setupHiDPICanvas) ===
 function fitCanvasToCssSize() {
     const c = document.getElementById('canvas');
+    if (!c) return;                      // <— CANVAS existiert nicht
     const ctx = c.getContext('2d');
     const BASE_W = 720, BASE_H = 480;
 
@@ -753,6 +787,8 @@ window.addEventListener('load', () => {
 
     addMobileButtonsFunction();
     document.getElementById('restartGame')?.addEventListener('click', restartGame);
+
+    document.getElementById('pauseBtn')?.addEventListener('click', togglePause);
 
     document.getElementById('burgerBtn')?.addEventListener('click', toggleBurgerMenu);
     document.getElementById('burgerClose')?.addEventListener('click', closeBurgerMenu);
@@ -823,6 +859,8 @@ window.addEventListener('load', () => {
         document.getElementById('gameOverOverlay')?.classList.add('d-none');
         document.getElementById('gameOverOverlay')?.classList.remove('d-flex');
         restartGame(); // existiert bereits und zeigt den Startscreen wieder an
+
+        // document.getElementById('pauseBtn')?.classList.add('d-none');
     });
 
 

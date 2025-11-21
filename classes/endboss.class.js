@@ -135,6 +135,7 @@ class Endboss extends MovableObject {
 
     animate() {
         this.aiInterval = setInterval(() => {
+            if (isGamePaused) return;
             if (this.handleDeath() || !this.world?.character) return;
             const now = performance.now();
             const pepeX = this.world.character.x;
@@ -146,7 +147,11 @@ class Endboss extends MovableObject {
             this.applyWalkBob(now);          // 🆕 sanftes Wippen beim Gehen
             this.x += this.currentSpeed;
         }, 1000 / 60);
-        this.animationInterval = setInterval(() => this.updateFrames(), 50);
+        // this.animationInterval = setInterval(() => this.updateFrames(), 50);
+        this.animationInterval = setInterval(() => {
+            if (isGamePaused) return;
+            this.updateFrames();
+        }, 50);
     }
 
 
@@ -356,7 +361,7 @@ class Endboss extends MovableObject {
         if (!this.baseY) {
             this.baseY = this.y;
         }
- 
+
         const speedRef = Math.abs(this.currentSpeed) > 0.2 ? this.currentSpeed : this.targetSpeed;
         if (this.currentAnimation !== 'walk' || Math.abs(speedRef) < 0.2) {
             this.y = this.baseY;
@@ -428,7 +433,7 @@ class Endboss extends MovableObject {
         }, 320);
     }
 
-    
+
     stun(ms = 700) {
         const now = performance.now();
         this.setAnimation('hurt');
