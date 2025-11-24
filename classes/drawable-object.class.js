@@ -14,7 +14,7 @@ class DrawableObject {
 
 
     draw(ctx) {
-        if (!this.img) return; // 🛡️ Schutz gegen ungültige Bilder
+        if (!this.img) return;
         ctx.drawImage(this.img, Math.round(0), Math.round(0), this.width, this.height);
     }
 
@@ -34,9 +34,7 @@ class DrawableObject {
             ctx.beginPath();
             ctx.lineWidth = '3';
             ctx.strokeStyle = 'blue';
-            // ctx.rect(Math.round(0), Math.round(0), this.width, this.height);
             ctx.rect(frameOffsetX, frameOffsetY, frameWidth, frameHeight);
-
             ctx.stroke();
         }
     }

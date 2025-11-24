@@ -7,7 +7,7 @@ class Endscreen {
         this.x = 0;
         this.y = 0;
         this.image = new Image();
-        this.image.src = '../img/9_intro_outro_screens/game_over/game over.png';
+        this.image.src = 'img/9_intro_outro_screens/game_over/game over.png';
         this.loaded = false;
         this.image.onload = () => {
             this.loaded = true;
