@@ -8,11 +8,9 @@ const buttons = [
     { id: 'btnThrow', key: 'THROW' }
 ];
 let _viewportRaf = null;
-// let _viewportRaf = null, _viewportTimer = null;
 let isMusicMuted = localStorage.getItem('isMusicMuted') === 'true';
 let isSoundMuted = localStorage.getItem('isSoundMuted') === 'true';
 let currentLanguage = localStorage.getItem('language') || 'ES';
-// game.js – Top-Level
 let reopenBurgerAfterOverlay = false;
 let isGamePaused = false;
 console.log(isGamePaused);
@@ -733,51 +731,18 @@ function quickRestartGame() {
 }
 
 
-
-// // === Zentraler Fit für das Canvas (außerhalb von setupHiDPICanvas) ===
-// function fitCanvasToCssSize() {
-//     const c = document.getElementById('canvas');
-//     if (!c) return;                      // <— CANVAS existiert nicht
-//     const ctx = c.getContext('2d');
-//     const BASE_W = 720, BASE_H = 480;
-
-//     // sichtbare CSS-Größe (nicht per JS setzen!)
-//     const dpr = Math.max(1, window.devicePixelRatio || 1);
-//     const cssW = Math.round(c.clientWidth);
-//     const cssH = Math.round(c.clientHeight);
-
-//     // 🔒 vermeidet harte Resets bei transient 0px
-//     if (!cssW || !cssH) return;
-
-//     // physische Puffergröße
-//     const pxW = cssW * dpr;
-//     const pxH = cssH * dpr;
-
-//     if (c.width !== pxW || c.height !== pxH) {
-//         c.width = pxW;
-//         c.height = pxH;
-//     }
-
-//     const scaleX = pxW / BASE_W;
-//     const scaleY = pxH / BASE_H;
-//     ctx.setTransform(scaleX, 0, 0, scaleY, 0, 0);
-//     ctx.imageSmoothingEnabled = true;
-// }
-
-
 function fitCanvasToCssSize() {
     const c = document.getElementById('canvas');
+    if (!c) return;
     const ctx = c.getContext('2d');
     const BASE_W = 720, BASE_H = 480;
     const dpr = Math.max(1, window.devicePixelRatio || 1);
-    const cssW = Math.round(c.clientWidth);
-    const cssH = Math.round(c.clientHeight);
+    const cssW = Math.round(c.clientWidth); cssH = Math.round(c.clientHeight);
     if (!cssW || !cssH) return;
     const pxW = cssW * dpr, pxH = cssH * dpr;
     if (c.width !== pxW || c.height !== pxH) { c.width = pxW; c.height = pxH; }
     const scale = Math.min(pxW / BASE_W, pxH / BASE_H);
-    const offX = (pxW - BASE_W * scale) / 2;
-    const offY = (pxH - BASE_H * scale) / 2;
+    const offX = (pxW - BASE_W * scale) / 2; offY = (pxH - BASE_H * scale) / 2;
     ctx.setTransform(scale, 0, 0, scale, offX, offY);
     ctx.imageSmoothingEnabled = true;
 }

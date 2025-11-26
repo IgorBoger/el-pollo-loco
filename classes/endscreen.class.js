@@ -19,10 +19,7 @@ class Endscreen {
 
     show() {
         this.visible = true;
-        // vor dem Zeichnen sicher neutraler Kontext (falls von außen nicht neutral)
-        // this.ctx.setTransform(1, 0, 0, 1, 0, 0);
         this.draw();
-        // this.createButtons(); // <— Buttons hinzufügen
         const ov = document.getElementById('gameOverOverlay');
         ov?.classList.remove('d-none');
         ov?.classList.add('d-flex');
@@ -32,14 +29,17 @@ class Endscreen {
     draw() {
         if (!this.visible) return;
         this.ctx.save();
+        this.ctx.setTransform(1, 0, 0, 1, 0, 0);
         this.ctx.globalAlpha = this.overlayAlpha;
         this.ctx.fillStyle = '#000';
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        this.ctx.restore();
         if (this.loaded) {
-            this.ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+            this.ctx.globalAlpha = 1;
+            this.ctx.drawImage(this.image, 0, 0, this.canvas.width, this.canvas.height);
         }
+        this.ctx.restore();
     }
+
 
 
     hide() {
