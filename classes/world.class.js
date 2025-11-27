@@ -374,6 +374,11 @@ class World {
                 setTimeout(() => {
                     this.stopped = true;
                     this.endscreen.show();
+
+                    if (typeof onGameOver === 'function') {
+                        onGameOver(this);
+                    }
+
                 }, Math.min(1200, restBoss + 500));
             }
         }
@@ -383,6 +388,19 @@ class World {
         requestAnimationFrame(function () {
             self.draw();
         });
+    }
+
+
+    // Datei: classes/world.class.js
+    drawStaticFrame() {
+        // const wasStopped = this.stopped;
+        // this.stopped = false;
+        // this.draw();
+        // this.stopped = wasStopped;
+
+        this.stopped = false;
+        this.draw();
+        this.stopped = true;
     }
 
 

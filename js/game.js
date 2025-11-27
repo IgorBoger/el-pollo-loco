@@ -697,6 +697,8 @@ function togglePause() {
 
 // Datei: js/game.js — NEU
 function quickRestartGame() {
+
+    isGamePaused = false;
     // Startscreen bleibt versteckt:
     document.getElementById('startScreen')?.classList.add('d-none');
 
@@ -748,16 +750,34 @@ function fitCanvasToCssSize() {
 }
 
 
-
 function handleViewportChange() {
     if (_viewportRaf) return;
     _viewportRaf = requestAnimationFrame(() => {
         fitCanvasToCssSize();
+        if (world
+            && world.character?.isDead?.()
+            && world.endscreen?.visible) {
+            world.drawStaticFrame?.();
+            world.endscreen.draw();
+        }
         updateMobileControlsVisibility();
         checkOrientation();
         _viewportRaf = null;
     });
 }
+
+
+// Datei: js/game.js — Funktion: onGameOver (NEU)
+function onGameOver(worldInstance) {
+    isGamePaused = true;
+    const pauseBtn = document.getElementById('pauseBtn');
+    pauseBtn?.classList.add('d-none');
+    const bg = worldInstance?.sounds?.background;
+    if (bg) {
+        bg.pause();
+    }
+}
+
 
 
 function setupHiDPICanvas() {
