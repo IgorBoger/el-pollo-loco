@@ -102,7 +102,7 @@ class MovableObject extends DrawableObject {
             } else {
                 this.speedY = 0; // ⬅️ NEU: Wenn am Boden → keine Bewegung mehr nach unten!
             }
-        }, 1000 / 25);
+        }, 1000 / 40);
     }
 
 

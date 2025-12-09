@@ -67,6 +67,7 @@ class Character extends MovableObject {
     y = 50;
     height = 250;
     width = 100;
+    acceleration = 2.0;
     walking_sound;
     world;
     speed = 5;
@@ -117,17 +118,12 @@ class Character extends MovableObject {
 
 
     animate() {
+        // this.animationTimer1 = setInterval(() => {
         setInterval(() => {
-            if (isGamePaused) return;
-            if (this.world.keyBaord.RIGHT || this.world.keyBaord.LEFT) {
-                if (this.world?.sounds?.walk?.paused) {
-                    this.world.sounds.walk.loop = true;
-                    this.world.sounds.walk.volume = 0.1;
-                    this.world.playEffectSound(this.world.sounds.walk);
-                }
-            } else {
-                this.world?.sounds?.walk?.pause();
-            }
+            if (isGamePaused || this.world.stopped) return;
+            this.setupWalkSound();
+            this.handleWalkSound();
+
             if (this.world.keyBaord.RIGHT && this.x < this.world.level.level_end_x) {
                 this.moveRight();
                 this.otherDirection = false;
@@ -150,6 +146,8 @@ class Character extends MovableObject {
 
             if (doingSomething) {
                 this.lastActivityAt = performance.now();
+                this.stopPepeSnoring?.();
+                this.stopPepeCalmBreathing?.();
             }
 
             const now = performance.now();
@@ -159,8 +157,10 @@ class Character extends MovableObject {
         }, 1000 / 60);
 
 
+        // this.animationTimer2 = setInterval(() => {
         setInterval(() => {
-            if (isGamePaused) return;
+            // if (isGamePaused) return;
+            if (isGamePaused || this.world.stopped) return;
             const now = performance.now();
 
             if (this.isDead()) {
@@ -171,11 +171,7 @@ class Character extends MovableObject {
                 }
                 this.maybeAdvance(this.IMAGES_DEAD, now, this.deadFrameMs);
                 this.img = this.imageCache[this.IMAGES_DEAD[this.IMAGES_DEAD.length - 1]];
-
-                if (!this.deadSoundPlayed) {
-                    this.world.playEffectSound(this.world.sounds.dead);
-                    this.deadSoundPlayed = true;
-                }
+                this.setDeadSound();
                 return;
             }
 
@@ -186,11 +182,7 @@ class Character extends MovableObject {
                     this.lastAnimAt = 0;
                 }
                 this.maybeAdvance(this.IMAGES_HURT, now, this.hurtFrameMs);
-
-                if (!this.hurtSoundPlayed) {
-                    this.world.playEffectSound(this.world.sounds.hurt);
-                    this.hurtSoundPlayed = true;
-                }
+                this.setHurtSound();
                 return;
             }
 
@@ -215,28 +207,84 @@ class Character extends MovableObject {
                 this.maybeAdvance(this.IMAGES_WALKING, now, this.walkFrameMs);
                 this.hurtSoundPlayed = false;
             } else {
-                const isSleeping = (now - this.lastActivityAt) >= this.idleTimeoutMs;
-
-                if (isSleeping) {
-                    if (this.currentAnimation !== 'sleep') {
-                        this.currentAnimation = 'sleep';
-                        this.currentImage = 0;
-                        this.lastAnimAt = 0;
-                    }
-                    this.maybeAdvance(this.IMAGES_LONG_IDLE, now, this.sleepFrameMs);
-                } else {
-                    if (this.currentAnimation !== 'idle') {
-                        this.currentAnimation = 'idle';
-                        this.currentImage = 0;
-                        this.lastAnimAt = 0;
-                    }
-                    this.maybeAdvance(this.IMAGES_IDLE, now, this.idleFrameMs);
-                }
+                this.pepeIsSleeping(now);
                 this.hurtSoundPlayed = false;
             }
         }, 50);
+    }
 
 
+    setupWalkSound() {
+        const walkSound = this.world.sounds.walk;
+        if (!walkSound) return;
+        walkSound.loop = true;
+        // walkSound.volume = 0.1;
+    }
+
+
+    handleWalkSound() {
+        const walkSound = this.world.sounds.walk;
+        if (!walkSound) return;
+        if (this.world.keyBaord.RIGHT || this.world.keyBaord.LEFT) {
+            if (walkSound.paused) this.world.playEffectSound(walkSound);
+        } else {
+            walkSound.pause();
+        }
+    }
+
+
+    setHurtSound() {
+        if (this.hurtSoundPlayed) return;
+        const hurtSound = this.world?.sounds?.hurt;
+        if (!hurtSound) return;
+        hurtSound.loop = false;
+        hurtSound.volume = 0.2;
+        this.world.playEffectSound(hurtSound);
+        this.hurtSoundPlayed = true;
+    }
+
+
+    setDeadSound() {
+        if (this.deadSoundPlayed) return;
+        const deadSound = this.world?.sounds?.dead;
+        if (!deadSound) return;
+        deadSound.loop = false;
+        deadSound.volume = 0.3;
+        this.world.playEffectSound(deadSound);
+        this.deadSoundPlayed = true;
+    }
+
+
+    pepeIsSleeping(now) {
+        const isSleeping = (now - this.lastActivityAt) >= this.idleTimeoutMs;
+        if (isSleeping) {
+            this.sleeping(now);
+        } else {
+            this.idle(now);
+        }
+    }
+
+
+    sleeping(now) {
+        this.stopPepeCalmBreathing?.();
+        if (this.currentAnimation !== 'sleep') {
+            this.currentAnimation = 'sleep';
+            this.currentImage = 0;
+            this.lastAnimAt = 0;
+            this.playPepeSnoring();
+        }
+        this.maybeAdvance(this.IMAGES_LONG_IDLE, now, this.sleepFrameMs);
+    }
+
+
+    idle(now) {
+        if (this.currentAnimation !== 'idle') {
+            this.currentAnimation = 'idle';
+            this.currentImage = 0;
+            this.lastAnimAt = 0;
+        }
+        this.maybeAdvance(this.IMAGES_IDLE, now, this.idleFrameMs);
+        this.playPepeCalmBreating();
     }
 
 
@@ -251,7 +299,17 @@ class Character extends MovableObject {
     jump() {
         this.speedY = 27.5;
         this.isJumping = true;
-        this.world.playEffectSound(this.world.sounds.jump);
+        // this.world.playEffectSound(this.world.sounds.jump);
+        this.setupJumpSound();
+    }
+
+
+    setupJumpSound() {
+        const jumpSound = this.world?.sounds?.jump;
+        if (!jumpSound) return;
+        jumpSound.loop = false;
+        jumpSound.volume = 0.1;
+        this.world.playEffectSound(jumpSound);
     }
 
 
@@ -307,4 +365,37 @@ class Character extends MovableObject {
         }
     }
 
+
+    playPepeSnoring() {
+        const pepeSnoring = this.world.sounds.pepeSnoring;
+        this.world.sounds.pepeSnoring.loop = true;
+        pepeSnoring.volume = 0.8;
+        pepeSnoring.currentTime = 0;
+        pepeSnoring.play();
+    }
+
+
+    stopPepeSnoring() {
+        const pepeSnoring = this.world?.sounds?.pepeSnoring;
+        if (!pepeSnoring) return;
+        pepeSnoring.pause();
+        pepeSnoring.currentTime = 0;
+    }
+
+
+    playPepeCalmBreating() {
+        const calmBreathing = this.world?.sounds?.calmBreathing;
+        if (!calmBreathing || !calmBreathing.paused || isSoundMuted) return;
+        calmBreathing.loop = true;
+        calmBreathing.volume = 0.4;
+        calmBreathing.play();
+    }
+
+
+    stopPepeCalmBreathing() {
+        const calmBreathing = this.world?.sounds?.calmBreathing;
+        if (!calmBreathing) return;
+        calmBreathing.pause();
+        calmBreathing.currentTime = 0;
+    }
 }

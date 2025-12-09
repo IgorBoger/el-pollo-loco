@@ -39,7 +39,7 @@ class ThrowableObject extends MovableObject {
 
 
     throw() {
-        this.world.playEffectSound(this.world.sounds.throw);
+        this.setupTrhowSound();
         console.log('bottle is throw ');
         this.speedY = 20;
         this.applyGravity();
@@ -48,6 +48,15 @@ class ThrowableObject extends MovableObject {
             if (isGamePaused) return;
             this.x += 15 * this.direction;
         }, 25);
+    }
+
+
+    setupTrhowSound() {
+        const throwSound = this.world?.sounds?.throw;
+        if (throwSound) {
+            throwSound.loop = false; throwSound.volume = 0.1;
+            this.world.playEffectSound(throwSound);
+        }
     }
 
 

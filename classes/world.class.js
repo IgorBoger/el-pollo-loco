@@ -16,7 +16,8 @@ class World {
         throw: new Audio('audio/bottle-throw.mp3'),          //  Sound-OK
         chicken: new Audio('audio/chicken.mp3'),
 
-        // pepeSnoring: new Audio('audio/pepe-snoring.mp3'),
+        calmBreathing: new Audio('audio/calm-breathing.mp3'),
+        pepeSnoring: new Audio('audio/pepe-snoring.mp3'),
 
         // endbossAppear: new Audio('audio/endboss_appear.mp3'),
         // endbossDead: new Audio('audio/endboss_dead.mp3')
@@ -51,7 +52,7 @@ class World {
         this.initCollectables(this.coins, Coin, 200, 50);
         this.initCollectables(this.bottles, Bottle, 100, 150);
         this.sounds.background.loop = true;
-        this.sounds.background.volume = 0.1;
+        // this.sounds.background.volume = 0.1;
         this.sounds.background.muted = isMusicMuted;
         this.endscreen = new Endscreen(this.ctx, this.canvas);
     }
@@ -219,30 +220,34 @@ class World {
     playEffectSound(sound) {
         if (!sound) return;
 
-        const isBackground = sound === this.sounds?.background;
+        const backgroundSounds = sound === this.sounds?.background;
 
-        if (isBackground && isMusicMuted) return;
-        if (!isBackground && isSoundMuted) return;
+        if ((backgroundSounds && isMusicMuted) || (!backgroundSounds && isSoundMuted)) return;
+        // if (!backgroundSounds && isSoundMuted) return;
 
         try {
             sound.pause();
             sound.currentTime = 0;
 
             const playPromise = sound.play();
-            if (playPromise !== undefined) {
-                playPromise.catch((error) => {
-                    console.warn('Sound konnte nicht abgespielt werden:', error);
-                });
-            }
-        } catch (e) {
-            console.warn('Fehler beim Abspielen des Sounds:', e);
-        }
-
-        if (this.sounds.background) {
-            this.sounds.background.volume = 0.1;
+            if (!playPromise) return;
+            playPromise.catch(err => {
+                if (err?.name === 'AbortError') return;
+                console.warn('Sound konnte nicht abgespielt werden:', err);
+            });
+        } catch (err) {
+            console.warn('Fehler beim Abspielen des Sounds:', err);
         }
     }
 
+
+    pauseAllSounds() {
+        Object.values(this.sounds).forEach(sound => {
+            if (sound instanceof Audio) {
+                sound.pause();
+            }
+        });
+    }
 
 
     initCollectables(array, ClassRef, offsetMinX = 200, offsetMaxX = 50) {
@@ -263,17 +268,29 @@ class World {
         if (this.keyBaord.THROW && this.character.bottle > 0 && now - this.lastBottleThrow > 500) {
             const direction = this.character.otherDirection ? -1 : 1;
             const offsetX = direction * 30;
+            const inTheAirY = this.character.y + 140;
+            const baseY = typeof this.character.minY === 'number'
+                ? this.character.minY
+                : this.character.y;
+            const spawnY = baseY + 140;
             let bottle;
-            if (direction === -1) {
-                bottle = new ThrowableObject(this.character.x + offsetX, this.character.y + 140, this, direction);
+
+            if (this.character.y < 180) {
+                // Immer 
+                bottle = new ThrowableObject(this.character.x + offsetX, inTheAirY, this, direction); // Wen Pepe in der lüft ist
             } else {
-                bottle = new ThrowableObject(this.character.x + 50, this.character.y + 140, this, direction);
+                if (direction === -1) {
+                    // Nur am boden nach Links
+                    bottle = new ThrowableObject(this.character.x + offsetX, spawnY, this, direction); // Wen Pepe auf dem Boden ist
+                } else {
+                    // Nur am boden nach Rechts
+                    bottle = new ThrowableObject(this.character.x + 50, spawnY, this, direction); // Wen Pepe auf dem Boden ist
+                }
             }
             this.throwableObject.push(bottle);
             this.character.bottle -= 5;
             if (this.character.bottle < 0) this.character.bottle = 0;
             this.updateBottleStatusBar();
-
             this.lastBottleThrow = now;
         }
     }
@@ -391,13 +408,7 @@ class World {
     }
 
 
-    // Datei: classes/world.class.js
     drawStaticFrame() {
-        // const wasStopped = this.stopped;
-        // this.stopped = false;
-        // this.draw();
-        // this.stopped = wasStopped;
-
         this.stopped = false;
         this.draw();
         this.stopped = true;
@@ -448,16 +459,21 @@ class World {
             clearInterval(this.runTimer);
             this.runTimer = null;
         }
-        Object.values(this.sounds).forEach(s => {
-            if (s instanceof Audio) {
-                s.pause();
-                s.currentTime = 0;
-            }
-        });
+        this.resetAllSounds();
         this.endscreen?.hide();
         this.throwableObject = [];
         this.coins = [];
         this.bottles = [];
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+
+
+    resetAllSounds() {
+        Object.values(this.sounds).forEach(sound => {
+            if (sound instanceof Audio) {
+                sound.pause();
+                sound.currentTime = 0;
+            }
+        });
     }
 }
