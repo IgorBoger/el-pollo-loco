@@ -19,8 +19,11 @@ class World {
         calmBreathing: new Audio('audio/calm-breathing.mp3'),
         pepeSnoring: new Audio('audio/pepe-snoring.mp3'),
 
-        // endbossAppear: new Audio('audio/endboss_appear.mp3'),
-        // endbossDead: new Audio('audio/endboss_dead.mp3')
+        endbossAppear: new Audio('audio/endboss_appear.mp3'),   //  Sound-OK
+        endbossAlert: new Audio('audio/endboss_alert.mp3'),
+        endbossAttack: new Audio('audio/endboss_attack.mp3'),
+        endbossHurt: new Audio('audio/endboss_hurt.mp3'),
+        endbossDead: new Audio('audio/endboss_dead.mp3')
     };
     coins = [];
     bottles = [];
@@ -84,7 +87,7 @@ class World {
 
     run() {
         this.runTimer = setInterval(() => {
-            if (isGamePaused) return;
+            if (isGamePaused || this.stopped) return;
             this.checkCollisions();
             this.checkThrowObject();
             this.checkBottleOnGround();
@@ -206,6 +209,7 @@ class World {
                         enemy.stun(700);
                         if (!enemy.lastHit || now - enemy.lastHit > cd) {
                             enemy.hit();
+                            if (!enemy.isDead()) enemy.hurtFlash();
                             enemy.lastHit = now;
                             this.updateEndbossStatusBar(enemy);
                         }
@@ -454,6 +458,7 @@ class World {
 
 
     destroy() {
+        this.stopAllEnemies();
         this.stopped = true;
         if (this.runTimer) {
             clearInterval(this.runTimer);
@@ -465,6 +470,11 @@ class World {
         this.coins = [];
         this.bottles = [];
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+
+
+    stopAllEnemies() {
+        this.level?.enemies?.forEach(enemy => enemy.stop?.());
     }
 
 

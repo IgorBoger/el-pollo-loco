@@ -107,7 +107,20 @@ class Endboss extends MovableObject {
     recoveryAfterAttackMs = 2400;   // Pause nach einer Attacke
     recoverUntil = 0;               // Timestamp bis wann Pause aktiv ist
 
+    // Sounds......
 
+    // Appear
+    appearSoundPlayed = false;
+
+    // Alert
+    alertSoundCooldownUntil = 0;
+    alertSoundCooldownMs = 1400;
+    scheduledAlertSoundAt = 0;
+    appearToAlertDelayMs = 950;
+
+
+    // Dead
+    deadSoundPlayed = false;
 
 
     constructor() {
@@ -115,9 +128,8 @@ class Endboss extends MovableObject {
         [this.IMAGES_WALKING, this.IMAGES_ALERT, this.IMAGES_ATTACK,
         this.IMAGES_HURT, this.IMAGES_DEAD].forEach(imgs => this.loadImages(imgs));
         this.alertDurationMs = (this.alertFrameMs * this.IMAGES_ALERT.length) + 60;
-        // console.log('🔧 Alert-Dauer automatisch berechnet:', this.alertDurationMs, 'ms');
         this.attackDurationMs = (this.attackFrameMs * this.IMAGES_ATTACK.length) + 80;
-        this.energy = 100; // Neu: Energie wie andere Gegner
+        this.energy = 100;
         this.currentAnimation = 'walk';
         this.targetSpeed = this.baseWalkSpeed * this.patrolDir;
         this.animate();
@@ -135,7 +147,7 @@ class Endboss extends MovableObject {
 
     animate() {
         this.aiInterval = setInterval(() => {
-            if (isGamePaused) return;
+            if (isGamePaused || this.world?.stopped) return;
             if (this.handleDeath() || !this.world?.character) return;
             const now = performance.now();
             const pepeX = this.world.character.x;
@@ -144,12 +156,11 @@ class Endboss extends MovableObject {
                 ? this.applyRecovery()
                 : this.updateAI(now, pepeX, dist);
             this.updateFacing();
-            this.applyWalkBob(now);          // 🆕 sanftes Wippen beim Gehen
-            this.x += this.currentSpeed;
+            this.applyWalkBob(now);
+            this.applyHorizontalMotion();
         }, 1000 / 60);
-        // this.animationInterval = setInterval(() => this.updateFrames(), 50);
         this.animationInterval = setInterval(() => {
-            if (isGamePaused) return;
+            if (isGamePaused || this.world?.stopped) return;
             this.updateFrames();
         }, 50);
     }
@@ -157,7 +168,9 @@ class Endboss extends MovableObject {
 
     handleDeath() {
         if (!this.isDead()) return false;
-        this.setAnimation('dead');
+        // this.setAnimation('dead');
+        const changedToDead = this.setAnimation('dead');
+        if (changedToDead) this.playEndbossDeadSound();
         this.currentSpeed = 0;
         setTimeout(() => {
             if (this.world) {
@@ -177,7 +190,8 @@ class Endboss extends MovableObject {
 
     applyRecovery() {
         if (this.currentAnimation !== 'hurt') {
-            this.setAnimation('alert');
+            const changedToAlert = this.setAnimation('alert');
+            if (changedToAlert) this.playEndbossAlertSound(performance.now());
         }
         this.targetSpeed = 0;
         this.currentSpeed += (0 - this.currentSpeed) * 0.25;
@@ -185,6 +199,7 @@ class Endboss extends MovableObject {
 
 
     updateAI(now, pepeX, dist) {
+        this.tryPlayScheduledEndbossAlertSound(now);
         this.updateAggro(dist);
         if (this.handleHurtState()) return;
         this.updatePatrol();
@@ -277,8 +292,13 @@ class Endboss extends MovableObject {
         if (this.isInRecovery(now) || now < this.postAlertCooldownUntil) return;
         if (now < (this.forceAlertUntil || 0) || this.currentAnimation === 'hurt') return;
         this.isChasing = false; this.chaseUntil = 0;
-        this.setAnimation('attack');
+
+        // this.setAnimation('attack');
+        const changedToAttack = this.setAnimation('attack');
+        if (changedToAttack) this.playEndbossAttackSound();
+
         this.attackUntil = now + this.attackDurationMs;
+
         const dir = pepeX > this.x ? 1 : -1;
         this.otherDirection = pepeX > this.x;
         this.currentSpeed = 0; this.targetSpeed = this.attackDashSpeed * dir;
@@ -292,9 +312,71 @@ class Endboss extends MovableObject {
         if (inCd || this.isHurt?.() || this.isChasing) return;
         if (this.currentAnimation === 'alert' || this.currentAnimation === 'attack') return;
         if (dist > this.alertRange) return;
-        this.setAnimation('alert'); this.aggro = true;
+        const changedToAlert = this.setAnimation('alert');
+        if (!changedToAlert) return;
+        this.aggro = true;
+        this.handleAlertSounds(now);
         this.alertUntil = now + this.alertFrameMs * this.IMAGES_ALERT.length + 60;
         this.forceAlertUntil = Math.max(this.forceAlertUntil || 0, now + 300);
+    }
+
+
+    handleAlertSounds(now) {
+        const isFirstEncounter = !this.appearSoundPlayed;
+        if (isFirstEncounter) {
+            this.playEndbossAppearSound();
+            this.scheduleEndbossAlertSound(now);
+            return;
+        }
+        this.playEndbossAlertSound(now);
+    }
+
+
+    playEndbossAppearSound() {
+        if (this.appearSoundPlayed) return;
+        const endbossAppear = this.world?.sounds?.endbossAppear;
+        if (!endbossAppear) return;
+        this.world.playEffectSound(endbossAppear);
+        this.appearSoundPlayed = true;
+        // pepeSnoring.volume = 0.8;
+    }
+
+
+    playEndbossAlertSound(now) {
+        if (now < this.alertSoundCooldownUntil) return;
+        const endbossAlert = this.world?.sounds?.endbossAlert;
+        if (!endbossAlert) return;
+        this.world.playEffectSound(endbossAlert);
+        this.alertSoundCooldownUntil = now + this.alertSoundCooldownMs;
+    }
+
+
+    scheduleEndbossAlertSound(now) {
+        this.scheduledAlertSoundAt = now + this.appearToAlertDelayMs;
+    }
+
+
+    tryPlayScheduledEndbossAlertSound(now) {
+        if (!this.scheduledAlertSoundAt) return;
+        if (now < this.scheduledAlertSoundAt) return;
+        this.scheduledAlertSoundAt = 0;
+        this.playEndbossAlertSound(now);
+    }
+
+
+    playEndbossAttackSound() {
+        const endbossAttack = this.world?.sounds?.endbossAttack;
+        if (!endbossAttack) return;
+        this.world.playEffectSound(endbossAttack);
+    }
+
+
+    stop() {
+        if (this.aiInterval) clearInterval(this.aiInterval);
+        if (this.animationInterval) clearInterval(this.animationInterval);
+        this.aiInterval = null;
+        this.animationInterval = null;
+        this.scheduledAlertSoundAt = 0;
     }
 
 
@@ -375,6 +457,12 @@ class Endboss extends MovableObject {
     }
 
 
+    applyHorizontalMotion() {
+        if (Math.abs(this.currentSpeed) < 0.05) return;
+        this.x += this.currentSpeed;
+    }
+
+
     updateFrames() {
         const now = performance.now();
         let images = this.IMAGES_WALKING;
@@ -402,13 +490,23 @@ class Endboss extends MovableObject {
     }
 
 
+    // setAnimation(name) {
+    //     if (this.currentAnimation !== name) {
+    //         this.currentAnimation = name;
+    //         this.currentImage = 0;
+    //         this.lastAnimAt = 0;
+    //     }
+    // }
+
+
     setAnimation(name) {
-        if (this.currentAnimation !== name) {
-            this.currentAnimation = name;
-            this.currentImage = 0;
-            this.lastAnimAt = 0;
-        }
+        if (this.currentAnimation === name) return false;
+        this.currentAnimation = name;
+        this.currentImage = 0;
+        this.lastAnimAt = 0;
+        return true;
     }
+
 
 
     maybeAdvance(images, now, frameMs) {
@@ -422,6 +520,7 @@ class Endboss extends MovableObject {
     hurtFlash() {
         if (this.currentAnimation === 'dead') return;
         this.setAnimation('hurt');
+        this.playEndbossHurtSound();
         this.currentSpeed = 0;
         const until = performance.now() + 320;
         this.recoverUntil = Math.max(this.recoverUntil, until);
@@ -431,6 +530,25 @@ class Endboss extends MovableObject {
             if (!this.isDead() && this.isInRecovery(performance.now()))
                 this.setAnimation('alert');
         }, 320);
+    }
+
+
+    playEndbossHurtSound() {
+        const endbossHurt = this.world?.sounds?.endbossHurt;
+        if (!endbossHurt) return;
+        this.world.playEffectSound(endbossHurt);
+        // endbossHurt.volume = 0.8;
+    }
+
+
+    playEndbossDeadSound() {
+        if (this.deadSoundPlayed) return;
+
+        const endbossDead = this.world?.sounds?.endbossDead;
+        if (!endbossDead) return;
+
+        this.world.playEffectSound(endbossDead);
+        this.deadSoundPlayed = true;
     }
 
 

@@ -62,8 +62,7 @@ class MovableObject extends DrawableObject {
         this.energy -= 20;
         console.log(this.constructor.name, 'energy is ', this.energy);
 
-        if (this instanceof Chicken || this instanceof Endboss
-            || this instanceof SmallChicken) {
+        if (this instanceof Chicken || this instanceof SmallChicken) {
             this.world.playEffectSound(this.world.sounds.chicken);
         }
 
