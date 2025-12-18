@@ -147,7 +147,8 @@ class Endboss extends MovableObject {
 
     animate() {
         this.aiInterval = setInterval(() => {
-            if (isGamePaused || this.world?.stopped) return;
+            // if (isGamePaused || this.world?.stopped) return;
+            if (window.isGamePaused || this.world?.stopped) return;
             if (this.handleDeath() || !this.world?.character) return;
             const now = performance.now();
             const pepeX = this.world.character.x;
