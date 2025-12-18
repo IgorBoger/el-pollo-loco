@@ -12,7 +12,8 @@ let isMusicMuted = localStorage.getItem('isMusicMuted') === 'true';
 let isSoundMuted = localStorage.getItem('isSoundMuted') === 'true';
 let currentLanguage = localStorage.getItem('language') || 'ES';
 let reopenBurgerAfterOverlay = false;
-let isGamePaused = false;
+// let isGamePaused = false;
+var isGamePaused = false;
 console.log(isGamePaused);
 
 
@@ -264,16 +265,39 @@ function startGame() {
 
     document.getElementById('startScreen').classList.add('d-none');
     init();
-    if (world?.sounds?.background) {
-        const bg = world.sounds.background;
-        bg.loop = true;
-        bg.volume = 0.1;
-        bg.muted = isMusicMuted;
+    playBackgroundIfAllowed();
 
-        if (!isMusicMuted) {
-            bg.play().catch((e) => console.warn('Musikstart fehlgeschlagen:', e));
-        }
-    }
+    // if (world?.sounds?.background) {
+    //     const bg = world.sounds.background;
+    //     bg.loop = true;
+    //     bg.volume = 0.1;
+    //     bg.muted = isMusicMuted;
+
+    //     if (!isMusicMuted) {
+    //         bg.play().catch((e) => console.warn('Musikstart fehlgeschlagen:', e));
+    //     }
+    // }
+}
+
+
+function getBackgroundAudio() {
+    return world?.sounds?.background || null;
+}
+
+
+function applyBackgroundSettings(backgroundAudio) {
+    if (!backgroundAudio) return;
+    backgroundAudio.loop = true;
+    backgroundAudio.volume = 0.1;
+    backgroundAudio.muted = isMusicMuted;
+}
+
+
+function playBackgroundIfAllowed() {
+    const backgroundAudio = getBackgroundAudio();
+    applyBackgroundSettings(backgroundAudio);
+    if (!backgroundAudio || isMusicMuted || isGamePaused) return;
+    backgroundAudio.play();
 }
 
 
@@ -678,19 +702,33 @@ function toggleFullscreen() {
 
 
 function togglePause() {
-    console.log(isGamePaused);
-
     if (!world) return;
     isGamePaused = !isGamePaused;
+
     const btn = document.getElementById('pauseBtn');
     if (btn) btn.textContent = isGamePaused ? 'Play ▶' : 'Pause ❚❚';
-    const bg = world.sounds?.background;
-    if (!bg || isMusicMuted) return;
+
+    // const bg = world.sounds?.background;
+    // if (!bg || isMusicMuted) return;
     if (isGamePaused) {
-        bg.pause();
+        world.pauseAllSounds();        //  ⬅️ NEU
         return;
     }
-    bg.play().catch(() => { });
+
+    if (world.character) {
+        world.character.lastActivityAt = performance.now();
+    }
+
+    // if (!isMusicMuted && bg) {
+    //     bg.play().catch(() => { });
+    // }
+
+    // if (world.character) world.character.lastActivityAt = performance.now();
+    // const bg = world.sounds?.background;
+    // if (!isMusicMuted && bg) bg.play().catch(() => { });
+
+    if (world.character) world.character.lastActivityAt = performance.now();
+    playBackgroundIfAllowed();
 }
 
 
@@ -699,6 +737,10 @@ function togglePause() {
 function quickRestartGame() {
 
     isGamePaused = false;
+    const pauseBtn = document.getElementById('pauseBtn');
+    pauseBtn?.classList.remove('d-none');
+    if (pauseBtn) pauseBtn.textContent = 'Pause ❚❚';
+
     // Startscreen bleibt versteckt:
     document.getElementById('startScreen')?.classList.add('d-none');
 
@@ -717,17 +759,18 @@ function quickRestartGame() {
         setupHiDPICanvas();
     }
     world = new World(canvas, keyBaord);
+    playBackgroundIfAllowed();
 
     // Musik wie beim Start behandeln
-    if (world?.sounds?.background) {
-        const bg = world.sounds.background;
-        bg.loop = true;
-        bg.volume = 0.1;
-        bg.muted = isMusicMuted;
-        if (!isMusicMuted) {
-            bg.play().catch(e => console.warn('Musikstart fehlgeschlagen:', e));
-        }
-    }
+    // if (world?.sounds?.background) {
+    //     const bg = world.sounds.background;
+    //     bg.loop = true;
+    //     bg.volume = 0.1;
+    //     bg.muted = isMusicMuted;
+    //     if (!isMusicMuted) {
+    //         bg.play().catch(e => console.warn('Musikstart fehlgeschlagen:', e));
+    //     }
+    // }
 
     handleViewportChange?.();
 }
@@ -767,17 +810,13 @@ function handleViewportChange() {
 }
 
 
-// Datei: js/game.js — Funktion: onGameOver (NEU)
 function onGameOver(worldInstance) {
     isGamePaused = true;
     const pauseBtn = document.getElementById('pauseBtn');
     pauseBtn?.classList.add('d-none');
     const bg = worldInstance?.sounds?.background;
-    if (bg) {
-        bg.pause();
-    }
+    worldInstance?.pauseAllSounds();
 }
-
 
 
 function setupHiDPICanvas() {

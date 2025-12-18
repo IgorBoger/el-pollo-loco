@@ -367,11 +367,13 @@ class Character extends MovableObject {
 
 
     playPepeSnoring() {
-        const pepeSnoring = this.world.sounds.pepeSnoring;
-        this.world.sounds.pepeSnoring.loop = true;
+        const pepeSnoring = this.world?.sounds?.pepeSnoring;
+        if (!pepeSnoring || isSoundMuted || isGamePaused || this.world?.stopped) return;
+        pepeSnoring.loop = true;
         pepeSnoring.volume = 0.8;
         pepeSnoring.currentTime = 0;
-        pepeSnoring.play();
+        // pepeSnoring.play();
+        this.world.playEffectSound(pepeSnoring);
     }
 
 
@@ -388,7 +390,8 @@ class Character extends MovableObject {
         if (!calmBreathing || !calmBreathing.paused || isSoundMuted) return;
         calmBreathing.loop = true;
         calmBreathing.volume = 0.4;
-        calmBreathing.play();
+        // calmBreathing.play();
+        this.world.playEffectSound(calmBreathing);
     }
 
 
