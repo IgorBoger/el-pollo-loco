@@ -88,8 +88,12 @@ class Endboss extends MovableObject {
     isChasing = false;
 
     // === Attack (Dash nach Alert) ===
+    // attackFrameMs = 100;          // schneller Takt für G13–G20
     attackFrameMs = 100;          // schneller Takt für G13–G20
-    attackRange = 200;           // nur wenn Pepe noch so nah ist → Attack
+    attackMoveStartFrame = 4;
+    // attackRange = 200;           // nur wenn Pepe noch so nah ist → Attack
+    attackRange = 100;           // nur wenn Pepe noch so nah ist → Attack
+    // attackStartRange = 90;
     attackDashSpeed = 4;         // Dash-Geschwindigkeit
     attackUntil = 0;             // Timer für Attack-Dauer
 
@@ -106,6 +110,9 @@ class Endboss extends MovableObject {
     // === Erholungsphase nach Attack ===
     recoveryAfterAttackMs = 2400;   // Pause nach einer Attacke
     recoverUntil = 0;               // Timestamp bis wann Pause aktiv ist
+
+    isHurtLocked = false;
+    recoveryType = null;
 
     // Sounds......
 
@@ -169,7 +176,6 @@ class Endboss extends MovableObject {
 
     handleDeath() {
         if (!this.isDead()) return false;
-        // this.setAnimation('dead');
         const changedToDead = this.setAnimation('dead');
         if (changedToDead) this.playEndbossDeadSound();
         this.currentSpeed = 0;
@@ -190,25 +196,41 @@ class Endboss extends MovableObject {
 
 
     applyRecovery() {
-        if (this.currentAnimation !== 'hurt') {
-            const changedToAlert = this.setAnimation('alert');
-            if (changedToAlert) this.playEndbossAlertSound(performance.now());
-        }
+        if (this.recoveryType === 'hurt') this.ensureHurtAnimation();
+        this.stopMovementSoft();
+    }
+
+
+    ensureHurtAnimation() {
+        if (this.currentAnimation !== 'hurt') this.setAnimation('hurt');
+    }
+
+    stopMovementSoft() {
         this.targetSpeed = 0;
         this.currentSpeed += (0 - this.currentSpeed) * 0.25;
     }
 
 
     updateAI(now, pepeX, dist) {
+        if (this.exitRecoveryToAlert(now)) return;
         this.tryPlayScheduledEndbossAlertSound(now);
         this.updateAggro(dist);
-        if (this.handleHurtState()) return;
         this.updatePatrol();
         this.updateChaseMovement(now, pepeX);
         this.updateChaseTransitions(now, pepeX, dist);
         this.tryStartAlert(now, pepeX, dist);
         this.updateAlertState(now, pepeX, dist);
         this.updateAttackState(now, pepeX);
+    }
+
+
+    exitRecoveryToAlert(now) {
+        if (this.isInRecovery(now)) return false;
+        if (this.recoveryType !== 'hurt') return false;
+        this.recoveryType = null;
+        this.setAnimation('alert');
+        this.forceAlertUntil = Math.max(this.forceAlertUntil || 0, now + 350);
+        return false;
     }
 
 
@@ -222,42 +244,10 @@ class Endboss extends MovableObject {
     }
 
 
-    handleHurtState() {
-        if (!this.isHurt()) return false;
-        this.setAnimation('hurt');
-        this.currentSpeed = 0;
-
-        // KI pausieren für Dauer des Hurt-Zustands
-        const until = performance.now() + 1000;
-        this.recoverUntil = until;                 // KI pausiert
-        this.postAlertCooldownUntil = until;       // keine neuen Alerts
-        this.isChasing = false;
-        this.chaseUntil = 0;
-        setTimeout(() => {
-            if (!this.isDead()) {
-                const now2 = performance.now();
-                const pepeX = this.world?.character?.x ?? this.x;
-                const dir = pepeX > this.x ? 1 : -1;
-
-                // Sichtbar in Lauf übergehen und SOFORT wieder bewegen
-                this.setAnimation('walk');
-                this.chaseUntil = now2 + 900;
-
-                // wichtig: Tempo direkt setzen, nicht warten
-                this.targetSpeed = this.chaseSpeed * dir;
-                this.currentSpeed = this.targetSpeed;
-            }
-        }, 1000);
-
-        return true;
-    }
-
-
-
     updatePatrol() {
         if (this.isChasing || this.aggro ||
             this.currentAnimation === 'alert' ||
-            this.currentAnimation === 'attack') return;
+            this.isAttackAnim()) return;
         this.targetSpeed = this.baseWalkSpeed * this.patrolDir;
         this.currentSpeed += (this.targetSpeed - this.currentSpeed) * 0.12;
         if (this.x <= this.patrolLeft || this.x >= this.patrolRight) {
@@ -268,7 +258,7 @@ class Endboss extends MovableObject {
 
 
     updateChaseMovement(now, pepeX) {
-        if (now >= this.chaseUntil || this.currentAnimation === 'attack') return;
+        if (!this.isChasing || this.isAttackAnim()) return;
         const dir = pepeX > this.x ? 1 : -1;
         this.targetSpeed = this.chaseSpeed * dir;
         this.otherDirection = pepeX > this.x;
@@ -277,30 +267,27 @@ class Endboss extends MovableObject {
 
 
     updateChaseTransitions(now, pepeX, dist) {
-        if (!this.isChasing || this.currentAnimation === 'attack') return;
-        if (dist <= this.attackRange) {
-            this.startAttack(now, pepeX);
-        } else if (dist > this.alertRange) {
-            this.isChasing = false;
-            this.chaseUntil = 0;
-            this.setAnimation('walk');
-            this.postAlertCooldownUntil = now + 300;
-        }
+        if (!this.isChasing || this.isAttackAnim()) return;
+        if (dist <= this.attackRange) { this.startAttack(now, pepeX); return; }
+        if (dist <= this.alertRange) return;
+        this.isChasing = false;
+        this.chaseUntil = 0;
+        this.setAnimation('walk');
+        this.postAlertCooldownUntil = now + 300;
     }
 
 
     startAttack(now, pepeX) {
+        console.log('START ATTACK', { now, postAlertCooldownUntil: this.postAlertCooldownUntil, recoverUntil: this.recoverUntil });
+        if (this.isAttackAnim()) return;
         if (this.isInRecovery(now) || now < this.postAlertCooldownUntil) return;
         if (now < (this.forceAlertUntil || 0) || this.currentAnimation === 'hurt') return;
         this.isChasing = false; this.chaseUntil = 0;
-
-        // this.setAnimation('attack');
-        const changedToAttack = this.setAnimation('attack');
+        const changedToAttack = this.setAnimation('attackPrep');
         if (changedToAttack) this.playEndbossAttackSound();
-
         this.attackUntil = now + this.attackDurationMs;
-
         const dir = pepeX > this.x ? 1 : -1;
+        this.attackDir = dir;
         this.otherDirection = pepeX > this.x;
         this.currentSpeed = 0; this.targetSpeed = this.attackDashSpeed * dir;
         this.attackHitAllowedAt = now + this.attackHitDelayMs;
@@ -311,7 +298,7 @@ class Endboss extends MovableObject {
     tryStartAlert(now, pepeX, dist) {
         const inCd = this.isInRecovery(now) || now < this.postAlertCooldownUntil;
         if (inCd || this.isHurt?.() || this.isChasing) return;
-        if (this.currentAnimation === 'alert' || this.currentAnimation === 'attack') return;
+        if (this.currentAnimation === 'alert' || this.isAttackAnim()) return;
         if (dist > this.alertRange) return;
         const changedToAlert = this.setAnimation('alert');
         if (!changedToAlert) return;
@@ -337,9 +324,10 @@ class Endboss extends MovableObject {
         if (this.appearSoundPlayed) return;
         const endbossAppear = this.world?.sounds?.endbossAppear;
         if (!endbossAppear) return;
+        endbossAppear.loop = false;
+        endbossAppear.volume = 0.2;
         this.world.playEffectSound(endbossAppear);
         this.appearSoundPlayed = true;
-        // pepeSnoring.volume = 0.8;
     }
 
 
@@ -347,6 +335,8 @@ class Endboss extends MovableObject {
         if (now < this.alertSoundCooldownUntil) return;
         const endbossAlert = this.world?.sounds?.endbossAlert;
         if (!endbossAlert) return;
+        endbossAlert.loop = false;
+        endbossAlert.volume = 0.1;
         this.world.playEffectSound(endbossAlert);
         this.alertSoundCooldownUntil = now + this.alertSoundCooldownMs;
     }
@@ -368,6 +358,8 @@ class Endboss extends MovableObject {
     playEndbossAttackSound() {
         const endbossAttack = this.world?.sounds?.endbossAttack;
         if (!endbossAttack) return;
+        endbossAttack.loop = false;
+        endbossAttack.volume = 0.1;
         this.world.playEffectSound(endbossAttack);
     }
 
@@ -387,7 +379,7 @@ class Endboss extends MovableObject {
         this.currentSpeed = 0;
         if (now < (this.forceAlertUntil || 0)) return;
         if (now < this.alertUntil) return;
-        if (dist <= this.attackRange + 40) { this.startAttack(now, pepeX); return; }
+        if (dist <= this.attackRange + 100) { this.startAttack(now, pepeX); return; }
         this.setAnimation('walk');
         this.isChasing = true;
         this.chaseUntil = now + 900;
@@ -400,26 +392,85 @@ class Endboss extends MovableObject {
     }
 
 
-
-    updateAttackState(now, pepeX) {
-        if (this.currentAnimation !== 'attack') return;
-
-        if (this.isInRecovery(now) || now < this.postAlertCooldownUntil) {
-            this.currentSpeed = 0; this.targetSpeed = 0;
-            this.setAnimation('alert'); return;
-        }
-
-        const dir = this.targetSpeed >= 0 ? 1 : -1;
-        this.currentSpeed += (this.attackDashSpeed * dir - this.currentSpeed) * 0.25;
+    updateAttackState(now) {
+        if (!this.isAttackAnim()) return;
+        if (this.isAttackBlocked(now)) return this.blockAttack(now);
+        this.tryEnableAttackDamage(now);
+        this.applyAttackDash();
         if (now < this.attackUntil) return;
+        this.finishAttack(now);
+    }
+
+
+    isAttackAnim() {
+        return this.currentAnimation === 'attack' || this.currentAnimation === 'attackPrep';
+    }
+
+
+    isAttackBlocked(now) {
+        return this.isInRecovery(now) || now < this.postAlertCooldownUntil;
+    }
+
+
+    blockAttack(now) {
         this.currentSpeed = 0;
         this.targetSpeed = 0;
-        this.recoverUntil = now + this.recoveryAfterAttackMs;
-        this.postAlertCooldownUntil = this.recoverUntil;
+        this.attackUntil = now;
+        this.setAnimation('alert');
+    }
+
+
+    finishAttack(now) {
+        this.resetAttackMotion();
+        this.setAnimation('alert');
+        this.forceAlertUntil = Math.max(this.forceAlertUntil || 0, now + 350);
+        this.startAttackRecovery(now);
+    }
+
+
+    resetAttackMotion() {
+        this.currentSpeed = 0;
+        this.targetSpeed = 0;
         this.isChasing = false;
         this.chaseUntil = 0;
-        // this.setAnimation('walk');
+    }
+
+    startAttackRecovery(now) {
+        this.recoveryType = 'attack';
+        this.recoverUntil = now + this.recoveryAfterAttackMs;
+        this.postAlertCooldownUntil = this.recoverUntil;
+    }
+
+
+    shouldAbortAttack(now) {
+        return this.isInRecovery(now) || now < this.postAlertCooldownUntil;
+    }
+
+
+    abortAttackToAlert() {
+        console.log('ABORT ATTACK', {
+            now: performance.now(),
+            recoverUntil: this.recoverUntil,
+            postAlertCooldownUntil: this.postAlertCooldownUntil
+        });
+
+        this.currentSpeed = 0;
+        this.targetSpeed = 0;
         this.setAnimation('alert');
+    }
+
+
+    tryEnableAttackDamage(now) {
+        if (this.currentAnimation !== 'attackPrep') return;
+        if (now < this.attackHitAllowedAt) return;
+        this.setAnimationKeepFrame('attack');
+    }
+
+
+    applyAttackDash() {
+        const dir = this.targetSpeed >= 0 ? 1 : -1;
+        const dash = (this.currentImage >= this.attackMoveStartFrame) ? this.attackDashSpeed : 0;
+        this.currentSpeed += (dash * dir - this.currentSpeed) * 0.25;
 
     }
 
@@ -429,7 +480,7 @@ class Endboss extends MovableObject {
             Math.abs(this.currentSpeed) > 0.2
                 ? this.currentSpeed
                 : (Math.abs(this.targetSpeed) > 0.2 ? this.targetSpeed : 0);
-        if (Math.abs(speedRef) < 0.2 || this.currentAnimation === 'attack') return;
+        if (Math.abs(speedRef) < 0.2 || this.isAttackAnim()) return;
         const desired = speedRef >= 0 ? 1 : -1;
         this.facing += (desired - this.facing) * this.facingLerp;
         if (this.facing > this.facingThreshold) {
@@ -459,6 +510,7 @@ class Endboss extends MovableObject {
 
 
     applyHorizontalMotion() {
+        if (this.isAttackAnim() && this.hasHitInCurrentAttack) return;
         if (Math.abs(this.currentSpeed) < 0.05) return;
         this.x += this.currentSpeed;
     }
@@ -477,7 +529,7 @@ class Endboss extends MovableObject {
         } else if (this.currentAnimation === 'alert') {
             images = this.IMAGES_ALERT;
             frameMs = this.alertFrameMs;
-        } else if (this.currentAnimation === 'attack') {
+        } else if (this.isAttackAnim()) {
             images = this.IMAGES_ATTACK;
             frameMs = this.attackFrameMs;
         }
@@ -491,16 +543,8 @@ class Endboss extends MovableObject {
     }
 
 
-    // setAnimation(name) {
-    //     if (this.currentAnimation !== name) {
-    //         this.currentAnimation = name;
-    //         this.currentImage = 0;
-    //         this.lastAnimAt = 0;
-    //     }
-    // }
-
-
     setAnimation(name) {
+        if (this.isInRecovery(performance.now()) && name !== 'hurt') return false;
         if (this.currentAnimation === name) return false;
         this.currentAnimation = name;
         this.currentImage = 0;
@@ -508,6 +552,12 @@ class Endboss extends MovableObject {
         return true;
     }
 
+
+    setAnimationKeepFrame(name) {
+        if (this.currentAnimation === name) return false;
+        this.currentAnimation = name;
+        return true;
+    }
 
 
     maybeAdvance(images, now, frameMs) {
@@ -520,34 +570,48 @@ class Endboss extends MovableObject {
 
     hurtFlash() {
         if (this.currentAnimation === 'dead') return;
-        this.setAnimation('hurt');
+        this.isHurtLocked = true;
+        this.currentAnimation = 'hurt';
+        this.currentImage = 0;
+        this.lastAnimAt = 0;
         this.playEndbossHurtSound();
-        this.currentSpeed = 0;
-        const until = performance.now() + 320;
+        const now = performance.now();
+        this.recoveryType = 'hurt';
+        const until = now + 320;
         this.recoverUntil = Math.max(this.recoverUntil, until);
         this.postAlertCooldownUntil = Math.max(this.postAlertCooldownUntil, until);
-        this.isChasing = false; this.chaseUntil = 0;
+        this.isChasing = false;
+        this.chaseUntil = 0;
+        this.scheduleBackToAlert(now);
+    }
+
+
+    scheduleBackToAlert(now) {
+        const ms = Math.max(0, (this.recoverUntil || now) - now);
         setTimeout(() => {
-            if (!this.isDead() && this.isInRecovery(performance.now()))
-                this.setAnimation('alert');
-        }, 320);
+            if (this.isDead()) return;
+            if (performance.now() < (this.recoverUntil || 0)) return;
+            this.isHurtLocked = false;
+            this.setAnimation('alert');
+        }, ms);
     }
 
 
     playEndbossHurtSound() {
         const endbossHurt = this.world?.sounds?.endbossHurt;
         if (!endbossHurt) return;
+        endbossHurt.loop = false;
+        endbossHurt.volume = 0.1;
         this.world.playEffectSound(endbossHurt);
-        // endbossHurt.volume = 0.8;
     }
 
 
     playEndbossDeadSound() {
         if (this.deadSoundPlayed) return;
-
         const endbossDead = this.world?.sounds?.endbossDead;
         if (!endbossDead) return;
-
+        endbossDead.loop = false;
+        endbossDead.volume = 0.3;
         this.world.playEffectSound(endbossDead);
         this.deadSoundPlayed = true;
     }
@@ -555,14 +619,36 @@ class Endboss extends MovableObject {
 
     stun(ms = 700) {
         const now = performance.now();
-        this.setAnimation('hurt');
-        this.currentSpeed = 0; this.targetSpeed = 0;
-        this.attackUntil = now;                  // Attack sofort abbrechen
-        this.isChasing = false; this.chaseUntil = 0;
-        const until = now + ms;
-        const grace = until + 250;               // 🆕 kleine Pause NACH Hurt
-        this.recoverUntil = until;               // KI pausiert (keine Moves)
-        this.postAlertCooldownUntil = grace;     // keine Alerts/Attacks starten
+        this.enterHurtState(now, ms);
+        this.scheduleBackToAlert(now);
     }
 
+
+    enterHurtState(now, ms) {
+        this.recoveryType = 'hurt';
+        this.setAnimation('hurt');
+        this.stopAttackState(now);
+        this.stopChaseState();
+        this.stopMovementHard();
+        this.recoverUntil = now + ms;
+        this.postAlertCooldownUntil = this.recoverUntil + 250;
+    }
+
+
+    stopAttackState(now) {
+        this.attackUntil = now;
+        this.attackHitAllowedAt = 0;
+        this.hasHitInCurrentAttack = true;
+        this.currentAnimation = 'hurt';
+    }
+
+    stopChaseState() {
+        this.isChasing = false;
+        this.chaseUntil = 0;
+    }
+
+    stopMovementHard() {
+        this.currentSpeed = 0;
+        this.targetSpeed = 0;
+    }
 }

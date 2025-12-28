@@ -91,7 +91,7 @@ class World {
             this.checkCollisions();
             this.checkThrowObject();
             this.checkBottleOnGround();
-        }, 50);
+        }, 1000 / 60);
     }
 
 
@@ -105,54 +105,64 @@ class World {
 
 
     collisionWithChicken() {
-        this.level.enemies.forEach((enemy) => {
-            if (enemy.isDead() || this.character.isDead()) return;
-            const now = new Date().getTime();
-            if (!this.character.isColliding(enemy)) return;
-            if (enemy instanceof Endboss && enemy.currentAnimation === 'attack') {
-                const nowPerf = performance.now();
-                const dir = (this.character.x < enemy.x) ? -1 : 1;
-                const knockY = 15;
-                this.character.speedY = knockY;
-                this.keepCharacterInsideBounds();
-                if (!enemy.lastHitOnCharacter || now - enemy.lastHitOnCharacter > 600) {
-                    this.character.hit(enemy);
-                    enemy.lastHitOnCharacter = now;
-                    this.updateHealthStatusBar();
-                }
-                enemy.currentSpeed = 0;
-                enemy.targetSpeed = 0;
-                enemy.recoverUntil = nowPerf + enemy.recoveryAfterAttackMs;
-                enemy.postAlertCooldownUntil = enemy.recoverUntil;
-                enemy.isChasing = false;
-                enemy.chaseUntil = 0;
-                enemy.setAnimation('walk');
-                this.adjustEndbossAtLeftEdge(enemy);
-                return;
-            }
+        this.level.enemies.forEach(enemy => this.handleEnemyCollision(enemy));
+    }
 
-            if (
-                this.character.isCollidingFromTop(enemy) &&
-                (enemy instanceof Chicken || enemy instanceof SmallChicken)
-            ) {
-                enemy.energy = 0;
-                enemy.hit();
-                console.warn(`☠️ Gegner ${enemy.constructor.name} bei X=${enemy.x} wurde durch STOMP getötet`);
-                return;
-            }
 
-            if (enemy instanceof Endboss) {
-                const nowPerf = performance.now();
-                if (nowPerf < (enemy.postAlertCooldownUntil || 0)) return; // kurze Body-Hit-Sperre nach Hurt/Stun
-            }
+    handleEnemyCollision(enemy) {
+        if (this.shouldSkipEnemyCollision(enemy)) return;
+        if (!this.character.isColliding(enemy)) return;
+        if (this.handleEndbossAttackCollision(enemy)) return;
+        if (this.handleStompCollision(enemy)) return;
+        if (this.isEndbossBodyHitBlocked(enemy)) return;
+        this.applyCharacterHit(enemy, 4000);
+    }
 
-            if (!enemy.lastHitOnCharacter || now - enemy.lastHitOnCharacter > 4000) {
-                this.character.hit(enemy);
-                enemy.lastHitOnCharacter = now;
-                this.updateHealthStatusBar();
-            }
 
-        });
+    shouldSkipEnemyCollision(enemy) {
+        return enemy.isDead() || this.character.isDead();
+    }
+
+
+    handleEndbossAttackCollision(enemy) {
+        if (!(enemy instanceof Endboss)) return false;
+        if (!enemy.isAttackAnim()) return false;
+        if (enemy.hasHitInCurrentAttack) return true;
+        const nowPerf = performance.now();
+        if (nowPerf < (enemy.attackHitAllowedAt || 0)) return true;
+        this.applyAttackKnockback(enemy);
+        this.applyCharacterHit(enemy, 600);
+        this.adjustEndbossAtLeftEdge(enemy);
+        enemy.hasHitInCurrentAttack = true;
+        return true;
+    }
+
+    applyAttackKnockback(enemy) {
+        this.character.speedY = 15;
+        this.keepCharacterInsideBounds();
+    }
+
+
+    handleStompCollision(enemy) {
+        const isChicken = enemy instanceof Chicken || enemy instanceof SmallChicken;
+        if (!isChicken) return false;
+        if (!this.character.isCollidingFromTop(enemy)) return false;
+        enemy.energy = 0;
+        enemy.hit();
+        return true;
+    }
+
+    isEndbossBodyHitBlocked(enemy) {
+        if (!(enemy instanceof Endboss)) return false;
+        return performance.now() < (enemy.postAlertCooldownUntil || 0);
+    }
+
+    applyCharacterHit(enemy, cooldownMs) {
+        const now = Date.now();
+        if (enemy.lastHitOnCharacter && now - enemy.lastHitOnCharacter <= cooldownMs) return;
+        this.character.hit(enemy);
+        enemy.lastHitOnCharacter = now;
+        this.updateHealthStatusBar();
     }
 
 
@@ -215,6 +225,17 @@ class World {
                         }
                         bottle.splash();
                     }
+
+                    // if (enemy instanceof Endboss) {
+                    //     const cd = 250;
+                    //     if (!enemy.lastHit || now - enemy.lastHit > cd) {
+                    //         enemy.hit();
+                    //         if (!enemy.isDead()) enemy.stun(700);
+                    //         enemy.lastHit = now;
+                    //         this.updateEndbossStatusBar(enemy);
+                    //     }
+                    //     bottle.splash();
+                    // }
                 }
             });
         });
@@ -223,16 +244,11 @@ class World {
 
     playEffectSound(sound) {
         if (!sound) return;
-
         const backgroundSounds = sound === this.sounds?.background;
-
         if ((backgroundSounds && isMusicMuted) || (!backgroundSounds && isSoundMuted)) return;
-        // if (!backgroundSounds && isSoundMuted) return;
-
         try {
             sound.pause();
             sound.currentTime = 0;
-
             const playPromise = sound.play();
             if (!playPromise) return;
             playPromise.catch(err => {
