@@ -111,7 +111,8 @@ class World {
 
     handleEnemyCollision(enemy) {
         if (this.shouldSkipEnemyCollision(enemy)) return;
-        if (!this.character.isColliding(enemy)) return;
+        // if (!this.character.isColliding(enemy)) return;
+        if (!this.isEndbossAwareCollision(this.character, enemy)) return;
         if (this.handleEndbossAttackCollision(enemy)) return;
         if (this.handleStompCollision(enemy)) return;
         if (this.isEndbossBodyHitBlocked(enemy)) return;
@@ -213,7 +214,8 @@ class World {
             if (enemy.isDead()) return;
 
             this.throwableObject.forEach(bottle => {
-                if (!bottle.isSplashed && bottle.isColliding(enemy)) {
+                // if (!bottle.isSplashed && bottle.isColliding(enemy)) {
+                if (!bottle.isSplashed && this.isEndbossAwareCollision(bottle, enemy)) {
                     if (enemy instanceof Endboss) {
                         const cd = 250;
                         enemy.stun(700);
@@ -501,5 +503,12 @@ class World {
                 sound.currentTime = 0;
             }
         });
+    }
+
+
+    isEndbossAwareCollision(a, b) {
+        if (a instanceof Endboss) return a.isColliding(b);
+        if (b instanceof Endboss) return b.isColliding(a);
+        return a.isColliding(b);
     }
 }

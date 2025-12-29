@@ -651,4 +651,75 @@ class Endboss extends MovableObject {
         this.currentSpeed = 0;
         this.targetSpeed = 0;
     }
+
+
+    getMainFrameRect() {
+        const x = this.x + (this.frameOffsetX || 0);
+        const y = this.y + (this.frameOffsetY || 0);
+        const w = this.frameWidth || this.width;
+        const h = this.frameHeight || this.height;
+        return { x, y, w, h };
+    }
+
+
+    getTopRect(r, split) {
+        return { x: r.x, y: r.y, w: r.w, h: split };
+    }
+
+
+    getMiddleRect(r, split, baseX, cm2) {
+        const leftExtra = 70;
+        const rightCut = 40;
+        return { x: baseX - leftExtra, y: r.y + split, w: (r.w - (baseX - r.x)) + leftExtra - rightCut, h: r.h - split - cm2 };
+    }
+
+
+    getFootRect(baseX, feetY, cm2) {
+        const footExtraRight = 20;
+        return { x: baseX, y: feetY, w: cm2 + footExtraRight, h: cm2 };
+    }
+
+
+    getEndbossHitRects() {
+        const r = this.getMainFrameRect();
+        const split = r.h * 0.5;
+        const cut = r.w / 3;
+        const cm2 = 80;
+        const baseX = r.x + cut;
+        const feetY = r.y + r.h - cm2;
+        return [this.getTopRect(r, split), this.getMiddleRect(r, split, baseX, cm2), , this.getFootRect(baseX, feetY, cm2)];
+    }
+
+
+    getMoFrameRect(mo) {
+        const x = mo.x + (mo.frameOffsetX || 0);
+        const y = mo.y + (mo.frameOffsetY || 0);
+        const w = mo.frameWidth || mo.width;
+        const h = mo.frameHeight || mo.height;
+        return { x, y, w, h };
+    }
+
+
+    rectsOverlap(a, b) {
+        return a.x + a.w > b.x &&
+            a.x < b.x + b.w &&
+            a.y + a.h > b.y &&
+            a.y < b.y + b.h;
+    }
+
+
+    isColliding(mo) {
+        if (this.collected || mo.collected) return false;
+        const b = this.getMoFrameRect(mo);
+        return this.getEndbossHitRects().some(r => this.rectsOverlap(r, b));
+    }
+
+    // Nur zum Test-Phase
+    drawFrame(ctx) {
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = 'blue';
+        this.getEndbossHitRects().forEach(r => {
+            ctx.strokeRect(r.x - this.x, r.y - this.y, r.w, r.h);
+        });
+    }
 }
