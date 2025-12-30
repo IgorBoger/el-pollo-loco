@@ -56,8 +56,10 @@ class World {
         this.initCollectables(this.coins, Coin, 200, 50);
         this.initCollectables(this.bottles, Bottle, 100, 150);
         this.sounds.background.loop = true;
-        // this.sounds.background.volume = 0.1;
+        this.sounds.background.volume = 0.1;
         this.sounds.background.muted = isMusicMuted;
+        this.bgBaseVolume = 0.1;
+        this.applyBackgroundBaseVolume();
         this.endscreen = new Endscreen(this.ctx, this.canvas);
     }
 
@@ -235,6 +237,7 @@ class World {
 
 
     hitEndbossWithBottle(enemy, bottle, now) {
+        this.stopEndbossActionSounds();
         const cd = 250;
         enemy.stun(700);
         if (!enemy.lastHit || now - enemy.lastHit > cd) {
@@ -244,6 +247,19 @@ class World {
             this.updateEndbossStatusBar(enemy);
         }
         bottle.splash();
+    }
+
+
+    stopEndbossActionSounds() {
+        const sounds = [this.sounds.endbossAppear, this.sounds.endbossAlert, this.sounds.endbossAttack];
+        sounds.forEach(s => this.stopSound(s));
+    }
+
+
+    stopSound(sound) {
+        if (!sound) return;
+        sound.pause();
+        sound.currentTime = 0;
     }
 
 
@@ -259,6 +275,7 @@ class World {
         if (!sound) return;
         const backgroundSounds = sound === this.sounds?.background;
         if ((backgroundSounds && isMusicMuted) || (!backgroundSounds && isSoundMuted)) return;
+        this.duckBackground();
         try {
             sound.pause();
             sound.currentTime = 0;
@@ -271,6 +288,31 @@ class World {
         } catch (err) {
             console.warn('Fehler beim Abspielen des Sounds:', err);
         }
+    }
+
+
+    duckBackground() {
+        const bg = this.sounds?.background;
+        if (!bg) return;
+        this.setBackgroundVolume(this.bgBaseVolume * 0.5);
+        clearTimeout(this.bgDuckTimeout);
+        this.bgDuckTimeout = setTimeout(() => {
+            this.setBackgroundVolume(this.bgBaseVolume);
+        }, 180);
+    }
+
+
+    setBackgroundVolume(vol) {
+        const bg = this.sounds?.background;
+        if (!bg) return;
+        bg.volume = vol;
+    }
+
+
+    applyBackgroundBaseVolume() {
+        const bg = this.sounds?.background;
+        if (!bg) return;
+        bg.volume = this.bgBaseVolume;
     }
 
 
