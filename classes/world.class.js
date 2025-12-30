@@ -146,12 +146,22 @@ class World {
 
 
     handleStompCollision(enemy) {
-        const isChicken = enemy instanceof Chicken || enemy instanceof SmallChicken;
-        if (!isChicken) return false;
+        if (!this.isChickenEnemy(enemy)) return false;
         if (!this.character.isCollidingFromTop(enemy)) return false;
-        enemy.energy = 0;
-        enemy.hit();
+        this.killChicken(enemy);
         return true;
+    }
+
+
+    isChickenEnemy(enemy) {
+        return enemy instanceof Chicken || enemy instanceof SmallChicken;
+    }
+
+
+    killChicken(enemy) {
+        enemy.energy = 0;
+        enemy.lastHit = Date.now();
+        this.playEffectSound(this.sounds.chickenDead);
     }
 
 
@@ -159,7 +169,7 @@ class World {
         if (!(enemy instanceof Endboss)) return false;
         return performance.now() < (enemy.postAlertCooldownUntil || 0);
     }
-    
+
 
     applyCharacterHit(enemy, cooldownMs) {
         const now = Date.now();
@@ -212,26 +222,36 @@ class World {
 
     checkBottleHitsEnemies() {
         const now = new Date().getTime();
-
         this.level.enemies.forEach(enemy => {
             if (enemy.isDead()) return;
-
             this.throwableObject.forEach(bottle => {
-                if (!bottle.isSplashed && this.isEndbossAwareCollision(bottle, enemy)) {
-                    if (enemy instanceof Endboss) {
-                        const cd = 250;
-                        enemy.stun(700);
-                        if (!enemy.lastHit || now - enemy.lastHit > cd) {
-                            enemy.hit();
-                            if (!enemy.isDead()) enemy.hurtFlash();
-                            enemy.lastHit = now;
-                            this.updateEndbossStatusBar(enemy);
-                        }
-                        bottle.splash();
-                    }
-                }
+                if (bottle.isSplashed) return;
+                if (!this.isEndbossAwareCollision(bottle, enemy)) return;
+                if (enemy instanceof Endboss) return this.hitEndbossWithBottle(enemy, bottle, now);
+                if (this.isChickenEnemy(enemy)) return this.killChickenWithBottle(enemy, bottle);
             });
         });
+    }
+
+
+    hitEndbossWithBottle(enemy, bottle, now) {
+        const cd = 250;
+        enemy.stun(700);
+        if (!enemy.lastHit || now - enemy.lastHit > cd) {
+            enemy.hit();
+            if (!enemy.isDead()) enemy.hurtFlash();
+            enemy.lastHit = now;
+            this.updateEndbossStatusBar(enemy);
+        }
+        bottle.splash();
+    }
+
+
+    killChickenWithBottle(enemy, bottle) {
+        enemy.energy = 0;
+        enemy.lastHit = new Date().getTime();
+        this.playEffectSound(this.sounds.chickenDead);
+        bottle.splash();
     }
 
 
