@@ -8,6 +8,9 @@ class MovableObject extends DrawableObject {
     coin = 0;
     bottle = 0;
     lastHit = 0;
+    gravityInterval = null;
+    lastGravityTime = 0;
+    gravityBaseMs = 25; // entspricht dem alten 1000/40
 
 
     // character.isColliding(chicken);
@@ -90,18 +93,43 @@ class MovableObject extends DrawableObject {
     }
 
 
-    //  || this.speedY > 0
     applyGravity() {
-        setInterval(() => {
-            if (isGamePaused) return;
-            if (this.isAboveGround() || this.speedY > 0) {
-                this.y -= this.speedY;
-                // this.y -= this.speedY * 0.5;
-                this.speedY -= this.acceleration;
-            } else {
-                this.speedY = 0; // ⬅️ NEU: Wenn am Boden → keine Bewegung mehr nach unten!
-            }
-        }, 1000 / 40);
+        this.lastGravityTime = performance.now();
+        this.gravityInterval = setInterval(() => {
+            this.updateGravity(performance.now());
+        }, 1000 / 60);
+    }
+
+
+    updateGravity(now) {
+        const delta = this.getDelta(now);
+        this.lastGravityTime = now;
+        if (this.shouldStopGravity()) return;
+        this.applyGravityStep(delta);
+        this.snapToGround();
+    }
+
+
+    getDelta(now) {
+        const rawDelta = (now - this.lastGravityTime) / this.gravityBaseMs;
+        return Math.min(rawDelta, 1.2);
+    }
+
+
+    shouldStopGravity() {
+        return !this.isAboveGround() && this.speedY <= 0;
+    }
+
+    applyGravityStep(delta) {
+        this.y -= this.speedY * delta;
+        this.speedY -= this.acceleration * delta;
+    }
+
+    snapToGround() {
+        if (this.y >= this.minY) {
+            this.y = this.minY;
+            if (this.speedY < 0) this.speedY = 0;
+        }
     }
 
 
@@ -110,7 +138,7 @@ class MovableObject extends DrawableObject {
      * Gibt false zurück, wenn der Charakter am Boden ist.
      */
     isAboveGround() {
-        if (this instanceof ThrowableObject) {//Throwable object should always fall/Wurfobjekte sollten immer fallen
+        if (this instanceof ThrowableObject) {
             return true;
         } else {
             return this.y < this.minY;
