@@ -63,7 +63,7 @@ class MovableObject extends DrawableObject {
         console.log(this.constructor.name, 'energy is ', this.energy);
 
         if (this instanceof Chicken || this instanceof SmallChicken) {
-            this.world.playEffectSound(this.world.sounds.chicken);
+            this.world.playEffectSound(this.world.sounds.chickenDead);
         }
 
         if (this.energy <= 0) {

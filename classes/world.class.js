@@ -5,19 +5,20 @@ class World {
     bottleBar = new StatusBar('bottle');
     endbossBar = new StatusBar('endboss');
     sounds = {
-        background: new Audio('audio/background.mp3'),       //  Sound-OK
-        walk: new Audio('audio/walk.mp3'),                   //  Sound-OK
-        jump: new Audio('audio/jump.mp3'),                   //  Sound-OK 
-        hurt: new Audio('audio/hurt.mp3'),                   //  Sound-OK
-        dead: new Audio('audio/dead.mp3'),                   //  Sound-OK
-        coin: new Audio('audio/coin.mp3'),                   //  Sound-OK
-        bottle: new Audio('audio/bottle.mp3'),               //  Sound-OK
-        // hit: new Audio('audio/hit.mp3'),                     //  Sound-OK
-        throw: new Audio('audio/bottle-throw.mp3'),          //  Sound-OK
-        chicken: new Audio('audio/chicken.mp3'),
+        background: new Audio('audio/background.mp3'),                  //  Sound-OK
+        pepeWalk: new Audio('audio/pepe_walk.mp3'),                   //  Sound-OK
+        pepeJump: new Audio('audio/pepe_jump.mp3'),                   //  Sound-OK
+        pepeHurt: new Audio('audio/pepe_hurt.mp3'),                   //  Sound-OK
+        pepeDead: new Audio('audio/pepe_dead.mp3'),                   //  Sound-OK
+        pepeSnoring: new Audio('audio/pepe_snoring.mp3'),               //  Sound-
+        pepeCalmBreathing: new Audio('audio/pepe_calm_breathing.mp3'),  //  Sound-OK
 
-        calmBreathing: new Audio('audio/calm-breathing.mp3'),
-        pepeSnoring: new Audio('audio/pepe-snoring.mp3'),
+        collectedCoin: new Audio('audio/collected_coin.mp3'),                   //  Sound-OK
+        collectedBottle: new Audio('audio/collected_bottle.mp3'),               //  Sound-OK
+        // hit: new Audio('audio/hit.mp3'),                     //  Sound-OK
+
+        thrownBottle: new Audio('audio/thrown_bottle.mp3'),     //  Sound-OK
+        chickenDead: new Audio('audio/chicken_dead.mp3'),       //  Sound-OK
 
         endbossAppear: new Audio('audio/endboss_appear.mp3'),   //  Sound-OK
         endbossAlert: new Audio('audio/endboss_alert.mp3'),
@@ -153,10 +154,12 @@ class World {
         return true;
     }
 
+
     isEndbossBodyHitBlocked(enemy) {
         if (!(enemy instanceof Endboss)) return false;
         return performance.now() < (enemy.postAlertCooldownUntil || 0);
     }
+    
 
     applyCharacterHit(enemy, cooldownMs) {
         const now = Date.now();
@@ -198,10 +201,10 @@ class World {
             updateStatusBarCallback.call(this);
             array.splice(index, 1);
             if (propertyName === 'coin') {
-                this.playEffectSound(this.sounds.coin);
+                this.playEffectSound(this.sounds.collectedCoin);
             }
             if (propertyName === 'bottle') {
-                this.playEffectSound(this.sounds.bottle);
+                this.playEffectSound(this.sounds.collectedBottle);
             }
         }
     }
@@ -214,7 +217,6 @@ class World {
             if (enemy.isDead()) return;
 
             this.throwableObject.forEach(bottle => {
-                // if (!bottle.isSplashed && bottle.isColliding(enemy)) {
                 if (!bottle.isSplashed && this.isEndbossAwareCollision(bottle, enemy)) {
                     if (enemy instanceof Endboss) {
                         const cd = 250;
@@ -227,17 +229,6 @@ class World {
                         }
                         bottle.splash();
                     }
-
-                    // if (enemy instanceof Endboss) {
-                    //     const cd = 250;
-                    //     if (!enemy.lastHit || now - enemy.lastHit > cd) {
-                    //         enemy.hit();
-                    //         if (!enemy.isDead()) enemy.stun(700);
-                    //         enemy.lastHit = now;
-                    //         this.updateEndbossStatusBar(enemy);
-                    //     }
-                    //     bottle.splash();
-                    // }
                 }
             });
         });

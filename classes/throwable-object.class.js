@@ -52,7 +52,7 @@ class ThrowableObject extends MovableObject {
 
 
     setupTrhowSound() {
-        const throwSound = this.world?.sounds?.throw;
+        const throwSound = this.world?.sounds?.thrownBottle;
         if (throwSound) {
             throwSound.loop = false; throwSound.volume = 0.1;
             this.world.playEffectSound(throwSound);

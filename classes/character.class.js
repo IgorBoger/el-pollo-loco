@@ -215,15 +215,15 @@ class Character extends MovableObject {
 
 
     setupWalkSound() {
-        const walkSound = this.world.sounds.walk;
+        const walkSound = this.world.sounds.pepeWalk;
         if (!walkSound) return;
         walkSound.loop = true;
-        // walkSound.volume = 0.1;
+        walkSound.volume = 0.7;
     }
 
 
     handleWalkSound() {
-        const walkSound = this.world.sounds.walk;
+        const walkSound = this.world.sounds.pepeWalk;
         if (!walkSound) return;
         if (this.world.keyBaord.RIGHT || this.world.keyBaord.LEFT) {
             if (walkSound.paused) this.world.playEffectSound(walkSound);
@@ -235,7 +235,7 @@ class Character extends MovableObject {
 
     setHurtSound() {
         if (this.hurtSoundPlayed) return;
-        const hurtSound = this.world?.sounds?.hurt;
+        const hurtSound = this.world?.sounds?.pepeHurt;
         if (!hurtSound) return;
         hurtSound.loop = false;
         hurtSound.volume = 0.2;
@@ -246,7 +246,7 @@ class Character extends MovableObject {
 
     setDeadSound() {
         if (this.deadSoundPlayed) return;
-        const deadSound = this.world?.sounds?.dead;
+        const deadSound = this.world?.sounds?.pepeDead;
         if (!deadSound) return;
         deadSound.loop = false;
         deadSound.volume = 0.3;
@@ -305,7 +305,7 @@ class Character extends MovableObject {
 
 
     setupJumpSound() {
-        const jumpSound = this.world?.sounds?.jump;
+        const jumpSound = this.world?.sounds?.pepeJump;
         if (!jumpSound) return;
         jumpSound.loop = false;
         jumpSound.volume = 0.1;
@@ -386,7 +386,7 @@ class Character extends MovableObject {
 
 
     playPepeCalmBreating() {
-        const calmBreathing = this.world?.sounds?.calmBreathing;
+        const calmBreathing = this.world?.sounds?.pepeCalmBreathing;
         if (!calmBreathing || !calmBreathing.paused || isSoundMuted) return;
         calmBreathing.loop = true;
         calmBreathing.volume = 0.4;
@@ -396,7 +396,7 @@ class Character extends MovableObject {
 
 
     stopPepeCalmBreathing() {
-        const calmBreathing = this.world?.sounds?.calmBreathing;
+        const calmBreathing = this.world?.sounds?.pepeCalmBreathing;
         if (!calmBreathing) return;
         calmBreathing.pause();
         calmBreathing.currentTime = 0;

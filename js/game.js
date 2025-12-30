@@ -266,17 +266,6 @@ function startGame() {
     document.getElementById('startScreen').classList.add('d-none');
     init();
     playBackgroundIfAllowed();
-
-    // if (world?.sounds?.background) {
-    //     const bg = world.sounds.background;
-    //     bg.loop = true;
-    //     bg.volume = 0.1;
-    //     bg.muted = isMusicMuted;
-
-    //     if (!isMusicMuted) {
-    //         bg.play().catch((e) => console.warn('Musikstart fehlgeschlagen:', e));
-    //     }
-    // }
 }
 
 
