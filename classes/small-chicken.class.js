@@ -30,34 +30,57 @@ class SmallChicken extends MovableObject {
 
         this.frameOffsetY = 6;
         this.frameHeight = this.height - 13;
-    }
 
+
+        this.frameMs = 120;
+        this.lastFrameTime = 0;
+        this.isRemoved = false;
+        this.mainInterval = null;
+    }
+    
 
     animate() {
-        this.walkInterval = setInterval(() => {
+        this.mainInterval = setInterval(() => {
             if (isGamePaused) return;
-            if (!this.isDead()) {
-                // this.moveLeft();
-            }
+            this.updateSmallChicken(performance.now());
         }, 1000 / 60);
-
-        this.animationInterval = setInterval(() => {
-            if (isGamePaused) return;
-            if (this.isDead()) {
-                this.loadImage(this.deadImagePath); // 🔥 direkt neu laden
-                clearInterval(this.animationInterval);
-                clearInterval(this.walkInterval);
-
-                setTimeout(() => {
-                    if (this.world) {
-                        this.world.level.enemies = this.world.level.enemies.filter(e => e !== this);
-                    }
-                }, 2000);
-            } else {
-                this.playAnimation(this.IMAGES_WALKING);
-            }
-        }, 200);
     }
 
 
+    updateSmallChicken(now) {
+        if (this.isDead()) return this.handleDeath();
+        this.moveLeft();
+        this.updateWalkingFrames(now);
+    }
+
+    updateWalkingFrames(now) {
+        if (!this.shouldAdvanceFrame(now)) return;
+        this.playAnimation(this.IMAGES_WALKING);
+        this.lastFrameTime = now;
+    }
+
+    shouldAdvanceFrame(now) {
+        return (now - this.lastFrameTime) >= this.frameMs;
+    }
+
+
+    handleDeath() {
+        if (this.isRemoved) return;
+        this.isRemoved = true;
+        this.loadImage(this.deadImagePath);
+        this.stopSmallChickenLoop();
+        this.removeFromWorldDelayed();
+    }
+
+    stopSmallChickenLoop() {
+        if (this.mainInterval) clearInterval(this.mainInterval);
+    }
+
+    removeFromWorldDelayed() {
+        setTimeout(() => {
+            if (!this.world) return;
+            this.world.level.enemies =
+                this.world.level.enemies.filter(e => e !== this);
+        }, 2000);
+    }
 }
