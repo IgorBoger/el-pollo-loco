@@ -29,21 +29,18 @@ class ThrowableObject extends MovableObject {
         this.y = y;
         this.minY = 330; // 🟡 Bodenhöhe für Flasche (statt 180)
         this.world = world;
-
         this.direction = direction;
         this.otherDirection = direction === -1; // für Spiegelung beim Zeichnen
-
         this.throw();
         this.animate(); // 4) Die Animation wird aufgerufen, Flasche dreht sich!
     }
 
 
     throw() {
-        this.setupTrhowSound();
+        this.setupThrowSound();
         console.log('bottle is throw ');
         this.speedY = 20;
         this.applyGravity();
-
         this.throwInterval = setInterval(() => {
             if (isGamePaused) return;
             this.x += 15 * this.direction;
@@ -51,7 +48,21 @@ class ThrowableObject extends MovableObject {
     }
 
 
-    setupTrhowSound() {
+    applyGravity() {
+        this.gravityInterval = setInterval(() => {
+            if (isGamePaused) return;
+            this.applyBottleGravityStep();
+        }, 1000 / 40);
+    }
+
+
+    applyBottleGravityStep() {
+        this.y -= this.speedY;
+        this.speedY -= this.acceleration;
+    }
+
+
+    setupThrowSound() {
         const throwSound = this.world?.sounds?.thrownBottle;
         if (throwSound) {
             throwSound.loop = false; throwSound.volume = 0.1;
@@ -65,21 +76,22 @@ class ThrowableObject extends MovableObject {
         this.speedY = 0;
         this.speed = 0;
 
+
         setTimeout(() => {
             clearInterval(this.throwInterval);
+            clearInterval(this.gravityInterval);
+            clearInterval(this.mainInterval);
             this.world.throwableObject = this.world.throwableObject.filter(obj => obj !== this);
         }, 300);
     }
-
+    
 
     animate() {
-        setInterval(() => {
+        this.mainInterval = setInterval(() => {
             if (isGamePaused) return;
-            if (this.isSplashed) {
-                this.playAnimation(this.IMAGES_SPLASHES); // 3) Die Pfade werden nacheinander animiert!
-            } else {
-                this.playAnimation(this.IMAGES_THROW);// 3) Die Pfade werden nacheinander animiert!
-            }
-        }, 1000 / 60); // Oder 20 FPS
+            if (this.isSplashed) this.playAnimation(this.IMAGES_SPLASHES);
+            else this.playAnimation(this.IMAGES_THROW);
+        }, 1000 / 60);
     }
+
 }
