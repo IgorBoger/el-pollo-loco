@@ -20,8 +20,8 @@ class Chicken extends MovableObject {
         this.deadImagePath = 'img/3_enemies_chicken/chicken_normal/2_dead/dead.png';
 
 
-        this.x = 150 + Math.random() * 1200;
-        this.speed = 0.15 + Math.random() * 0.2;
+        this.x = 300 + Math.random() * 700;
+        this.speed = 0.3 + Math.random() * 0.2;
         // this.animate();
 
         // Wird nur für Colisionberechnung gezeichnet, danach muss weg!!!
