@@ -137,6 +137,7 @@ class World {
         this.applyAttackKnockback(enemy);
         this.applyCharacterHit(enemy, 600);
         this.adjustEndbossAtLeftEdge(enemy);
+        enemy.resolveAttackContact?.(this.character);
         enemy.hasHitInCurrentAttack = true;
         return true;
     }
