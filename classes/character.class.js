@@ -152,14 +152,11 @@ class Character extends MovableObject {
 
             const now = performance.now();
             this.handleJumpInput(now);
-
-            this.world.camera_x = -this.x + 100;
+            this.updateCamera();
         }, 1000 / 60);
 
 
-        // this.animationTimer2 = setInterval(() => {
         setInterval(() => {
-            // if (isGamePaused) return;
             if (isGamePaused || this.world.stopped) return;
             const now = performance.now();
 
@@ -211,6 +208,119 @@ class Character extends MovableObject {
                 this.hurtSoundPlayed = false;
             }
         }, 50);
+    }
+
+
+    updateCamera() {
+        const boss = this.getEndboss();
+        if (this.isCameraLocked()) return this.updateLockedCamera(boss);
+        if (this.shouldLockCamera(boss)) return this.lockCamera();
+        this.followCamera();
+    }
+
+
+    getEndboss() {
+        return this.world.level.enemies.find(e => e instanceof Endboss);
+    }
+
+
+    isCameraLocked() {
+        return !!this.cameraLocked;
+    }
+
+
+    updateLockedCamera(boss) {
+        this.world.camera_x = this.cameraLockX;
+        if (!boss) return this.unlockCamera();
+        if (!this.hasPassedBoss(boss)) return;
+        if (!this.isAtLockEdge()) return;
+        this.unlockCamera();
+    }
+
+
+    unlockCamera() {
+        this.cameraLocked = false;
+        this.cameraLockX = null;
+        this.cameraAnchor = this.lockDir === 'right' ? 'right' : 'left';
+    }
+
+
+    hasPassedBoss(boss) {
+        const cL = this.x, cR = this.x + this.width;
+        const bL = boss.x, bR = boss.x + boss.width;
+        return this.lockDir === 'right' ? (cL > bR + 20) : (cR < bL - 20);
+    }
+
+
+    isAtLockEdge() {
+        const vx = this.getViewOffsetX();
+        const screenX = this.getScreenX(vx);
+        const b = this.getLockBounds();
+        return this.lockDir === 'right' ? screenX >= b.right : screenX <= b.left;
+    }
+
+
+    getViewOffsetX() {
+        return window.viewOffsetX || 0;
+    }
+
+
+    getScreenX(vx) {
+        return this.x + (this.world.camera_x || 0) + vx;
+    }
+
+
+    getLockBounds() {
+        return { left: 120, right: 500 }; // 🔧 DAS sind deine “Klebepunkte” im Lock
+    }
+
+
+    shouldLockCamera(boss) {
+        if (!boss) return false;
+        const dist = Math.abs((this.x + this.width / 2) - (boss.x + boss.width / 2));
+        return dist < 140; // 🔧 DAS ist der Lock-Radius
+    }
+
+
+    lockCamera() {
+        this.cameraLocked = true;
+        this.cameraLockX = this.world.camera_x;
+        this.lockDir = this.otherDirection ? 'left' : 'right';
+    }
+
+
+    followCamera() {
+        // this.updateAnchorByInput();
+        const vx = this.getViewOffsetX();
+        const anchor = this.getAnchorX();
+        const desired = -this.x + (anchor - vx);
+        this.applyCameraLerp(desired);
+    }
+
+
+    // updateAnchorByInput() {
+    //     const kb = this.world?.keyBaord;
+    //     if (kb?.LEFT) this.cameraAnchor = 'right';
+    //     if (kb?.RIGHT) this.cameraAnchor = 'left';
+    // }
+
+
+    getAnchorX() {
+        const b = this.getLockBounds();
+        return this.cameraAnchor === 'right' ? b.right : 100;
+    }
+
+
+    applyCameraLerp(desired) {
+        const t = this.getCameraLerpFactor();
+        const has = typeof this.world.camera_x === 'number';
+        const current = has ? this.world.camera_x : desired;
+        this.world.camera_x = current + (desired - current) * t;
+    }
+
+
+    getCameraLerpFactor() {
+        return 0.12;
     }
 
 

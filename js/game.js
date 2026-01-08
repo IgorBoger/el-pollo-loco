@@ -693,29 +693,15 @@ function toggleFullscreen() {
 function togglePause() {
     if (!world) return;
     isGamePaused = !isGamePaused;
-
     const btn = document.getElementById('pauseBtn');
     if (btn) btn.textContent = isGamePaused ? 'Play ▶' : 'Pause ❚❚';
-
-    // const bg = world.sounds?.background;
-    // if (!bg || isMusicMuted) return;
     if (isGamePaused) {
         world.pauseAllSounds();        //  ⬅️ NEU
         return;
     }
-
     if (world.character) {
         world.character.lastActivityAt = performance.now();
     }
-
-    // if (!isMusicMuted && bg) {
-    //     bg.play().catch(() => { });
-    // }
-
-    // if (world.character) world.character.lastActivityAt = performance.now();
-    // const bg = world.sounds?.background;
-    // if (!isMusicMuted && bg) bg.play().catch(() => { });
-
     if (world.character) world.character.lastActivityAt = performance.now();
     playBackgroundIfAllowed();
 }
@@ -749,18 +735,6 @@ function quickRestartGame() {
     }
     world = new World(canvas, keyBaord);
     playBackgroundIfAllowed();
-
-    // Musik wie beim Start behandeln
-    // if (world?.sounds?.background) {
-    //     const bg = world.sounds.background;
-    //     bg.loop = true;
-    //     bg.volume = 0.1;
-    //     bg.muted = isMusicMuted;
-    //     if (!isMusicMuted) {
-    //         bg.play().catch(e => console.warn('Musikstart fehlgeschlagen:', e));
-    //     }
-    // }
-
     handleViewportChange?.();
 }
 
@@ -777,6 +751,7 @@ function fitCanvasToCssSize() {
     if (c.width !== pxW || c.height !== pxH) { c.width = pxW; c.height = pxH; }
     const scale = Math.min(pxW / BASE_W, pxH / BASE_H);
     const offX = (pxW - BASE_W * scale) / 2; offY = (pxH - BASE_H * scale) / 2;
+    window.viewOffsetX = offX / scale;
     ctx.setTransform(scale, 0, 0, scale, offX, offY);
     ctx.imageSmoothingEnabled = true;
 }
