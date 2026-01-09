@@ -325,7 +325,6 @@ h2 {
 .burger-btn:hover,
 .toggle-btn:hover,
 .settings-button:hover,
-.control-btn:hover,
 .close-btn:hover,
 .menu-btn:hover,
 .lang-opt:hover {
@@ -474,20 +473,35 @@ h2 {
 .control-btn {
     font-family: "Bungee Spice", sans-serif;
     padding: 6px 12px;
-    /* padding: 10px 20px; */
-    /* font-size: 1.2em; */
     font-size: 20px;
     border: none;
     border-radius: 8px;
-    /* background-color: #ffa726; */
-    background-color: rgb(255, 186, 0);
     background-color: rgba(0, 0, 0, 0.2);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
     transition: background 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
     color: white;
-    /* box-shadow: 0 3px 5px rgba(0, 0, 0, 0.3); */
     border: white 1px solid;
     cursor: pointer;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: none;
+}
+
+.control-btn:hover {
+    background-color: rgba(0, 0, 0, 0.3);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.4);
+}
+
+
+.no-active-press:active {
+    transform: none !important;
+}
+
+
+.control-btn.is-pressed {
+    transform: translateY(1px);
+    background-color: rgba(0, 0, 0, 0.3);
 }
 
 
@@ -495,10 +509,10 @@ h2 {
     display: flex;
     align-items: center;
     justify-content: center;
-    /* width: 24px; */
-    /* height: 24px; */
     width: 16px;
     height: 16px;
+
+    pointer-events: none;
 }
 
 
