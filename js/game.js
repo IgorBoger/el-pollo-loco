@@ -840,12 +840,16 @@ function fitCanvasToCssSize() {
     const ctx = c.getContext('2d');
     const BASE_W = 720, BASE_H = 480;
     const dpr = Math.max(1, window.devicePixelRatio || 1);
-    const cssW = Math.round(c.clientWidth); cssH = Math.round(c.clientHeight);
+    // const cssW = Math.round(c.clientWidth); cssH = Math.round(c.clientHeight);
+    const cssW = Math.round(c.clientWidth);
+    const cssH = Math.round(c.clientHeight);
     if (!cssW || !cssH) return;
     const pxW = cssW * dpr, pxH = cssH * dpr;
     if (c.width !== pxW || c.height !== pxH) { c.width = pxW; c.height = pxH; }
     const scale = Math.min(pxW / BASE_W, pxH / BASE_H);
-    const offX = (pxW - BASE_W * scale) / 2; offY = (pxH - BASE_H * scale) / 2;
+    // const offX = (pxW - BASE_W * scale) / 2; offY = (pxH - BASE_H * scale) / 2;
+    const offX = (pxW - BASE_W * scale) / 2;
+    const offY = (pxH - BASE_H * scale) / 2;
     window.viewOffsetX = offX / scale;
     ctx.setTransform(scale, 0, 0, scale, offX, offY);
     ctx.imageSmoothingEnabled = true;
@@ -875,6 +879,13 @@ function onGameOver(worldInstance) {
     pauseBtn?.classList.add('d-none');
     const bg = worldInstance?.sounds?.background;
     worldInstance?.pauseAllSounds();
+}
+
+
+function onWin(worldInstance) {
+    isGamePaused = true;
+    document.getElementById('pauseBtn')?.classList.add('d-none');
+    worldInstance?.pauseAllSounds?.();
 }
 
 
@@ -965,6 +976,18 @@ window.addEventListener('load', () => {
         // document.getElementById('pauseBtn')?.classList.add('d-none');
     });
 
+
+    document.getElementById('nextLevelBtn')?.addEventListener('click', () => {
+        document.getElementById('winOverlay')?.classList.add('d-none');
+        document.getElementById('winOverlay')?.classList.remove('d-flex');
+        quickRestartGame();
+    });
+
+    document.getElementById('winHomeBtn')?.addEventListener('click', () => {
+        document.getElementById('winOverlay')?.classList.add('d-none');
+        document.getElementById('winOverlay')?.classList.remove('d-flex');
+        restartGame();
+    });
 
     // Impressum
     document.getElementById('impressumButton')?.addEventListener('click', openImpressumOverlay);

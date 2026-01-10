@@ -61,6 +61,9 @@ class World {
         this.bgBaseVolume = 0.1;
         this.applyBackgroundBaseVolume();
         this.endscreen = new Endscreen(this.ctx, this.canvas);
+        this.winscreen = new Winscreen(this.ctx, this.canvas);
+        this.winScheduled = false;
+
     }
 
 
@@ -476,11 +479,33 @@ class World {
             }
         }
 
-
+        this.checkWinCondition();
         let self = this;
         requestAnimationFrame(function () {
             self.draw();
         });
+    }
+
+
+    checkWinCondition() {
+        const boss = this.getEndboss();
+        if (!boss || !boss.isDead?.()) return;
+        if (!boss.isDeadAnimFinished?.()) return;
+        if (this.winScheduled || this.gameOverScheduled) return;
+        this.winScheduled = true;
+        setTimeout(() => this.showWin(), 1200);
+    }
+
+
+    getEndboss() {
+        return this.level?.enemies?.find(e => e instanceof Endboss) || null;
+    }
+
+
+    showWin() {
+        this.stopped = true;
+        this.winscreen.show();
+        if (typeof onWin === 'function') onWin(this);
     }
 
 
@@ -538,6 +563,9 @@ class World {
         }
         this.resetAllSounds();
         this.endscreen?.hide();
+        this.winscreen?.hide();
+        this.winScheduled = false;
+        this.gameOverScheduled = false;
         this.throwableObject = [];
         this.coins = [];
         this.bottles = [];

@@ -34,6 +34,7 @@
     <script src="classes/coin.class.js"></script>
     <script src="classes/bottle.class.js"></script>
     <script src="classes/endscreen.class.js"></script>
+    <script src="classes/winscreen.class.js"></script>
     <script src="levels/level1.js"></script>
     <script src="js/game.js"></script>
 </head>
@@ -256,18 +257,29 @@
 
         <!-- Game-Over Overlay -->
         <div id="gameOverOverlay" class="game-over-overlay d-none" role="dialog" aria-modal="true">
-            <!-- <div class="game-over-card">
-                <h2 class="game-over-title">Game Over</h2>
-                <div class="game-over-actions d-flex">
-                    <button id="restartBtn" class="game-over-btn">🔁 Neustart</button>
-                    <button id="homeBtn" class="game-over-btn">🏠 Hauptmenü</button>
-                </div>
-            </div> -->
             <button id="restartBtn" class="game-over-btn">
                 <img src="img/restart.png" alt="">
                 Neustart
             </button>
             <button id="homeBtn" class="game-over-btn">
+                <img src="img/home.png" alt="">
+                Hauptmenü
+            </button>
+        </div>
+
+
+        <!-- WIN Overlay -->
+        <div id="winOverlay" class="win-overlay d-none" role="dialog" aria-modal="true">
+            <div class="next-level-query">
+                <!-- <div>Would you like to continue with the next level?</div> -->
+                <div>Möchten Sie mit dem nächsten Level fortfahren?</div>
+                <button id="nextLevelBtn" class="win-btn">
+                    Nächsten Level
+                    <img src="img/forward.png" alt="">
+                </button>
+            </div>
+
+            <button id="winHomeBtn" class="win-btn">
                 <img src="img/home.png" alt="">
                 Hauptmenü
             </button>

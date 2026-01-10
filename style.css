@@ -322,6 +322,7 @@ h2 {
 #fullscreenBtn:hover,
 #startButton:hover,
 .game-over-btn:hover,
+.win-btn:hover,
 .burger-btn:hover,
 .toggle-btn:hover,
 .settings-button:hover,
@@ -337,6 +338,7 @@ h2 {
 #fullscreenBtn:focus-visible,
 #startButton:focus-visible,
 .game-over-btn:focus-visible,
+.win-btn:focus-visible,
 .burger-btn:focus-visible,
 .toggle-btn:focus-visible,
 .settings-button:focus-visible,
@@ -353,6 +355,7 @@ h2 {
 #fullscreenBtn:active,
 #startButton:active,
 .game-over-btn:active,
+.win-btn:active,
 .burger-btn:active,
 .toggle-btn:active,
 .settings-button:active,
@@ -403,8 +406,11 @@ h2 {
     aspect-ratio: unset;
 }
 
+
 #gameContainer:fullscreen #gameOverOverlay,
-#gameContainer:-webkit-full-screen #gameOverOverlay {
+#gameContainer:-webkit-full-screen #gameOverOverlay,
+#gameContainer:fullscreen #winOverlay,
+#gameContainer:-webkit-full-screen #winOverlay {
     width: 100vw;
     height: 100vh;
     inset: 0;
@@ -775,38 +781,27 @@ h2 {
 }
 
 
-.game-over-overlay {
+.game-over-overlay,
+.win-overlay {
     position: absolute;
     inset: 0;
-    /* z-index: 1200; */
-    /* background: rgba(0, 0, 0, .55); */
     align-items: center;
     flex-direction: column;
     justify-content: space-between;
     padding: 12px 0 12px;
 }
 
-.game-over-card {
-    width: min(92vw, 420px);
-    /* background: #fff; */
-    border-radius: 14px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, .25);
-    padding: 20px;
-    text-align: center;
+
+.next-level-query {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
 }
 
-.game-over-title {
-    margin: 0 0 14px 0;
-    font-size: 22px;
-    letter-spacing: 1px;
-}
-
-.game-over-actions {
-    gap: 16px;
-    justify-content: center;
-}
 
 .game-over-btn,
+.win-btn,
 #startButton {
     font-family: "Bungee Spice", sans-serif;
     font-size: 20px;
@@ -826,6 +821,7 @@ h2 {
 
 
 .game-over-btn img,
+.win-btn img,
 #startButton img {
     width: 36px;
     height: 36px;

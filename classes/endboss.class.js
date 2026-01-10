@@ -115,6 +115,9 @@ class Endboss extends MovableObject {
     isHurtLocked = false;
     recoveryType = null;
 
+    deadFrameMs = 160;
+    deadAnimEndAt = 0;
+
     // Sounds......
 
     // Appear
@@ -138,6 +141,7 @@ class Endboss extends MovableObject {
         this.alertDurationMs = (this.alertFrameMs * this.IMAGES_ALERT.length) + 60;
         this.attackDurationMs = (this.attackFrameMs * this.IMAGES_ATTACK.length) + 80;
         this.energy = 100;
+        this.attackRecoilPx = 10;
         this.currentAnimation = 'walk';
         this.targetSpeed = this.baseWalkSpeed * this.patrolDir;
         this.animate();
@@ -205,6 +209,7 @@ class Endboss extends MovableObject {
         if (!this.isDead()) return false;
         const changedToDead = this.setAnimation('dead');
         if (changedToDead) this.playEndbossDeadSound();
+        if (changedToDead) this.initDeadAnimTimer();
         this.currentSpeed = 0;
         setTimeout(() => {
             if (this.world) {
@@ -214,6 +219,23 @@ class Endboss extends MovableObject {
             clearInterval(this.animationInterval);
         }, 2000);
         return true;
+    }
+
+
+    initDeadAnimTimer() {
+        if (this.deadAnimEndAt) return;
+        const now = performance.now();
+        this.deadAnimEndAt = now + this.getDeadAnimDuration();
+    }
+
+    getDeadAnimDuration() {
+        const frames = this.IMAGES_DEAD?.length || 0;
+        return frames * this.deadFrameMs + 80;
+    }
+
+    isDeadAnimFinished() {
+        if (!this.deadAnimEndAt) return false;
+        return performance.now() >= this.deadAnimEndAt;
     }
 
 
@@ -741,10 +763,12 @@ class Endboss extends MovableObject {
         this.currentAnimation = 'hurt';
     }
 
+
     stopChaseState() {
         this.isChasing = false;
         this.chaseUntil = 0;
     }
+
 
     stopMovementHard() {
         this.currentSpeed = 0;
@@ -777,17 +801,6 @@ class Endboss extends MovableObject {
         const footExtraRight = 20;
         return { x: baseX, y: feetY, w: cm2 + footExtraRight, h: cm2 };
     }
-
-
-    // getEndbossHitRects() {
-    //     const r = this.getMainFrameRect();
-    //     const split = r.h * 0.5;
-    //     const cut = r.w / 3;
-    //     const cm2 = 80;
-    //     const baseX = r.x + cut;
-    //     const feetY = r.y + r.h - cm2;
-    //     return [this.getTopRect(r, split), this.getMiddleRect(r, split, baseX, cm2), , this.getFootRect(baseX, feetY, cm2)];
-    // }
 
 
     getEndbossHitRects() {
