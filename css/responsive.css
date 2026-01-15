@@ -1,0 +1,80 @@
+/* :::::: MEDIA-QUERY::::::: */
+
+/* ::::: WIDTH ::::::: */
+
+@media only screen and (max-width: 720px) {
+
+    /* canvas {
+        width: 100%;
+    } */
+
+    #titleGame {
+        display: none;
+    }
+
+    #startButton,
+    .burger-btn,
+    .control-btn,
+    #fullscreenBtn,
+    .game-over-btn {
+        padding: 6px 10px;
+        font-size: 16px;
+    }
+
+    .game-over-btn img {
+        width: 30px;
+        height: 30px;
+    }
+
+    .burger-overlay.open {
+        gap: 8px;
+    }
+}
+
+/* ::::: HEIGHT ::::::: */
+
+@media only screen and (max-height: 480px) {
+    /* canvas {
+        height: 100svh;
+    } */
+}
+
+
+/* @media (orientation: landscape) and (max-height: 720px) {
+    #titleGame {
+        display: none;
+    }
+} */
+
+
+@media (orientation: landscape) and (max-height: 480px) {
+    #titleGame {
+        display: none;
+    }
+
+    #gameContainer {
+        border-radius: 0;
+        height: 100svh;
+    }
+
+    .story-header {
+        border-radius: 0;
+    }
+
+    .story-card {
+        height: 100svh;
+        width: 100%;
+        border-radius: 0;
+    }
+}
+
+
+@media only screen and (max-width: 480px) {
+    #titleGame {
+        display: none;
+    }
+
+    #gameContainer {
+        border-radius: 0;
+    }
+}
