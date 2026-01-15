@@ -40,22 +40,15 @@
     <script src="js/game.js"></script>
 </head>
 
-<!-- <body onload="init()"> -->
 
 <body>
-    <!-- :: -->
-    <!-- <div id="frameTime" style="position: fixed; top: 5px; left: 5px; background: rgba(0,0,0,0.7); color: #0f0;
-            font-family: monospace; font-size: 12px; padding: 2px 6px; z-index: 10000;">
-        draw: -
-    </div> -->
-
     <h1 id="titleGame">El Pollo Loco</h1>
 
     <div id="gameContainer">
 
         <!-- Orientation-Warnung -->
-        <!-- <div id="orientationWarning" class="orientation-overlay d-none">
-            <div id="orientationCard" class="orientation-card">
+        <!-- <div id="orientationWarning" class="orientation-overlay overlay-style d-none">
+            <div id="orientationCard" class="orientation-card box-shadow">
                 📱 Bitte drehen Sie Ihr Gerät ins Querformat (Landscape), um zu spielen.
             </div>
         </div> -->
@@ -63,9 +56,8 @@
 
         <div id="startScreen">
             <img id="startScreenImg" src="img/9_intro_outro_screens/start/startscreen_1.png">
-            <button id="startButton" onclick="startGame()">
+            <button id="startButton" class="btn-style" onclick="startGame()">
                 <img src="img/game-play.png" alt="">
-                <!-- Start Game -->
                 <p id="startGame">Spiel starten</p>
             </button>
         </div>
@@ -74,40 +66,31 @@
 
         </canvas>
 
-        <!-- NEU: Hamburger-Button -->
-        <button id="burgerBtn" class="burger-btn" aria-label="Menü">☰</button>
+        <button id="burgerBtn" class="burger-btn btn-style text-shadow-none" aria-label="Menü">☰</button>
 
-        <!-- Burger-Menü -->
         <div id="burgerMenu" class="burger-overlay d-none">
             <div class="burger-header">
-                <!-- Settings-Icon: öffnet direkt Settings-Overlay -->
-                <button id="openSettings" class="settings-button" aria-label="Settings">
-                    <!-- <img src="img/settings.png" alt="Settings" class="icon-img"> -->
+                <button id="openSettings" class="settings-button btn-style" aria-label="Settings">
                     <img src="img/settings1.png" alt="Settings" class="icon-img">
                 </button>
-                <!-- Back-Button: schließt Burger-Menü -->
-                <button id="burgerClose" class="close-btn" aria-label="Zurück">
+                <button id="burgerClose" class="btn-style" aria-label="Zurück">
                     <img src="img/arrow-back.png" alt="Zurück" class="icon-img">
                 </button>
             </div>
 
             <ul>
-                <li><button id="restartGame" class="menu-btn">Spiel neu starten</button></li>
-                <!-- <li><button id="showControls" class="menu-btn">Steuerung</button></li> -->
-                <!-- <li><button id="storyButton" class="menu-btn btn-primary">Story</button></li> -->
-                <li><button id="aboutGame" class="menu-btn">Über das Spiel</button></li>
-                <li><button id="keyHelpButton" class="menu-btn">Tastenbelegung</button>
-                </li>
-                <li><button id="rankingList" class="menu-btn">Rangliste</button></li>
-                <li><button id="impressumButton" class="menu-btn">Impressum</button></li>
+                <li><button id="restartGame" class="menu-btn btn-style">Spiel neu starten</button></li>
+                <li><button id="aboutGame" class="menu-btn btn-style">Über das Spiel</button></li>
+                <li><button id="keyHelpButton" class="menu-btn btn-style">Tastenbelegung</button></li>
+                <li><button id="rankingList" class="menu-btn btn-style">Rangliste</button></li>
+                <li><button id="impressumButton" class="menu-btn btn-style">Impressum</button></li>
             </ul>
         </div>
 
-        <!-- Settings-Overlay (separat) -->
         <div id="settingsOverlay" class="settings-overlay d-none">
             <div class="settings-header">
                 <h2 id="settingsTitle">Einstellungen</h2>
-                <button id="closeSettings" class="close-btn">
+                <button id="closeSettings" class="close-btn btn-style">
                     <img id="closeIcon" src="img/arrow-back.png" alt="Close" class="icon-img">
                 </button>
             </div>
@@ -115,31 +98,27 @@
             <div class="setting-block">
                 <div class="setting-row">
                     <span id="labelMusic">Musik</span>
-                    <!-- <span>Musik</span> -->
-                    <button id="musicToggle" class="toggle-btn">
+                    <button id="musicToggle" class="toggle-btn btn-style">
                         <img id="musicIcon" src="img/speaker.png" alt="Musik" class="icon-img">
                     </button>
                 </div>
                 <div class="setting-row">
                     <span id="labelSound">Ton</span>
-                    <!-- <span>Ton</span> -->
-                    <button id="soundToggle" class="toggle-btn">
+                    <button id="soundToggle" class="toggle-btn btn-style">
                         <img id="soundIcon" src="img/speaker.png" alt="Ton" class="icon-img">
                     </button>
                 </div>
             </div>
 
-            <button id="langToggle" class="language-btn">Deutsch</button>
+            <button id="langToggle" class="btn-style language-btn">Deutsch</button>
         </div>
 
 
-        <!-- Story-Overlay -->
-        <div id="storyOverlay" class="story-overlay d-none">
-            <div class="story-card">
+        <div id="storyOverlay" class="story-overlay overlay-style d-none">
+            <div class="story-card box-shadow">
                 <div class="story-header">
                     <h2 id="storyTitle" class="story-title">Die Geschichte</h2>
-                    <!-- <button id="closeStory" class="story-close">✖</button> -->
-                    <button id="closeStory" class="close-btn" aria-label="Schließen">
+                    <button id="closeStory" class="close-btn btn-style" aria-label="Schließen">
                         <img src="img/arrow-back.png" alt="" class="icon-img" />
                     </button>
                 </div>
@@ -161,10 +140,9 @@
 
 
 
-        <!-- NEU (nur Klassennamen mit Bindestrichen): -->
-        <div id="keyHelpOverlay" class="key-help-overlay d-none" role="dialog" aria-modal="true"
+        <div id="keyHelpOverlay" class="key-help-overlay overlay-style d-none" role="dialog" aria-modal="true"
             aria-labelledby="keyHelpTitle">
-            <div class="key-help-modal" role="document">
+            <div class="key-help-modal box-shadow" role="document">
                 <div class="key-help-modal-header">
                     <h2 id="keyHelpTitle" class="key-help-modal-title">Tastenbelegung</h2>
                     <button id="keyHelpClose" class="key-help-close-button" aria-label="Schließen">×</button>
@@ -206,111 +184,86 @@
 
 
 
-        <!-- Fullscreen Button -->
-        <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶</button>
+        <button id="fullscreenBtn" class="btn-style text-shadow-none" onclick="toggleFullscreen()">⛶</button>
 
-        <button class="d-none" id="pauseBtn">Pause ❚❚</button>
+        <button class="d-none btn-style" id="pauseBtn">Pause ❚❚</button>
 
         <div id="mobileControls" class="d-none">
             <div class="direction">
-                <!-- <button class="control-btn" id="btnLeft">⬅️</button> -->
-                <button class="control-btn" id="btnLeft">
+                <button class="control-btn btn-style" id="btnLeft">
                     <img src="img/chevron-left.png" alt="">
                 </button>
-                <!-- <button class="control-btn" id="btnRight">➡️</button> -->
-                <button class="control-btn" id="btnRight">
+                <button class="control-btn btn-style" id="btnRight">
                     <img src="img/chevron-right.png" alt="">
                 </button>
             </div>
 
             <div class="attack">
-                <!-- <button class="control-btn" id="btnJump">⤴️</button> -->
-                <button class="control-btn" id="btnJump">
+                <button class="control-btn btn-style" id="btnJump">
                     <img src="img/chevron-up.png" alt="">
                 </button>
-                <!-- <button class="control-btn" id="btnThrow">🧴</button> -->
-                <button class="control-btn" id="btnThrow">
+                <button class="control-btn btn-style" id="btnThrow">
                     <img src="img/6_salsa_bottle/bottle_rotation/rotation_sequences.gif" alt="">
                 </button>
             </div>
         </div>
 
-        <!-- Datei: index.html — EIN Overlay mit zentrierter Karte -->
         <div id="langOverlay" class="modal-overlay d-none" role="dialog" aria-modal="true">
-            <div class="modal-card" role="document">
+            <div class="modal-card box-shadow" role="document">
                 <div class="modal-header">
-                    <!-- Datei: index.html — Sprach-Overlay Titel -->
                     <span id="langModalTitle" class="modal-title">Sprache</span>
 
-                    <!-- <span class="modal-title">Sprache</span> -->
-                    <button id="langClose" class="close-btn" aria-label="Schließen">
+                    <button id="langClose" class="close-btn btn-style" aria-label="Schließen">
                         <img src="img/arrow-back.png" alt="Close" class="icon-img">
                     </button>
                 </div>
                 <div class="modal-content">
-                    <button class="lang-opt" data-lang="DE">Deutsch</button>
-                    <button class="lang-opt" data-lang="ES">Español</button>
-                    <button class="lang-opt" data-lang="EN">English</button>
+                    <button class="lang-opt btn-style" data-lang="DE">Deutsch</button>
+                    <button class="lang-opt btn-style" data-lang="ES">Español</button>
+                    <button class="lang-opt btn-style" data-lang="EN">English</button>
                 </div>
             </div>
         </div>
 
 
-        <!-- Game-Over Overlay -->
         <div id="gameOverOverlay" class="game-over-overlay d-none" role="dialog" aria-modal="true">
-            <button id="restartBtn" class="game-over-btn">
+            <button id="restartBtn" class="game-over-btn btn-style">
                 <img src="img/restart.png" alt="">
                 Neustart
             </button>
-            <button id="homeBtn" class="game-over-btn">
+            <button id="homeBtn" class="game-over-btn btn-style">
                 <img src="img/home.png" alt="">
                 Hauptmenü
             </button>
         </div>
 
 
-        <!-- WIN Overlay -->
         <div id="winOverlay" class="win-overlay d-none" role="dialog" aria-modal="true">
             <div class="next-level-query">
-                <!-- <div>Would you like to continue with the next level?</div> -->
                 <div class="next-level-text">Möchten Sie mit dem nächsten Level fortfahren?</div>
-                <button id="nextLevelBtn" class="win-btn">
+                <button id="nextLevelBtn" class="win-btn btn-style">
                     Nächsten Level
                     <img src="img/forward.png" alt="">
                 </button>
             </div>
 
-            <button id="winHomeBtn" class="win-btn">
+            <button id="winHomeBtn" class="win-btn btn-style">
                 <img src="img/home.png" alt="">
                 Hauptmenü
             </button>
         </div>
 
 
-        <div id="impressumOverlay" class="impressum-overlay d-none" role="dialog" aria-modal="true"
-            aria-labelledby="impressumTitle">
-            <div class="impressum-card" role="document">
+        <div id="impressumOverlay" class="impressum-overlay overlay-style text-shadow-none d-none" role="dialog"
+            aria-modal="true" aria-labelledby="impressumTitle">
+            <div class="impressum-card box-shadow" role="document">
                 <div class="impressum-header">
                     <h2 id="impressumTitle" class="impressum-title">Impressum</h2>
-                    <button id="impressumClose" class="close-btn" aria-label="Schließen">
+                    <button id="impressumClose" class="close-btn btn-style" aria-label="Schließen">
                         <img src="img/arrow-back.png" alt="Schließen" class="icon-img">
                     </button>
                 </div>
                 <div class="impressum-body">
-                    <!-- Impressum: Anbieter (DU) -->
-                    <!-- <p><strong>Verantwortlich für dieses Spiel (Schul-/Portfolio-Projekt):</strong></p>
-                    <p>
-                        [Dein Vor- und Nachname]<br>
-                        [Straße + Hausnummer]<br>
-                        [PLZ] [Ort]<br>
-                        E-Mail: [deine-email@example.com]
-                    </p>
-
-                    <p><strong>Art des Angebots:</strong><br>
-                        Dieses Spiel ist ein nicht-kommerzielles Schul- bzw. Lernprojekt.
-                        Es dient ausschließlich Demonstrations- und Übungszwecken.
-                        Es besteht kein Anspruch auf Vollständigkeit oder inhaltliche Richtigkeit.
-                    </p> -->
 
                     <p><strong>Verantwortlich für dieses Spiel (Schul-/Portfolio-Projekt):</strong></p>
                     <p>
@@ -326,7 +279,6 @@
                         geführt.
                     </p>
 
-                    <!-- Mentoren-Impressum -->
                     <p><strong>Betreuung:</strong></p>
                     <p>
                         Dieses Projekt entstand im Rahmen eines betreuten Kurses. Ansprechpartner (Mentor/Dozent):
@@ -336,7 +288,6 @@
                     </p>
 
 
-                    <!-- Rechtliches Basic -->
                     <p><strong>Haftungshinweis:</strong><br>
                         Trotz sorgfältiger Erstellung dieses Projekts wird keine Haftung für externe Inhalte
                         oder für Schäden übernommen, die aus der Nutzung dieses Spiels entstehen.
