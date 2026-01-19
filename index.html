@@ -40,6 +40,7 @@
     <script src="classes/endscreen.class.js"></script>
     <script src="classes/winscreen.class.js"></script>
     <script src="levels/level1.js"></script>
+    <script src="js/translation.js"></script>
     <script src="js/game.js"></script>
 </head>
 
@@ -133,10 +134,20 @@
                     </p>
 
                     <ul>
-                        <li><strong>Ziel:</strong> Besiege den Endboss & sammle Münzen.</li>
-                        <li><strong>Steuerung:</strong> Pfeile/WASD, D = Werfen, Space = Springen.</li>
-                        <li><strong>Tipp:</strong> Achte auf Boss-Animationen und Timing.</li>
+                        <li>
+                            <strong id="storyLabelGoal">Ziel:</strong>
+                            <span id="storyTextGoal">Besiege den Endboss & sammle Münzen.</span>
+                        </li>
+                        <li>
+                            <strong id="storyLabelControls">Steuerung:</strong>
+                            <span id="storyTextControls">Pfeile/WASD, D = Werfen, Space = Springen.</span>
+                        </li>
+                        <li>
+                            <strong id="storyLabelTip">Tipp:</strong>
+                            <span id="storyTextTip">Achte auf Boss-Animationen und Timing.</span>
+                        </li>
                     </ul>
+
                 </div>
             </div>
         </div>
@@ -187,6 +198,77 @@
 
 
 
+        <div id="impressumOverlay" class="impressum-overlay overlay-style text-shadow-none d-none" role="dialog"
+            aria-modal="true" aria-labelledby="impressumTitle">
+            <div class="impressum-card box-shadow" role="document">
+                <div class="impressum-header">
+                    <h2 id="impressumTitle" class="impressum-title">Impressum</h2>
+                    <button id="impressumClose" class="close-btn btn-style" aria-label="Schließen">
+                        <img src="img/arrow-back.png" alt="Schließen" class="icon-img">
+                    </button>
+                </div>
+
+                <div class="impressum-body">
+                    <p>
+                        <strong id="impressumResponsibleTitle">
+                            Verantwortlich für dieses Spiel (Schul-/Portfolio-Projekt):
+                        </strong>
+                    </p>
+
+                    <p>
+                        <span id="impressumName">Max Mustermann</span><br>
+                        <span id="impressumStreet">Musterstraße 1</span><br>
+                        <span id="impressumCity">12345 Musterstadt</span><br>
+                        <span id="impressumEmailLabel">E-Mail:</span>
+                        <span id="impressumEmailValue">beispiel@mail.de</span>
+                    </p>
+
+                    <p>
+                        <strong id="impressumHintTitle">Hinweis:</strong><br>
+                        <span id="impressumHintText">
+                            Dieses Impressum enthält Platzhalterdaten, da es sich um ein nicht-kommerzielles
+                            Schul- bzw. Lernprojekt handelt. Die echten Daten werden im Rahmen des betreuenden Kurses
+                            geführt.
+                        </span>
+                    </p>
+
+                    <p>
+                        <strong id="impressumSupervisionTitle">Betreuung:</strong>
+                    </p>
+
+                    <p id="impressumSupervisionText">
+                        Dieses Projekt entstand im Rahmen eines betreuten Kurses. Ansprechpartner (Mentor/Dozent):
+                    </p>
+
+                    <p id="impressumSupervisionPlaceholder">
+                        [Hier die offiziellen Kontaktdaten oder die Schul-/Akademie-Adresse einsetzen]
+                    </p>
+
+                    <p>
+                        <strong id="impressumLiabilityTitle">Haftungshinweis:</strong><br>
+                        <span id="impressumLiabilityText">
+                            Trotz sorgfältiger Erstellung dieses Projekts wird keine Haftung für externe Inhalte
+                            oder für Schäden übernommen, die aus der Nutzung dieses Spiels entstehen.
+                        </span>
+                    </p>
+
+                    <p>
+                        <strong id="impressumCopyrightTitle">Urheberrecht:</strong><br>
+                        <span id="impressumCopyrightText">
+                            Grafiken, Sounds und Quellcode stehen – soweit nicht anders gekennzeichnet –
+                            ausschließlich zu Demonstrationszwecken im Rahmen dieses Projekts zur Verfügung.
+                        </span>
+                    </p>
+
+                    <p>
+                        <strong id="impressumStatusTitle">Stand dieses Impressums:</strong><br>
+                        <span id="impressumStatusText">Schul-/Lernprojekt ohne Datumsangabe.</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+
         <button id="fullscreenBtn" class="btn-style text-shadow-none" onclick="toggleFullscreen()">⛶</button>
 
         <button class="d-none btn-style" id="pauseBtn">Pause ❚❚</button>
@@ -221,9 +303,9 @@
                     </button>
                 </div>
                 <div class="modal-content">
-                    <button class="lang-opt btn-style" data-lang="DE">Deutsch</button>
-                    <button class="lang-opt btn-style" data-lang="ES">Español</button>
-                    <button class="lang-opt btn-style" data-lang="EN">English</button>
+                    <button id="german" class="lang-opt btn-style" data-lang="DE">Deutsch</button>
+                    <button id="spanish" class="lang-opt btn-style" data-lang="ES">Español</button>
+                    <button id="english" class="lang-opt btn-style" data-lang="EN">English</button>
                 </div>
             </div>
         </div>
@@ -232,80 +314,32 @@
         <div id="gameOverOverlay" class="game-over-overlay d-none" role="dialog" aria-modal="true">
             <button id="restartBtn" class="game-over-btn btn-style">
                 <img src="img/restart.png" alt="">
-                Neustart
+                <span id="gameOverRestart">Neustart</span>
             </button>
+
+
             <button id="homeBtn" class="game-over-btn btn-style">
                 <img src="img/home.png" alt="">
-                Hauptmenü
+                <span id="gameOverHome">Hauptmenü</span>
             </button>
         </div>
 
 
         <div id="winOverlay" class="win-overlay d-none" role="dialog" aria-modal="true">
             <div class="next-level-query">
-                <div class="next-level-text">Möchten Sie mit dem nächsten Level fortfahren?</div>
+                <div class="next-level-text" id="winQuestion">
+                    Möchten Sie mit dem nächsten Level fortfahren?
+                </div>
                 <button id="nextLevelBtn" class="win-btn btn-style">
-                    Nächsten Level
+                    <span id="winNextLevel">Nächsten Level</span>
                     <img src="img/forward.png" alt="">
                 </button>
             </div>
 
             <button id="winHomeBtn" class="win-btn btn-style">
                 <img src="img/home.png" alt="">
-                Hauptmenü
+                <span id="winHome">Hauptmenü</span>
             </button>
-        </div>
-
-
-        <div id="impressumOverlay" class="impressum-overlay overlay-style text-shadow-none d-none" role="dialog"
-            aria-modal="true" aria-labelledby="impressumTitle">
-            <div class="impressum-card box-shadow" role="document">
-                <div class="impressum-header">
-                    <h2 id="impressumTitle" class="impressum-title">Impressum</h2>
-                    <button id="impressumClose" class="close-btn btn-style" aria-label="Schließen">
-                        <img src="img/arrow-back.png" alt="Schließen" class="icon-img">
-                    </button>
-                </div>
-                <div class="impressum-body">
-
-                    <p><strong>Verantwortlich für dieses Spiel (Schul-/Portfolio-Projekt):</strong></p>
-                    <p>
-                        Max Mustermann<br>
-                        Musterstraße 1<br>
-                        12345 Musterstadt<br>
-                        E-Mail: beispiel@mail.de
-                    </p>
-
-                    <p><strong>Hinweis:</strong><br>
-                        Dieses Impressum enthält Platzhalterdaten, da es sich um ein nicht-kommerzielles
-                        Schul- bzw. Lernprojekt handelt. Die echten Daten werden im Rahmen des betreuenden Kurses
-                        geführt.
-                    </p>
-
-                    <p><strong>Betreuung:</strong></p>
-                    <p>
-                        Dieses Projekt entstand im Rahmen eines betreuten Kurses. Ansprechpartner (Mentor/Dozent):
-                    </p>
-                    <p>
-                        [Hier die offiziellen Kontaktdaten oder die Schul-/Akademie-Adresse einsetzen]
-                    </p>
-
-
-                    <p><strong>Haftungshinweis:</strong><br>
-                        Trotz sorgfältiger Erstellung dieses Projekts wird keine Haftung für externe Inhalte
-                        oder für Schäden übernommen, die aus der Nutzung dieses Spiels entstehen.
-                    </p>
-
-                    <p><strong>Urheberrecht:</strong><br>
-                        Grafiken, Sounds und Quellcode stehen – soweit nicht anders gekennzeichnet –
-                        ausschließlich zu Demonstrationszwecken im Rahmen dieses Projekts zur Verfügung.
-                    </p>
-
-                    <p><strong>Stand dieses Impressums:</strong><br>
-                        Schul-/Lernprojekt ohne Datumsangabe.
-                    </p>
-                </div>
-            </div>
         </div>
 
 

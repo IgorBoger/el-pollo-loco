@@ -17,225 +17,6 @@ var isGamePaused = false;
 console.log(isGamePaused);
 
 
-
-const I18N = {
-    DE: {
-        orientationCard: "📱 Bitte drehen Sie Ihr Gerät ins Querformat (Landscape), um zu spielen.",
-
-        // titleGame: "El Pollo Loco",
-        titleGame: "Das verrückte Huhn",
-        startGame: "Spiel starten",
-        restartGame: "Spiel neu starten",
-        // showControls: "Steuerung",
-
-        aboutGame: "Über das Spiel",
-        storyTitle: "Die Geschichte",
-        storyP1: "In einem ruhigen Dorf lebten die Hühner friedlich … bis eines Tages das Chaos hereinbrach. Jetzt musst du Pepe helfen, Ordnung wiederherzustellen und gegen den verrückten Endboss zu bestehen!",
-        storyLabelGoal: "Ziel:",
-        storyTextGoal: "Besiege den Endboss & sammle Münzen.",
-        storyLabelControls: "Steuerung:",
-        storyTextControls: "Pfeile/WASD, D = Werfen, Space = Springen.",
-        storyLabelTip: "Tipp:",
-        storyTextTip: "Achte auf Boss-Animationen und Timing.",
-
-        keyHelpButton: "Tastenbelegung",
-        keyHelpTitle: "Tastenbelegung",
-        keyHelpHeaderAction: "Aktion",
-        keyHelpHeaderKey: "Taste",
-        keyHelpHint: "Tipp: Drücke <strong>Esc</strong>, um zu schließen.",
-        keyActionMoveLeft: "Links bewegen",
-        keyActionMoveRight: "Rechts bewegen",
-        keyActionJump: "Springen",
-        keyActionThrow: "Werfen",
-        keyKeyMoveLeft: "Pfeil links",
-        keyKeyMoveRight: "Pfeil rechts",
-        keyKeyJump: "Leertaste",
-        keyKeyThrow: "D",
-
-        rankingList: "Rangliste",
-        labelMusic: "Musik",
-        labelSound: "Ton",
-        labelLanguage: "Sprache",
-        settingsTitle: "Einstellungen",
-        langName: "Deutsch",
-        langModalTitle: "Sprache",
-        // mobileJump: "Springen",
-        // mobileThrow: "Werfen",
-    },
-    ES: {
-        orientationCard: "📱 Gire su dispositivo al modo horizontal para jugar.",
-        titleGame: "El Pollo Loco",
-        startGame: "Iniciar juego",
-        restartGame: "Reiniciar juego",
-        // showControls: "Controles",
-
-        aboutGame: "Acerca del juego",
-        storyTitle: "La historia",
-        storyP1: "En un pueblo tranquilo las gallinas vivían en paz… hasta que llegó el caos. ¡Ahora debes ayudar a Pepe a restablecer el orden y enfrentarte al jefe final!",
-        storyLabelGoal: "Objetivo:",
-        storyTextGoal: "Derrota al jefe final y recoge monedas.",
-        storyLabelControls: "Controles:",
-        storyTextControls: "Flechas/WASD, D = lanzar, Espacio = saltar.",
-        storyLabelTip: "Consejo:",
-        storyTextTip: "Fíjate en las animaciones del jefe y el timing.",
-
-        keyHelpButton: "Asignación de teclas",
-        keyHelpTitle: "Asignación de teclas",
-        keyHelpHeaderAction: "Acción",
-        keyHelpHeaderKey: "Tecla",
-        keyHelpHint: "Consejo: Pulsa <strong>Esc</strong> para cerrar.",
-        keyActionMoveLeft: "Mover a la izquierda",
-        keyActionMoveRight: "Mover a la derecha",
-        keyActionJump: "Saltar",
-        keyActionThrow: "Lanzar",
-        keyKeyMoveLeft: "Flecha izquierda",
-        keyKeyMoveRight: "Flecha derecha",
-        keyKeyJump: "Espacio",
-        keyKeyThrow: "D",
-
-        rankingList: "Clasificación",
-        labelMusic: "Música",
-        labelSound: "Sonido",
-        labelLanguage: "Idioma",
-        settingsTitle: "Ajustes",
-        langName: "Español",
-        langModalTitle: "Idioma",
-        // mobileJump: "Saltar",
-        // mobileThrow: "Tirar",
-    },
-    EN: {
-        orientationCard: "📱 Please rotate your device to landscape mode to play.",
-
-        // titleGame: "El Pollo Loco",
-        titleGame: "The Crazy Chicken",
-        startGame: "Start Game",
-        restartGame: "Restart Game",
-        // showControls: "Controls",
-
-        aboutGame: "About",
-        storyTitle: "The story",
-        storyP1: "In a quiet village the chickens lived in peace… until chaos arrived. Now you must help Pepe restore order and face the crazy end boss!",
-        storyLabelGoal: "Goal:",
-        storyTextGoal: "Defeat the end boss & collect coins.",
-        storyLabelControls: "Controls:",
-        storyTextControls: "Arrows/WASD, D = throw, Space = jump.",
-        storyLabelTip: "Tip:",
-        storyTextTip: "Watch boss animations and timing.",
-
-        keyHelpButton: "Key bindings",
-        keyHelpTitle: "Key bindings",
-        keyHelpHeaderAction: "Action",
-        keyHelpHeaderKey: "Key",
-        keyHelpHint: "Tip: Press <strong>Esc</strong> to close.",
-        keyActionMoveLeft: "Move left",
-        keyActionMoveRight: "Move right",
-        keyActionJump: "Jump",
-        keyActionThrow: "Throw",
-        keyKeyMoveLeft: "Arrow Left",
-        keyKeyMoveRight: "Arrow Right",
-        keyKeyJump: "Space",
-        keyKeyThrow: "D",
-
-        rankingList: "Leaderboard",
-        labelMusic: "Music",
-        labelSound: "Sound",
-        labelLanguage: "Language",
-        settingsTitle: "Settings",
-        langName: "English",
-        langModalTitle: "Language",
-        // mobileJump: "Jump",
-        // mobileThrow: "Throw",
-    }
-};
-
-
-function checkOrientation() {
-    const warning = document.getElementById('orientationWarning');
-    if (!warning) return;
-    if (window.innerHeight > window.innerWidth) {
-        warning.classList.remove('d-none');
-        warning.classList.add('d-flex');
-    } else {
-        warning.classList.remove('d-flex');
-        warning.classList.add('d-none');
-    }
-}
-
-
-function applyTranslations() {
-    document.documentElement.lang = currentLanguage.toLowerCase();
-    const t = I18N[currentLanguage] || I18N.ES;
-    const set = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
-    set('orientationCard', t.orientationCard);
-    // Titel / Start / Menü
-    set('titleGame', t.titleGame);
-    set('startGame', t.startGame);
-    set('restartGame', t.restartGame);
-    // set('showControls', t.showControls);
-    set('aboutGame', t.aboutGame);
-    // set('storyTitle', t.storyTitle);
-    /** STORY overlay **/
-    set('storyTitle', t.storyTitle); // <h2 id="storyTitle"> … </h2> ist schon da
-    // erster Absatz im Story-Overlay:
-    const storyP = document.querySelector('#storyOverlay .story-content > p');
-    if (storyP) storyP.textContent = t.storyP1;
-    // 3 Listeneinträge neu zusammenbauen
-    const lis = document.querySelectorAll('#storyOverlay .story-content ul li');
-    if (lis[0]) lis[0].innerHTML = `<strong>${t.storyLabelGoal}</strong> ${t.storyTextGoal}`;
-    if (lis[1]) lis[1].innerHTML = `<strong>${t.storyLabelControls}</strong> ${t.storyTextControls}`;
-    if (lis[2]) lis[2].innerHTML = `<strong>${t.storyLabelTip}</strong> ${t.storyTextTip}`;
-
-    set('keyHelpButton', t.keyHelpButton);
-    /** KEY-HELP overlay **/
-    set('keyHelpTitle', t.keyHelpTitle); // id existiert im H2
-    // Key-Help statische Zellen
-    set('keyActionMoveLeft', t.keyActionMoveLeft);
-    set('keyKeyMoveLeft', t.keyKeyMoveLeft);
-    set('keyActionMoveRight', t.keyActionMoveRight);
-    set('keyKeyMoveRight', t.keyKeyMoveRight);
-    set('keyActionJump', t.keyActionJump);
-    set('keyKeyJump', t.keyKeyJump);
-    set('keyActionThrow', t.keyActionThrow);
-    set('keyKeyThrow', t.keyKeyThrow);
-    // (falls IDs gesetzt)
-    set('keyHelpHeaderAction', t.keyHelpHeaderAction);
-    set('keyHelpHeaderKey', t.keyHelpHeaderKey);
-    const hint = document.getElementById('keyHelpHint');
-    if (hint) hint.innerHTML = t.keyHelpHint;
-
-    set('rankingList', t.rankingList);
-
-    // Settings-Bereich
-    set('settingsTitle', t.settingsTitle);
-    set('labelMusic', t.labelMusic);
-    set('labelSound', t.labelSound);
-    set('labelLanguage', t.labelLanguage); // falls du das Label wieder nutzt
-
-    // Grüner Sprach-Button → Name statt Kürzel
-    const langBtn = document.getElementById('langToggle');
-    if (langBtn) langBtn.textContent = t.langName;
-
-    // Sprach-Overlay Titel
-    set('langModalTitle', t.langModalTitle);
-
-    // Mobile Controls (mit Emoji davor)
-    const j = document.getElementById('btnJump');
-    // if (j) j.textContent = `⤴️ ${t.mobileJump}`;
-    const th = document.getElementById('btnThrow');
-    // if (th) th.textContent = `🧴 ${t.mobileThrow}`;
-}
-
-
-
-// Datei: game.js — Funktion: setLanguage (NEU)
-function setLanguage(lang) {
-    currentLanguage = lang;
-    localStorage.setItem('language', currentLanguage);
-    applyTranslations();
-}
-
-
-
 function init() {
     canvas = document.getElementById('canvas');
     setupHiDPICanvas();
@@ -257,12 +38,9 @@ function init() {
 function startGame() {
     console.log('gecklickt');
     isGamePaused = false;
-    console.log(isGamePaused);
-
-    document.getElementById('pauseBtn').classList.remove('d-none'); const btn = document.getElementById('pauseBtn');
-    btn.classList.remove('d-none');
-    btn.textContent = 'Pause ❚❚';
-
+    const pauseBtn = document.getElementById('pauseBtn');    
+    pauseBtn.classList.remove('d-none');
+    setPauseButtonLabel(I18N[currentLanguage] || I18N.ES);
     document.getElementById('startScreen').classList.add('d-none');
     init();
     playBackgroundIfAllowed();
@@ -789,7 +567,8 @@ function togglePause() {
     if (!world) return;
     isGamePaused = !isGamePaused;
     const btn = document.getElementById('pauseBtn');
-    if (btn) btn.textContent = isGamePaused ? 'Play ▶' : 'Pause ❚❚';
+    // if (btn) btn.textContent = isGamePaused ? 'Play ▶' : 'Pause ❚❚';
+    setPauseButtonLabel(I18N[currentLanguage] || I18N.ES);
     if (isGamePaused) {
         world.pauseAllSounds();        //  ⬅️ NEU
         return;
@@ -809,7 +588,8 @@ function quickRestartGame() {
     isGamePaused = false;
     const pauseBtn = document.getElementById('pauseBtn');
     pauseBtn?.classList.remove('d-none');
-    if (pauseBtn) pauseBtn.textContent = 'Pause ❚❚';
+    // if (pauseBtn) pauseBtn.textContent = 'Pause ❚❚';
+    setPauseButtonLabel(I18N[currentLanguage] || I18N.ES);
 
     // Startscreen bleibt versteckt:
     document.getElementById('startScreen')?.classList.add('d-none');
