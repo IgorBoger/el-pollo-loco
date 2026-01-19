@@ -195,6 +195,34 @@
         </div>
 
 
+        <!-- Rangliste Overlay -->
+        <div id="rankingOverlay" class="ranking-overlay overlay-style text-shadow-none d-none" role="dialog"
+            aria-modal="true" aria-labelledby="rankingTitle">
+            <div class="ranking-card box-shadow" role="document">
+                <div class="ranking-header">
+                    <h2 id="rankingTitle" class="ranking-title">Rangliste</h2>
+                    <button id="rankingClose" class="close-btn btn-style" aria-label="Schließen">
+                        <img src="img/arrow-back.png" alt="Schließen" class="icon-img">
+                    </button>
+                </div>
+
+                <div class="ranking-body">
+                    <p id="rankingEmpty" class="ranking-empty d-none">Noch keine Einträge vorhanden.</p>
+
+                    <table class="ranking-table" aria-describedby="rankingTitle">
+                        <thead>
+                            <tr>
+                                <th id="rankingHeaderRank">#</th>
+                                <th id="rankingHeaderCoins">Coins</th>
+                                <th id="rankingHeaderTime">Zeit</th>
+                                <th id="rankingHeaderResult">Ergebnis</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rankingTbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
 
 

@@ -14,7 +14,9 @@ let currentLanguage = localStorage.getItem('language') || 'ES';
 let reopenBurgerAfterOverlay = false;
 // let isGamePaused = false;
 var isGamePaused = false;
-console.log(isGamePaused);
+let gameStartAt = 0;
+const LEADERBOARD_KEY = 'leaderboard';
+
 
 
 function init() {
@@ -38,7 +40,8 @@ function init() {
 function startGame() {
     console.log('gecklickt');
     isGamePaused = false;
-    const pauseBtn = document.getElementById('pauseBtn');    
+    gameStartAt = Date.now();
+    const pauseBtn = document.getElementById('pauseBtn');
     pauseBtn.classList.remove('d-none');
     setPauseButtonLabel(I18N[currentLanguage] || I18N.ES);
     document.getElementById('startScreen').classList.add('d-none');
@@ -148,6 +151,127 @@ function closeKeyHelpOverlay() {
 }
 
 
+// 3) Datei: game.js — Funktionen: Leaderboard Helpers (NEU)
+function getLeaderboard() {
+    const raw = localStorage.getItem(LEADERBOARD_KEY);
+    if (!raw) return [];
+    try { return JSON.parse(raw) || []; }
+    catch { return []; }
+}
+
+function saveLeaderboard(list) {
+    localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(list));
+}
+
+function getRunDurationMs() {
+    if (!gameStartAt) return 0;
+    return Math.max(0, Date.now() - gameStartAt);
+}
+
+function formatDuration(ms) {
+    const total = Math.floor(ms / 1000);
+    const m = String(Math.floor(total / 60)).padStart(2, '0');
+    const s = String(total % 60).padStart(2, '0');
+    return `${m}:${s}`;
+}
+
+function buildResultLabel(resultKey) {
+    const t = I18N[currentLanguage] || I18N.ES;
+    return resultKey === 'win' ? t.rankingResultWin : t.rankingResultLose;
+}
+
+function buildLeaderboardEntry(worldInstance, resultKey) {
+    return {
+        coins: worldInstance?.character?.coin || 0,
+        timeMs: getRunDurationMs(),
+        result: buildResultLabel(resultKey),
+        at: Date.now()
+    };
+}
+
+function sortLeaderboard(list) {
+    return list.sort((a, b) => (b.coins - a.coins) || (a.timeMs - b.timeMs));
+}
+
+function addLeaderboardEntry(worldInstance, resultKey) {
+    const list = getLeaderboard();
+    list.push(buildLeaderboardEntry(worldInstance, resultKey));
+    const sorted = sortLeaderboard(list).slice(0, 10);
+    saveLeaderboard(sorted);
+}
+
+
+// 4) Datei: game.js — Funktionen: Render Rangliste(NEU)
+function clearRankingTable() {
+    const tbody = document.getElementById('rankingTbody');
+    if (tbody) tbody.innerHTML = '';
+}
+
+function setRankingEmptyVisible(isEmpty) {
+    const empty = document.getElementById('rankingEmpty');
+    if (!empty) return;
+    empty.classList.toggle('d-none', !isEmpty);
+}
+
+function appendRankingRow(tbody, idx, entry) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${idx}</td><td>${entry.coins}</td><td>${formatDuration(entry.timeMs)}</td><td>${entry.result}</td>`;
+    tbody.appendChild(tr);
+}
+
+function renderRankingList() {
+    const tbody = document.getElementById('rankingTbody');
+    if (!tbody) return;
+    clearRankingTable();
+    const list = getLeaderboard();
+    setRankingEmptyVisible(list.length === 0);
+    list.forEach((e, i) => appendRankingRow(tbody, i + 1, e));
+}
+
+
+// 5) Datei: game.js — Funktionen: Overlay öffnen / schließen(NEU)
+function openRankingOverlay() {
+    const overlay = document.getElementById('rankingOverlay');
+    if (!overlay) return;
+    rememberBurgerStateForOverlay();
+    closeBurgerIfNeeded();
+    renderRankingList();
+    showOverlayFlex(overlay);
+}
+
+function closeRankingOverlay() {
+    const overlay = document.getElementById('rankingOverlay');
+    if (!overlay) return;
+    restoreBurgerAfterOverlay();
+    hideOverlayFlex(overlay);
+}
+
+function rememberBurgerStateForOverlay() {
+    const burger = document.getElementById('burgerMenu');
+    reopenBurgerAfterOverlay = burger?.classList.contains('open') || false;
+}
+
+function closeBurgerIfNeeded() {
+    if (reopenBurgerAfterOverlay) closeBurgerMenu();
+}
+
+function restoreBurgerAfterOverlay() {
+    if (!reopenBurgerAfterOverlay) return;
+    toggleBurgerMenu();
+    reopenBurgerAfterOverlay = false;
+}
+
+function showOverlayFlex(overlay) {
+    overlay.classList.remove('d-none');
+    overlay.classList.add('d-flex');
+}
+
+function hideOverlayFlex(overlay) {
+    overlay.classList.remove('d-flex');
+    overlay.classList.add('d-none');
+}
+
+
 function toggleBurgerMenu() {
     const menu = document.getElementById('burgerMenu');
     const isOpen = menu.classList.contains('open');
@@ -239,20 +363,14 @@ function outsideCloseHandler(e) {
     const storyOv = document.getElementById('storyOverlay');
     const impressum = document.getElementById('impressumOverlay');
 
-    // // ✅ Wenn Sprach-Overlay offen ist → NICHTS anderes schließen
-    // if (langOv && !langOv.classList.contains('d-none')) return;
-
-    // ✅ Wenn Sprach-ODER Tastenhilfe-Overlay offen ist → nichts anderes schließen
-    // if ((langOv && !langOv.classList.contains('d-none')) ||
-    //     (keyHelp && !keyHelp.classList.contains('d-none')) ||
-    //     (storyOv && !storyOv.classList.contains('d-none'))) {
-    //     return;
-    // }
+    // 7) Datei: game.js — Funktion: outsideCloseHandler Rangliste berücksichtigen
+    const ranking = document.getElementById('rankingOverlay');
 
     if ((langOv && !langOv.classList.contains('d-none')) ||
         (keyHelp && !keyHelp.classList.contains('d-none')) ||
         (storyOv && !storyOv.classList.contains('d-none')) ||
-        (impressum && !impressum.classList.contains('d-none'))) {
+        (impressum && !impressum.classList.contains('d-none')) ||
+        (ranking && !ranking.classList.contains('d-none'))) {
         return;
     }
 
@@ -413,8 +531,10 @@ document.addEventListener("keydown", function (event) {
     if (event.key === "Escape") {
         closeKeyHelpOverlay();
         closeStoryOverlay();
-        closeLangModal(); // optional: Sprache auch schließen
+        closeLangModal();
+        closeRankingOverlay();
         closeImpressumOverlay();
+
     }
 });
 
@@ -657,15 +777,20 @@ function onGameOver(worldInstance) {
     isGamePaused = true;
     const pauseBtn = document.getElementById('pauseBtn');
     pauseBtn?.classList.add('d-none');
-    const bg = worldInstance?.sounds?.background;
+    // const bg = worldInstance?.sounds?.background;
+    // worldInstance?.pauseAllSounds();
     worldInstance?.pauseAllSounds();
+    addLeaderboardEntry(worldInstance, 'lose');
 }
 
 
 function onWin(worldInstance) {
     isGamePaused = true;
-    document.getElementById('pauseBtn')?.classList.add('d-none');
+    // document.getElementById('pauseBtn')?.classList.add('d-none');
+    const pauseBtn = document.getElementById('pauseBtn');
+    pauseBtn?.classList.add('d-none');
     worldInstance?.pauseAllSounds?.();
+    addLeaderboardEntry(worldInstance, 'win');
 }
 
 
@@ -780,6 +905,18 @@ window.addEventListener('load', () => {
         }
         e.stopPropagation();
     });
+
+
+    // 8) Datei: game.js — Im load-Handler Events hinzufügen
+    document.getElementById('rankingList')?.addEventListener('click', openRankingOverlay);
+    document.getElementById('rankingClose')?.addEventListener('click', closeRankingOverlay);
+
+    document.getElementById('rankingOverlay')?.addEventListener('click', (e) => {
+        const card = document.querySelector('#rankingOverlay .ranking-card');
+        if (card && !card.contains(e.target)) closeRankingOverlay();
+        e.stopPropagation();
+    });
+
 
 
     addReleaseGuards();

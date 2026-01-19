@@ -314,6 +314,62 @@ h2 {
 }
 
 
+.ranking-card {
+    width: min(92vw, 720px);
+    max-height: 80vh;
+    overflow: auto;
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: system-ui, sans-serif;
+    text-transform: none;
+}
+
+.ranking-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    background: #ffe7d6;
+    border-bottom: 2px solid #ffa94d;
+    border-radius: 14px 14px 0 0;
+}
+
+.ranking-title {
+    margin: 0;
+    font-size: 20px;
+}
+
+.ranking-body {
+    padding: 14px 18px 18px;
+}
+
+.ranking-empty {
+    margin: 0 0 12px;
+    color: #666;
+    font-size: 14px;
+}
+
+.ranking-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.ranking-table th,
+.ranking-table td {
+    padding: 10px 8px;
+    border-bottom: 1px solid #eee;
+    text-align: left;
+    font-size: 14px;
+}
+
+.ranking-table th {
+    font-weight: 700;
+}
+
+
+
 .impressum-card {
     width: min(92vw, 640px);
     max-height: 80vh;

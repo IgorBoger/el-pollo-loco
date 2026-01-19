@@ -27,6 +27,17 @@ const I18N = {
         keyKeyMoveRight: "Pfeil rechts",
         keyKeyJump: "Leertaste",
         keyKeyThrow: "D",
+
+        rankingTitle: "Rangliste",
+        rankingHeaderRank: "#",
+        rankingHeaderCoins: "Coins",
+        rankingHeaderTime: "Zeit",
+        rankingHeaderResult: "Ergebnis",
+        rankingEmpty: "Noch keine Einträge vorhanden.",
+        rankingResultWin: "Gewonnen",
+        rankingResultLose: "Verloren",
+
+
         rankingList: "Rangliste",
         impressumButton: "Impressum",
         labelMusic: "Musik",
@@ -92,6 +103,17 @@ const I18N = {
         keyKeyMoveRight: "Flecha derecha",
         keyKeyJump: "Espacio",
         keyKeyThrow: "D",
+
+        rankingTitle: "Clasificación",
+        rankingHeaderRank: "#",
+        rankingHeaderCoins: "Monedas",
+        rankingHeaderTime: "Tiempo",
+        rankingHeaderResult: "Resultado",
+        rankingEmpty: "Aún no hay entradas.",
+        rankingResultWin: "Ganado",
+        rankingResultLose: "Perdido",
+
+
         rankingList: "Clasificación",
         impressumButton: "Aviso legal",
         labelMusic: "Música",
@@ -156,6 +178,17 @@ const I18N = {
         keyKeyMoveRight: "Arrow Right",
         keyKeyJump: "Space",
         keyKeyThrow: "D",
+
+        rankingTitle: "Leaderboard",
+        rankingHeaderRank: "#",
+        rankingHeaderCoins: "Coins",
+        rankingHeaderTime: "Time",
+        rankingHeaderResult: "Result",
+        rankingEmpty: "No entries yet.",
+        rankingResultWin: "Won",
+        rankingResultLose: "Lost",
+
+
         rankingList: "Leaderboard",
         impressumButton: "Legal notice",
         labelMusic: "Music",
@@ -217,7 +250,7 @@ function applyTranslations() {
     applyBurgerMenuTranslations(t);
     applyStoryTranslations(t);
     applyKeyHelpTranslations(t);
-    // applyRankingListTranslation(t);
+    applyRankingListTranslation(t);
     applyImpressumTranslations(t);
     applySettingsTranslations(t);
     applyLanguageUiTranslations(t);
@@ -258,6 +291,16 @@ function applyKeyHelpTranslations(t) {
     applyKeyHelpHeaders(t);
     applyKeyHelpActions(t);
     applyKeyHelpHint(t);
+}
+
+
+function applyRankingListTranslation(t) {
+    setText('rankingTitle', t.rankingTitle);
+    setText('rankingHeaderRank', t.rankingHeaderRank);
+    setText('rankingHeaderCoins', t.rankingHeaderCoins);
+    setText('rankingHeaderTime', t.rankingHeaderTime);
+    setText('rankingHeaderResult', t.rankingHeaderResult);
+    setText('rankingEmpty', t.rankingEmpty);
 }
 
 
