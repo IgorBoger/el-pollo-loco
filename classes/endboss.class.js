@@ -159,21 +159,11 @@ class Endboss extends MovableObject {
 
     animate() {
         this.aiInterval = setInterval(() => {
-            // if (isGamePaused || this.world?.stopped) return;
             if (window.isGamePaused || this.world?.stopped) return;
             if (this.handleDeath() || !this.world?.character) return;
             const now = performance.now();
-
-            // const pepeX = this.world.character.x;
-            // const dist = Math.abs(pepeX - this.x);
-
-            // const pepeX = this.getCenterX(this.world.character);
-            // const dist = Math.abs(pepeX - this.getCenterX(this));
-
             const dist = this.getHorizontalGap(this.world.character, this);
             const pepeX = this.getCenterX(this.world.character);
-
-
             this.isInRecovery(now)
                 ? this.applyRecovery()
                 : this.updateAI(now, pepeX, dist);
@@ -182,7 +172,7 @@ class Endboss extends MovableObject {
             this.applyHorizontalMotion();
         }, 1000 / 60);
         this.animationInterval = setInterval(() => {
-            if (isGamePaused || this.world?.stopped) return;
+            if (window.isGamePaused || this.world?.stopped) return;
             this.updateFrames();
         }, 50);
     }
