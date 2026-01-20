@@ -14,6 +14,11 @@ body {
 }
 
 
+thead {
+    border-bottom: 2px solid #ffa94d;
+}
+
+
 button {
     text-shadow: inherit;
 }

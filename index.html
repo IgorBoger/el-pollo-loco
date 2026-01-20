@@ -126,7 +126,7 @@
                         <img src="img/arrow-back.png" alt="" class="icon-img" />
                     </button>
                 </div>
-                <div class="story-content">
+                <div class="padding-overlays">
                     <p id="storyP1">
                         In einem ruhigen Dorf lebten die Hühner friedlich … bis eines Tages
                         das Chaos hereinbrach. Jetzt musst du Pepe helfen, Ordnung
@@ -161,7 +161,7 @@
                     <h2 id="keyHelpTitle" class="key-help-modal-title">Tastenbelegung</h2>
                     <button id="keyHelpClose" class="key-help-close-button" aria-label="Schließen">×</button>
                 </div>
-                <div class="key-help-modal-body">
+                <div class="padding-overlays">
                     <table class="key-help-keys-table" aria-describedby="keyHelpTitle">
                         <thead>
                             <tr>
@@ -195,35 +195,55 @@
         </div>
 
 
-        <!-- Rangliste Overlay -->
-        <div id="rankingOverlay" class="ranking-overlay overlay-style text-shadow-none d-none" role="dialog"
-            aria-modal="true" aria-labelledby="rankingTitle">
-            <div class="ranking-card box-shadow" role="document">
+        <div id="rankingOverlay" class="overlay-style d-none" role="dialog" aria-modal="true">
+            <div class="ranking-card box-shadow">
                 <div class="ranking-header">
                     <h2 id="rankingTitle" class="ranking-title">Rangliste</h2>
-                    <button id="rankingClose" class="close-btn btn-style" aria-label="Schließen">
-                        <img src="img/arrow-back.png" alt="Schließen" class="icon-img">
-                    </button>
+
+                    <div class="ranking-actions">
+                        <button id="rankingClose" class="close-btn btn-style" aria-label="Schließen">
+                            <img src="img/arrow-back.png" alt="Schließen" class="icon-img">
+                        </button>
+                    </div>
                 </div>
 
-                <div class="ranking-body">
-                    <p id="rankingEmpty" class="ranking-empty d-none">Noch keine Einträge vorhanden.</p>
+                <div class="ranking-body padding-overlays text-shadow-none">
+                    <p id="rankingEmpty" class="ranking-empty d-none">Keine Einträge vorhanden.</p>
 
-                    <table class="ranking-table" aria-describedby="rankingTitle">
+                    <table class="ranking-table">
                         <thead>
                             <tr>
-                                <th id="rankingHeaderRank">#</th>
-                                <th id="rankingHeaderCoins">Coins</th>
-                                <th id="rankingHeaderTime">Zeit</th>
-                                <th id="rankingHeaderResult">Ergebnis</th>
+                                <th>#</th>
+                                <th>Münzen</th>
+                                <th>Zeit</th>
+                                <th>Ergebnis</th>
                             </tr>
                         </thead>
                         <tbody id="rankingTbody"></tbody>
                     </table>
                 </div>
+
+
+                <div class="ranking-footer">
+                    <button id="rankingClear" class="btn-style ranking-clear-btn">
+                        Rangliste löschen
+                    </button>
+                </div>
             </div>
         </div>
 
+
+        <div id="rankingClearOverlay" class="overlay-style d-none" role="dialog" aria-modal="true">
+            <div class="ranking-confirm-card box-shadow text-shadow-none">
+                <h3 id="rankingClearTitle" class="ranking-confirm-title">Rangliste löschen</h3>
+                <p id="rankingClearText" class="ranking-confirm-text">Willst du wirklich alle Einträge löschen?</p>
+
+                <div class="ranking-confirm-actions">
+                    <button id="rankingClearOk" class="ranking-clear-ok btn-style">Löschen</button>
+                    <button id="rankingClearCancel" class="ranking-clear-cancel btn-style">Abbrechen</button>
+                </div>
+            </div>
+        </div>
 
 
         <div id="impressumOverlay" class="impressum-overlay overlay-style text-shadow-none d-none" role="dialog"
@@ -236,7 +256,7 @@
                     </button>
                 </div>
 
-                <div class="impressum-body">
+                <div class="impressum-body padding-overlays">
                     <p>
                         <strong id="impressumResponsibleTitle">
                             Verantwortlich für dieses Spiel (Schul-/Portfolio-Projekt):

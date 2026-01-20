@@ -1,7 +1,6 @@
 const I18N = {
     DE: {
         orientationCard: "📱 Bitte drehen Sie Ihr Gerät ins Querformat (Landscape), um zu spielen.",
-        // titleGame: "El Pollo Loco",
         titleGame: "Das verrückte Huhn",
         startGame: "Spiel starten",
         restartGame: "Spiel neu starten",
@@ -27,7 +26,6 @@ const I18N = {
         keyKeyMoveRight: "Pfeil rechts",
         keyKeyJump: "Leertaste",
         keyKeyThrow: "D",
-
         rankingTitle: "Rangliste",
         rankingHeaderRank: "#",
         rankingHeaderCoins: "Coins",
@@ -36,8 +34,11 @@ const I18N = {
         rankingEmpty: "Noch keine Einträge vorhanden.",
         rankingResultWin: "Gewonnen",
         rankingResultLose: "Verloren",
-
-
+        rankingClear: "Rangliste löschen",
+        rankingClearTitle: "Rangliste löschen",
+        rankingClearText: "Willst du wirklich alle Einträge löschen?",
+        rankingClearOk: "Löschen",
+        rankingClearCancel: "Abbrechen",
         rankingList: "Rangliste",
         impressumButton: "Impressum",
         labelMusic: "Musik",
@@ -74,7 +75,6 @@ const I18N = {
         impressumCopyrightText: "Grafiken, Sounds und Quellcode stehen – soweit nicht anders gekennzeichnet – ausschließlich zu Demonstrationszwecken im Rahmen dieses Projekts zur Verfügung.",
         impressumStatusTitle: "Stand dieses Impressums:",
         impressumStatusText: "Schul-/Lernprojekt ohne Datumsangabe."
-
     },
     ES: {
         orientationCard: "📱 Gire su dispositivo al modo horizontal para jugar.",
@@ -103,7 +103,6 @@ const I18N = {
         keyKeyMoveRight: "Flecha derecha",
         keyKeyJump: "Espacio",
         keyKeyThrow: "D",
-
         rankingTitle: "Clasificación",
         rankingHeaderRank: "#",
         rankingHeaderCoins: "Monedas",
@@ -112,8 +111,11 @@ const I18N = {
         rankingEmpty: "Aún no hay entradas.",
         rankingResultWin: "Ganado",
         rankingResultLose: "Perdido",
-
-
+        rankingClear: "Borrar clasificación",
+        rankingClearTitle: "Borrar clasificación",
+        rankingClearText: "¿Seguro que quieres borrar todas las entradas?",
+        rankingClearOk: "Borrar",
+        rankingClearCancel: "Cancelar",
         rankingList: "Clasificación",
         impressumButton: "Aviso legal",
         labelMusic: "Música",
@@ -178,7 +180,6 @@ const I18N = {
         keyKeyMoveRight: "Arrow Right",
         keyKeyJump: "Space",
         keyKeyThrow: "D",
-
         rankingTitle: "Leaderboard",
         rankingHeaderRank: "#",
         rankingHeaderCoins: "Coins",
@@ -187,8 +188,11 @@ const I18N = {
         rankingEmpty: "No entries yet.",
         rankingResultWin: "Won",
         rankingResultLose: "Lost",
-
-
+        rankingClear: "Clear leaderboard",
+        rankingClearTitle: "Clear leaderboard",
+        rankingClearText: "Do you really want to delete all entries?",
+        rankingClearOk: "Delete",
+        rankingClearCancel: "Cancel",
         rankingList: "Leaderboard",
         impressumButton: "Legal notice",
         labelMusic: "Music",
@@ -225,7 +229,6 @@ const I18N = {
         impressumCopyrightText: "Graphics, sounds and source code are provided solely for demonstration purposes within the scope of this project, unless otherwise stated.",
         impressumStatusTitle: "Status of this legal notice:",
         impressumStatusText: "Educational project without a specific date."
-
     }
 };
 
@@ -301,6 +304,8 @@ function applyRankingListTranslation(t) {
     setText('rankingHeaderTime', t.rankingHeaderTime);
     setText('rankingHeaderResult', t.rankingHeaderResult);
     setText('rankingEmpty', t.rankingEmpty);
+    setText('rankingClear', t.rankingClear);
+    setText('rankingClearConfirm', t.rankingClearConfirm);
 }
 
 
@@ -356,7 +361,6 @@ function applyLanguageUiTranslations(t) {
     setText('spanish', t.spanish);
     setText('english', t.english);
 }
-
 
 
 function applyGameOverWinOverlayTranslations(t) {

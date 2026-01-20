@@ -250,13 +250,13 @@ function formatDuration(ms) {
 }
 
 
-// 5) Datei: game.js — Funktionen: Overlay öffnen / schließen(NEU)
 function openRankingOverlay() {
     const overlay = document.getElementById('rankingOverlay');
     if (!overlay) return;
     rememberBurgerStateForOverlay();
     closeBurgerIfNeeded();
     renderRankingList();
+    setClearRankingState();
     showOverlayFlex(overlay);
 }
 
@@ -266,6 +266,91 @@ function closeRankingOverlay() {
     if (!overlay) return;
     restoreBurgerAfterOverlay();
     hideOverlayFlex(overlay);
+}
+
+
+function clearLeaderboard() {
+    localStorage.removeItem(LEADERBOARD_KEY);
+}
+
+
+function setClearRankingState() {
+    const btn = document.getElementById('rankingClear');
+    if (!btn) return;
+    btn.disabled = !hasLeaderboardEntries();
+}
+
+
+function hasLeaderboardEntries() {
+    const data = localStorage.getItem(LEADERBOARD_KEY);
+    if (!data) return false;
+    return JSON.parse(data).length > 0;
+}
+
+
+function onClearRankingClick() {
+    openRankingClearConfirm();
+}
+
+
+function openRankingClearConfirm() {
+    const ov = document.getElementById('rankingClearOverlay');
+    if (!ov) return;
+    setRankingClearConfirmTexts();
+    showOverlayFlex(ov);
+}
+
+
+function setRankingClearConfirmTexts() {
+    const txt = getRankingClearTexts();
+    setTextById('rankingClearTitle', txt.title);
+    setTextById('rankingClearText', txt.text);
+    setTextById('rankingClearOk', txt.ok);
+    setTextById('rankingClearCancel', txt.cancel);
+}
+
+
+function getRankingClearTexts() {
+    const t = I18N[currentLanguage] || I18N.ES;
+    return {
+        title: t.rankingClearTitle || 'Rangliste löschen',
+        text: t.rankingClearText || 'Willst du wirklich alle Einträge löschen?',
+        ok: t.rankingClearOk || 'Löschen',
+        cancel: t.rankingClearCancel || 'Abbrechen'
+    };
+}
+
+
+function setTextById(id, text) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = text;
+}
+
+
+function closeRankingClearConfirm() {
+    const ov = document.getElementById('rankingClearOverlay');
+    if (!ov) return;
+    hideOverlayFlex(ov);
+}
+
+
+function onRankingClearConfirm() {
+    clearLeaderboard();
+    renderRankingList();
+    setClearRankingState();
+    closeRankingClearConfirm();
+}
+
+
+function onRankingClearCancel() {
+    closeRankingClearConfirm();
+}
+
+
+function onRankingClearOverlayClick(e) {
+    if (e.target.id !== 'rankingClearOverlay') return;
+    closeRankingClearConfirm();
 }
 
 
@@ -921,10 +1006,16 @@ window.addEventListener('load', () => {
         restartGame();
     });
 
-    // Impressum
+    bindImpressumOverlayEvents();
+    bindRankingOverlayEvents();
+    bindRankingClearOverlayEvents();
+    addReleaseGuards();
+});
+
+
+function bindImpressumOverlayEvents() {
     document.getElementById('impressumButton')?.addEventListener('click', openImpressumOverlay);
     document.getElementById('impressumClose')?.addEventListener('click', closeImpressumOverlay);
-
     document.getElementById('impressumOverlay')?.addEventListener('click', (e) => {
         const card = document.querySelector('#impressumOverlay .impressum-card');
         if (card && !card.contains(e.target)) {
@@ -932,23 +1023,26 @@ window.addEventListener('load', () => {
         }
         e.stopPropagation();
     });
+}
 
 
-    // 8) Datei: game.js — Im load-Handler Events hinzufügen
+function bindRankingOverlayEvents() {
     document.getElementById('rankingList')?.addEventListener('click', openRankingOverlay);
     document.getElementById('rankingClose')?.addEventListener('click', closeRankingOverlay);
-
+    document.getElementById('rankingClear')?.addEventListener('click', onClearRankingClick);
     document.getElementById('rankingOverlay')?.addEventListener('click', (e) => {
         const card = document.querySelector('#rankingOverlay .ranking-card');
         if (card && !card.contains(e.target)) closeRankingOverlay();
         e.stopPropagation();
     });
+}
 
 
-
-    addReleaseGuards();
-
-});
+function bindRankingClearOverlayEvents() {
+    document.getElementById('rankingClearOk')?.addEventListener('click', onRankingClearConfirm);
+    document.getElementById('rankingClearCancel')?.addEventListener('click', onRankingClearCancel);
+    document.getElementById('rankingClearOverlay')?.addEventListener('click', onRankingClearOverlayClick);
+}
 
 
 window.addEventListener('resize', handleViewportChange, { passive: true });
