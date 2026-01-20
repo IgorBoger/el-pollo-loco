@@ -152,47 +152,6 @@ function closeKeyHelpOverlay() {
 
 
 // 3) Datei: game.js — Funktionen: Leaderboard Helpers (NEU)
-function getLeaderboard() {
-    const raw = localStorage.getItem(LEADERBOARD_KEY);
-    if (!raw) return [];
-    try { return JSON.parse(raw) || []; }
-    catch { return []; }
-}
-
-function saveLeaderboard(list) {
-    localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(list));
-}
-
-function getRunDurationMs() {
-    if (!gameStartAt) return 0;
-    return Math.max(0, Date.now() - gameStartAt);
-}
-
-function formatDuration(ms) {
-    const total = Math.floor(ms / 1000);
-    const m = String(Math.floor(total / 60)).padStart(2, '0');
-    const s = String(total % 60).padStart(2, '0');
-    return `${m}:${s}`;
-}
-
-function buildResultLabel(resultKey) {
-    const t = I18N[currentLanguage] || I18N.ES;
-    return resultKey === 'win' ? t.rankingResultWin : t.rankingResultLose;
-}
-
-function buildLeaderboardEntry(worldInstance, resultKey) {
-    return {
-        coins: worldInstance?.character?.coin || 0,
-        timeMs: getRunDurationMs(),
-        result: buildResultLabel(resultKey),
-        at: Date.now()
-    };
-}
-
-function sortLeaderboard(list) {
-    return list.sort((a, b) => (b.coins - a.coins) || (a.timeMs - b.timeMs));
-}
-
 function addLeaderboardEntry(worldInstance, resultKey) {
     const list = getLeaderboard();
     list.push(buildLeaderboardEntry(worldInstance, resultKey));
@@ -201,24 +160,48 @@ function addLeaderboardEntry(worldInstance, resultKey) {
 }
 
 
+function getLeaderboard() {
+    const raw = localStorage.getItem(LEADERBOARD_KEY);
+    if (!raw) return [];
+    try { return JSON.parse(raw) || []; }
+    catch { return []; }
+}
+
+
+function buildLeaderboardEntry(worldInstance, resultKey) {
+    return {
+        coins: worldInstance?.character?.coin || 0,
+        timeMs: getRunDurationMs(),
+        // result: buildResultLabel(resultKey),
+        resultKey: resultKey,
+        at: Date.now()
+    };
+}
+
+
+function getRunDurationMs() {
+    if (!gameStartAt) return 0;
+    return Math.max(0, Date.now() - gameStartAt);
+}
+
+
+function buildResultLabel(resultKey) {
+    const t = I18N[currentLanguage] || I18N.ES;
+    return resultKey === 'win' ? t.rankingResultWin : t.rankingResultLose;
+}
+
+
+function sortLeaderboard(list) {
+    return list.sort((a, b) => (b.coins - a.coins) || (a.timeMs - b.timeMs));
+}
+
+
+function saveLeaderboard(list) {
+    localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(list));
+}
+
+
 // 4) Datei: game.js — Funktionen: Render Rangliste(NEU)
-function clearRankingTable() {
-    const tbody = document.getElementById('rankingTbody');
-    if (tbody) tbody.innerHTML = '';
-}
-
-function setRankingEmptyVisible(isEmpty) {
-    const empty = document.getElementById('rankingEmpty');
-    if (!empty) return;
-    empty.classList.toggle('d-none', !isEmpty);
-}
-
-function appendRankingRow(tbody, idx, entry) {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${idx}</td><td>${entry.coins}</td><td>${formatDuration(entry.timeMs)}</td><td>${entry.result}</td>`;
-    tbody.appendChild(tr);
-}
-
 function renderRankingList() {
     const tbody = document.getElementById('rankingTbody');
     if (!tbody) return;
@@ -226,6 +209,44 @@ function renderRankingList() {
     const list = getLeaderboard();
     setRankingEmptyVisible(list.length === 0);
     list.forEach((e, i) => appendRankingRow(tbody, i + 1, e));
+}
+
+
+function clearRankingTable() {
+    const tbody = document.getElementById('rankingTbody');
+    if (tbody) tbody.innerHTML = '';
+}
+
+
+function setRankingEmptyVisible(isEmpty) {
+    const empty = document.getElementById('rankingEmpty');
+    if (!empty) return;
+    empty.classList.toggle('d-none', !isEmpty);
+}
+
+
+function appendRankingRow(tbody, idx, entry) {
+    const tr = document.createElement('tr');
+    const resultText = getResultLabel(entry);
+    tr.innerHTML = `<td>${idx}</td><td>${entry.coins}</td><td>${formatDuration(entry.timeMs)}</td><td>${resultText}</td>`;
+    tbody.appendChild(tr);
+}
+
+
+function getResultLabel(entry) {
+    const t = I18N[currentLanguage] || I18N.ES;
+    const key = entry?.resultKey || '';
+    if (key === 'win') return t.rankingResultWin;
+    if (key === 'lose') return t.rankingResultLose;
+    return entry?.result || '';
+}
+
+
+function formatDuration(ms) {
+    const total = Math.floor(ms / 1000);
+    const m = String(Math.floor(total / 60)).padStart(2, '0');
+    const s = String(total % 60).padStart(2, '0');
+    return `${m}:${s}`;
 }
 
 
@@ -239,6 +260,7 @@ function openRankingOverlay() {
     showOverlayFlex(overlay);
 }
 
+
 function closeRankingOverlay() {
     const overlay = document.getElementById('rankingOverlay');
     if (!overlay) return;
@@ -246,14 +268,17 @@ function closeRankingOverlay() {
     hideOverlayFlex(overlay);
 }
 
+
 function rememberBurgerStateForOverlay() {
     const burger = document.getElementById('burgerMenu');
     reopenBurgerAfterOverlay = burger?.classList.contains('open') || false;
 }
 
+
 function closeBurgerIfNeeded() {
     if (reopenBurgerAfterOverlay) closeBurgerMenu();
 }
+
 
 function restoreBurgerAfterOverlay() {
     if (!reopenBurgerAfterOverlay) return;
@@ -261,10 +286,12 @@ function restoreBurgerAfterOverlay() {
     reopenBurgerAfterOverlay = false;
 }
 
+
 function showOverlayFlex(overlay) {
     overlay.classList.remove('d-none');
     overlay.classList.add('d-flex');
 }
+
 
 function hideOverlayFlex(overlay) {
     overlay.classList.remove('d-flex');
