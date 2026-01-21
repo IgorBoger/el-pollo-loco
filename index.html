@@ -156,10 +156,13 @@
 
         <div id="keyHelpOverlay" class="key-help-overlay overlay-style d-none" role="dialog" aria-modal="true"
             aria-labelledby="keyHelpTitle">
-            <div class="key-help-modal box-shadow" role="document">
-                <div class="key-help-modal-header">
-                    <h2 id="keyHelpTitle" class="key-help-modal-title">Tastenbelegung</h2>
-                    <button id="keyHelpClose" class="key-help-close-button" aria-label="Schließen">×</button>
+            <div class="key-help-card box-shadow" role="document">
+                <div class="key-help-header">
+                    <h2 id="keyHelpTitle" class="key-help-title">Tastenbelegung</h2>
+                    <!-- <button id="keyHelpClose" class="key-help-close-button" aria-label="Schließen">×</button> -->
+                    <button id="keyHelpClose" class="close-btn btn-style" aria-label="Schließen">
+                        <img src="img/arrow-back.png" alt="" class="icon-img" />
+                    </button>
                 </div>
                 <div class="padding-overlays">
                     <table class="key-help-keys-table" aria-describedby="keyHelpTitle">
@@ -207,7 +210,7 @@
                     </div>
                 </div>
 
-                <div class="ranking-body padding-overlays text-shadow-none">
+                <div class="ranking-body padding-overlays">
                     <p id="rankingEmpty" class="ranking-empty d-none">Keine Einträge vorhanden.</p>
 
                     <table class="ranking-table">
@@ -234,7 +237,7 @@
 
 
         <div id="rankingClearOverlay" class="overlay-style d-none" role="dialog" aria-modal="true">
-            <div class="ranking-confirm-card box-shadow text-shadow-none">
+            <div class="ranking-confirm-card box-shadow">
                 <h3 id="rankingClearTitle" class="ranking-confirm-title">Rangliste löschen</h3>
                 <p id="rankingClearText" class="ranking-confirm-text">Willst du wirklich alle Einträge löschen?</p>
 
