@@ -305,7 +305,6 @@ function applyRankingListTranslation(t) {
     setText('rankingHeaderResult', t.rankingHeaderResult);
     setText('rankingEmpty', t.rankingEmpty);
     setText('rankingClear', t.rankingClear);
-    setText('rankingClearConfirm', t.rankingClearConfirm);
 }
 
 
