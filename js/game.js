@@ -58,19 +58,45 @@ function restartGame() {
 
 
 function onLangOptionClick(e) {
-    const btn = e.target.closest('.lang-opt');
-    if (!btn) return;
-    const lang = btn.getAttribute('data-lang');
-    if (!lang) return;
-    if (typeof setLanguage === 'function') setLanguage(lang);
-    else {
-        currentLanguage = lang;
-        localStorage.setItem('language', currentLanguage);
-        if (typeof applyTranslations === 'function') applyTranslations();
-        const langBtn = document.getElementById('langToggle');
-        if (langBtn) langBtn.textContent = currentLanguage;
-    }
+    // const btn = e.target.closest('.lang-opt');
+    // if (!btn) return;
+    // const lang = btn.getAttribute('data-lang');
+    // if (!lang) return;
+    
+    // if (typeof setLanguage === 'function') setLanguage(lang);
+    // else {
+    //     currentLanguage = lang;
+    //     localStorage.setItem('language', currentLanguage);
+    //     if (typeof applyTranslations === 'function') applyTranslations();
+    //     const langBtn = document.getElementById('langToggle');
+    //     if (langBtn) langBtn.textContent = currentLanguage;
+    // }
     closeLangModal();
+}
+
+
+function onLangOptionClick(e) {
+    const lang = getLangFromClick(e);
+    if (!lang) return;
+    applyLanguageChange(lang);
+    closeLangModal();
+}
+
+
+function getLangFromClick(e) {
+    const btn = e.target.closest('.lang-opt');
+    return btn?.getAttribute('data-lang');
+}
+
+function applyLanguageChange(lang) {
+    if (typeof setLanguage === 'function') return setLanguage(lang);
+    setLanguageFallback(lang);
+}
+
+function setLanguageFallback(lang) {
+    currentLanguage = lang;
+    localStorage.setItem('language', currentLanguage);
+    applyTranslations?.();
 }
 
 

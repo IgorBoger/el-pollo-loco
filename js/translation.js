@@ -15,7 +15,6 @@ function applyTranslations() {
     document.documentElement.lang = currentLanguage.toLowerCase();
     // const t = I18N[currentLanguage] || I18N.ES;
     const t = getMergedPack(currentLanguage);
-
     applyStartScreenTranslations(setText, t);
     applyBurgerMenuTranslations(t);
     applyStoryTranslations(t);
@@ -26,6 +25,7 @@ function applyTranslations() {
     applyLanguageUiTranslations(t);
     applyGameOverWinOverlayTranslations(t);
     setPauseButtonLabel(t);
+    updateLanguageUiState();
 }
 
 
@@ -143,6 +143,31 @@ function setPauseButtonLabel(t) {
     if (!btn) return;
     btn.textContent = isGamePaused ? t.play : t.pause;
 }
+
+
+function updateLanguageUiState() {
+    const buttons = getLangOptionButtons();
+    buttons.forEach((btn) => setLangButtonState(btn));
+}
+
+
+function getLangOptionButtons() {
+    return Array.from(document.querySelectorAll('.lang-opt'));
+}
+
+
+function setLangButtonState(btn) {
+    const lang = btn.getAttribute('data-lang');
+    const isActive = lang === currentLanguage;
+    toggleActiveClass(btn, isActive);
+    btn.setAttribute('aria-pressed', String(isActive));
+}
+
+
+function toggleActiveClass(el, isActive) {
+    el.classList.toggle('is-active', isActive);
+}
+
 
 
 function setText(id, text) {
