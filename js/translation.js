@@ -179,7 +179,8 @@ function setText(id, text) {
 
 function setLanguage(lang) {
     currentLanguage = lang;
-    localStorage.setItem('language', currentLanguage);
+    // localStorage.setItem('language', currentLanguage);
+    setLanguageSetting(currentLanguage);
     applyTranslations();
     loadRemoteLanguage(currentLanguage).then(applyTranslations);
 }

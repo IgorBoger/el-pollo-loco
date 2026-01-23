@@ -21,7 +21,8 @@ function playBackgroundIfAllowed() {
 
 function toggleMusic() {
     isMusicMuted = !isMusicMuted;
-    localStorage.setItem('isMusicMuted', isMusicMuted);
+    // localStorage.setItem('isMusicMuted', isMusicMuted);
+    setMusicMutedSetting(isMusicMuted);
     const icon = document.getElementById('musicIcon');
     if (icon) icon.src = isMusicMuted ? 'img/mute.png' : 'img/speaker.png';
     const bg = world?.sounds?.background;
@@ -39,7 +40,8 @@ function toggleMusic() {
 
 function toggleSound() {
     isSoundMuted = !isSoundMuted;
-    localStorage.setItem('isSoundMuted', isSoundMuted);
+    // localStorage.setItem('isSoundMuted', isSoundMuted);
+    setSoundMutedSetting(isSoundMuted);
     const icon = document.getElementById('soundIcon');
     if (icon) icon.src = isSoundMuted ? 'img/mute.png' : 'img/speaker.png';
     if (!world || !world.sounds) return;

@@ -147,7 +147,7 @@ canvas {
 #gameContainer:fullscreen #winOverlay,
 #gameContainer:-webkit-full-screen #winOverlay {
     width: 100vw;
-    height: 100vh;
+    /* height: 100vh; */
     inset: 0;
 }
 

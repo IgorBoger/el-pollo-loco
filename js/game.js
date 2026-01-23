@@ -8,9 +8,13 @@ const buttons = [
     { id: 'btnThrow', key: 'THROW' }
 ];
 let _viewportRaf = null;
-let isMusicMuted = localStorage.getItem('isMusicMuted') === 'true';
-let isSoundMuted = localStorage.getItem('isSoundMuted') === 'true';
-let currentLanguage = localStorage.getItem('language') || 'ES';
+// let isMusicMuted = localStorage.getItem('isMusicMuted') === 'true';
+// let isSoundMuted = localStorage.getItem('isSoundMuted') === 'true';
+// let currentLanguage = localStorage.getItem('language') || 'ES';
+
+let isMusicMuted = !!getSetting('isMusicMuted');
+let isSoundMuted = !!getSetting('isSoundMuted');
+let currentLanguage = getSetting('language') || 'ES';
 var isGamePaused = false;
 let gameStartAt = 0;
 const LEADERBOARD_KEY = 'leaderboard';
@@ -54,24 +58,6 @@ function restartGame() {
         world.destroy();
     }
     document.getElementById('startScreen').classList.remove('d-none');
-}
-
-
-function onLangOptionClick(e) {
-    // const btn = e.target.closest('.lang-opt');
-    // if (!btn) return;
-    // const lang = btn.getAttribute('data-lang');
-    // if (!lang) return;
-    
-    // if (typeof setLanguage === 'function') setLanguage(lang);
-    // else {
-    //     currentLanguage = lang;
-    //     localStorage.setItem('language', currentLanguage);
-    //     if (typeof applyTranslations === 'function') applyTranslations();
-    //     const langBtn = document.getElementById('langToggle');
-    //     if (langBtn) langBtn.textContent = currentLanguage;
-    // }
-    closeLangModal();
 }
 
 
