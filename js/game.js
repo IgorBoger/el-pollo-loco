@@ -37,7 +37,8 @@ function startGame() {
     gameStartAt = Date.now();
     const pauseBtn = document.getElementById('pauseBtn');
     pauseBtn.classList.remove('d-none');
-    setPauseButtonLabel(I18N[currentLanguage] || I18N.ES);
+    // setPauseButtonLabel(I18N[currentLanguage] || I18N.ES);
+    setPauseButtonLabel(getMergedPack(currentLanguage));
     document.getElementById('startScreen').classList.add('d-none');
     init();
     playBackgroundIfAllowed();
@@ -77,7 +78,8 @@ function togglePause() {
     if (!world) return;
     isGamePaused = !isGamePaused;
     const btn = document.getElementById('pauseBtn');
-    setPauseButtonLabel(I18N[currentLanguage] || I18N.ES);
+    // setPauseButtonLabel(I18N[currentLanguage] || I18N.ES);
+    setPauseButtonLabel(getMergedPack(currentLanguage));
     if (isGamePaused) {
         world.pauseAllSounds();
         return;
@@ -91,7 +93,8 @@ function quickRestartGame() {
     isGamePaused = false;
     const pauseBtn = document.getElementById('pauseBtn');
     pauseBtn?.classList.remove('d-none');
-    setPauseButtonLabel(I18N[currentLanguage] || I18N.ES);
+    // setPauseButtonLabel(I18N[currentLanguage] || I18N.ES);
+    setPauseButtonLabel(getMergedPack(currentLanguage));
     document.getElementById('startScreen')?.classList.add('d-none');
     document.getElementById('gameOverOverlay')?.classList.add('d-none');
     document.getElementById('gameOverOverlay')?.classList.remove('d-flex');
