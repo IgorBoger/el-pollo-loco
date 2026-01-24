@@ -1,3 +1,6 @@
+/* global currentLanguage, getMergedPack, openRankingClearConfirm */
+
+
 function addLeaderboardEntry(worldInstance, resultKey) {
     const list = getLeaderboard();
     list.push(buildLeaderboardEntry(worldInstance, resultKey));
@@ -27,12 +30,6 @@ function buildLeaderboardEntry(worldInstance, resultKey) {
 function getRunDurationMs() {
     if (!gameStartAt) return 0;
     return Math.max(0, Date.now() - gameStartAt);
-}
-
-
-function buildResultLabel(resultKey) {
-    const t = I18N[currentLanguage] || I18N.ES;
-    return resultKey === 'win' ? t.rankingResultWin : t.rankingResultLose;
 }
 
 
@@ -68,17 +65,17 @@ function setRankingEmptyVisible(isEmpty) {
     empty.classList.toggle('d-none', !isEmpty);
 }
 
-// HTML-EXTRA AUSLAGERN:::::
+
 function appendRankingRow(tbody, idx, entry) {
     const tr = document.createElement('tr');
     const resultText = getResultLabel(entry);
-    tr.innerHTML = `<td>${idx}</td><td>${entry.coins}</td><td>${formatDuration(entry.timeMs)}</td><td>${resultText}</td>`;
+    tr.innerHTML = appendRankingRowTemplate(idx, entry, resultText);
     tbody.appendChild(tr);
 }
 
 
 function getResultLabel(entry) {
-    const t = I18N[currentLanguage] || I18N.ES;
+    const t = getMergedPack(currentLanguage);
     const key = entry?.resultKey || '';
     if (key === 'win') return t.rankingResultWin;
     if (key === 'lose') return t.rankingResultLose;
@@ -107,9 +104,7 @@ function setClearRankingState() {
 
 
 function hasLeaderboardEntries() {
-    const data = localStorage.getItem(LEADERBOARD_KEY);
-    if (!data) return false;
-    return JSON.parse(data).length > 0;
+    return getLeaderboard().length > 0;
 }
 
 
@@ -128,7 +123,7 @@ function setRankingClearConfirmTexts() {
 
 
 function getRankingClearTexts() {
-    const t = I18N[currentLanguage] || I18N.ES;
+    const t = getMergedPack(currentLanguage);
     return {
         title: t.rankingClearTitle || 'Rangliste löschen',
         text: t.rankingClearText || 'Willst du wirklich alle Einträge löschen?',
