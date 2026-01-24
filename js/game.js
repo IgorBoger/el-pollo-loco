@@ -8,10 +8,6 @@ const buttons = [
     { id: 'btnThrow', key: 'THROW' }
 ];
 let _viewportRaf = null;
-// let isMusicMuted = localStorage.getItem('isMusicMuted') === 'true';
-// let isSoundMuted = localStorage.getItem('isSoundMuted') === 'true';
-// let currentLanguage = localStorage.getItem('language') || 'ES';
-
 let isMusicMuted = !!getSetting('isMusicMuted');
 let isSoundMuted = !!getSetting('isSoundMuted');
 let currentLanguage = getSetting('language') || 'ES';
@@ -41,7 +37,6 @@ function startGame() {
     gameStartAt = Date.now();
     const pauseBtn = document.getElementById('pauseBtn');
     pauseBtn.classList.remove('d-none');
-    // setPauseButtonLabel(I18N[currentLanguage] || I18N.ES);
     setPauseButtonLabel(getMergedPack(currentLanguage));
     document.getElementById('startScreen').classList.add('d-none');
     init();
@@ -52,11 +47,17 @@ function startGame() {
 function restartGame() {
     closeBurgerMenu();
     document.getElementById('pauseBtn')?.classList.add('d-none');
-    document.getElementById('gameOverOverlay')?.classList.add('d-none');
-    document.getElementById('gameOverOverlay')?.classList.remove('d-flex');
+    closeGameOverOverlay();
     if (world && typeof world.destroy === "function") {
         world.destroy();
     }
+    document.getElementById('startScreen').classList.remove('d-none');
+    closeOverlayThen('gameOverOverlay', () => restartGameCore());
+}
+
+
+function restartGameCore() {
+    if (world && typeof world.destroy === "function") world.destroy();
     document.getElementById('startScreen').classList.remove('d-none');
 }
 
@@ -74,10 +75,12 @@ function getLangFromClick(e) {
     return btn?.getAttribute('data-lang');
 }
 
+
 function applyLanguageChange(lang) {
     if (typeof setLanguage === 'function') return setLanguage(lang);
     setLanguageFallback(lang);
 }
+
 
 function setLanguageFallback(lang) {
     currentLanguage = lang;
@@ -90,7 +93,6 @@ function togglePause() {
     if (!world) return;
     isGamePaused = !isGamePaused;
     const btn = document.getElementById('pauseBtn');
-    // setPauseButtonLabel(I18N[currentLanguage] || I18N.ES);
     setPauseButtonLabel(getMergedPack(currentLanguage));
     if (isGamePaused) {
         world.pauseAllSounds();
@@ -102,24 +104,55 @@ function togglePause() {
 
 
 function quickRestartGame() {
-    isGamePaused = false;
-    const pauseBtn = document.getElementById('pauseBtn');
-    pauseBtn?.classList.remove('d-none');
-    // setPauseButtonLabel(I18N[currentLanguage] || I18N.ES);
+    resumeGameState();
+    showPauseButton();
     setPauseButtonLabel(getMergedPack(currentLanguage));
-    document.getElementById('startScreen')?.classList.add('d-none');
-    document.getElementById('gameOverOverlay')?.classList.add('d-none');
-    document.getElementById('gameOverOverlay')?.classList.remove('d-flex');
-    if (world && typeof world.destroy === 'function') {
-        world.destroy();
-    }
-    if (!canvas) {
-        canvas = document.getElementById('canvas');
-        setupHiDPICanvas();
-    }
-    world = new World(canvas, keyBaord);
+    hideStartScreen();
+    hideGameOverOverlay();
+    destroyWorldIfExists();
+    ensureCanvasReady();
+    createNewWorld();
     playBackgroundIfAllowed();
     handleViewportChange?.();
+}
+
+
+function resumeGameState() {
+    isGamePaused = false;
+}
+
+function showPauseButton() {
+    const pauseBtn = document.getElementById('pauseBtn');
+    pauseBtn?.classList.remove('d-none');
+}
+
+// function updatePauseButtonText() {
+//     setPauseButtonLabel(getMergedPack(currentLanguage));
+// }
+
+function hideStartScreen() {
+    document.getElementById('startScreen')?.classList.add('d-none');
+}
+
+function hideGameOverOverlay() {
+    const ov = document.getElementById('gameOverOverlay');
+    ov?.classList.add('d-none');
+    ov?.classList.remove('d-flex');
+}
+
+function destroyWorldIfExists() {
+    if (!world || typeof world.destroy !== 'function') return;
+    world.destroy();
+}
+
+function ensureCanvasReady() {
+    if (canvas) return;
+    canvas = document.getElementById('canvas');
+    setupHiDPICanvas();
+}
+
+function createNewWorld() {
+    world = new World(canvas, keyBaord);
 }
 
 
@@ -129,6 +162,7 @@ function onGameOver(worldInstance) {
     pauseBtn?.classList.add('d-none');
     worldInstance?.pauseAllSounds();
     addLeaderboardEntry(worldInstance, 'lose');
+    openGameOverOverlay();
 }
 
 
@@ -138,4 +172,5 @@ function onWin(worldInstance) {
     pauseBtn?.classList.add('d-none');
     worldInstance?.pauseAllSounds?.();
     addLeaderboardEntry(worldInstance, 'win');
+    openWinOverlay();
 }

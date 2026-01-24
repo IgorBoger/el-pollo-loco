@@ -1,5 +1,3 @@
-// window.addEventListener('load', onWindowLoad);
-
 bootstrapUi();
 
 function onWindowLoad() {
@@ -89,7 +87,6 @@ function bindOverlayOutsideCloseEvents() {
 function bindOverlayContentDelegation() {
     const container = document.querySelector('#langOverlay .modal-content');
     if (!container) return;
-
     container.addEventListener('click', (e) => {
         onLangOptionClick(e);
         e.stopPropagation();
@@ -104,14 +101,18 @@ function bindEndscreenButtons() {
 
 
 function bindGameOverButtons() {
-    bindClick('restartBtn', quickRestartGame);
+    bindClick('restartBtn', onGameOverRestartClick);
     bindClick('homeBtn', onGameOverHomeClick);
 }
 
 
+function onGameOverRestartClick() {
+    closeOverlayThen('gameOverOverlay', quickRestartGame);
+}
+
+
 function onGameOverHomeClick() {
-    hideOverlayInstant('gameOverOverlay');
-    restartGame();
+    closeOverlayThen('gameOverOverlay', restartGame);
 }
 
 
@@ -122,14 +123,12 @@ function bindWinButtons() {
 
 
 function onNextLevelClick() {
-    hideOverlayInstant('winOverlay');
-    quickRestartGame();
+    closeOverlayThen('winOverlay', quickRestartGame);
 }
 
 
 function onWinHomeClick() {
-    hideOverlayInstant('winOverlay');
-    restartGame();
+    closeOverlayThen('winOverlay', restartGame);
 }
 
 
@@ -191,12 +190,10 @@ function bindViewportEvents() {
 
 function outsideCloseHandler(e) {
     if (shouldIgnoreOutsideClose()) return;
-
     if (shouldCloseSettingsByOutsideClick(e)) {
         closeSettingsOverlay();
         return;
     }
-
     if (shouldCloseBurgerByOutsideClick(e)) closeBurgerMenu();
 }
 

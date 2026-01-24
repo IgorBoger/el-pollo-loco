@@ -45,6 +45,23 @@
 }
 
 
+.overlay-style,
+.modal-overlay {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 180ms ease, transform 180ms ease;
+    pointer-events: none;
+}
+
+
+.overlay-style.is-open,
+.modal-overlay.is-open {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+
 .next-level-query {
     display: flex;
     flex-direction: column;

@@ -1,4 +1,3 @@
-// Ovarlays ::::::::::
 function openOverlay(overlayId, opts = {}) {
     if (opts.rememberBurger) rememberBurgerState();
     if (opts.rememberBurger) closeBurgerIfRemembered();
@@ -10,6 +9,12 @@ function openOverlay(overlayId, opts = {}) {
 function showOverlay(overlayId) {
     const ov = getEl(overlayId);
     if (!ov) return;
+    prepareOverlayShow(ov);
+    requestAnimationFrame(() => ov.classList.add('is-open'));
+}
+
+
+function prepareOverlayShow(ov) {
     ov.classList.remove('d-none');
     ov.classList.add('d-flex');
 }
@@ -25,6 +30,12 @@ function closeOverlay(overlayId, opts = {}) {
 function hideOverlay(overlayId) {
     const ov = getEl(overlayId);
     if (!ov) return;
+    ov.classList.remove('is-open');
+    waitOverlayFadeOut(ov, () => finalizeOverlayHide(ov));
+}
+
+
+function finalizeOverlayHide(ov) {
     ov.classList.remove('d-flex');
     ov.classList.add('d-none');
 }
@@ -32,6 +43,47 @@ function hideOverlay(overlayId) {
 
 function getEl(id) {
     return document.getElementById(id);
+}
+
+
+function waitOverlayFadeOut(ov, done) {
+    const finish = createFinishHandler(ov, done);
+    bindOverlayTransitionEnd(ov, finish);
+    setFadeOutFallback(finish);
+}
+
+
+function createFinishHandler(ov, done) {
+    let finished = false;
+    return function finish() {
+        if (finished) return;
+        finished = true;
+        ov.removeEventListener('transitionend', finish);
+        done();
+    };
+}
+
+
+function bindOverlayTransitionEnd(ov, finish) {
+    ov.addEventListener('transitionend', (e) => {
+        if (e.target === ov) finish();
+    });
+}
+
+
+function setFadeOutFallback(finish) {
+    setTimeout(finish, 220);
+}
+
+
+function closeOverlayThen(overlayId, after) {
+    const ov = getEl(overlayId);
+    if (!ov) return;
+    ov.classList.remove('is-open');
+    waitOverlayFadeOut(ov, () => {
+        finalizeOverlayHide(ov);
+        if (after) after();
+    });
 }
 
 
@@ -116,6 +168,23 @@ function closeImpressumOverlay() {
 
 function openLangModal() {
     openOverlay('langOverlay', { onOpen: markLangButtonActive });
+}
+
+
+function openWinOverlay() {
+    openOverlay('winOverlay');
+}
+
+function closeWinOverlay() {
+    closeOverlay('winOverlay');
+}
+
+function openGameOverOverlay() {
+    openOverlay('gameOverOverlay');
+}
+
+function closeGameOverOverlay() {
+    closeOverlay('gameOverOverlay');
 }
 
 
