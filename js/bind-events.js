@@ -1,4 +1,6 @@
-window.addEventListener('load', onWindowLoad);
+// window.addEventListener('load', onWindowLoad);
+
+bootstrapUi();
 
 function onWindowLoad() {
     initUiOnLoad();
@@ -17,7 +19,7 @@ function onWindowLoad() {
 
 
 function initUiOnLoad() {
-    applyTranslations();
+    initTranslations();
     handleViewportChange();
     addMobileButtonsFunction();
     setAudioIcons();
@@ -231,4 +233,9 @@ function shouldCloseBurgerByOutsideClick(e) {
     return burger.classList.contains('open')
         && !burger.contains(e.target)
         && e.target !== burgerBtn;
+}
+
+
+function bootstrapUi() {
+    window.addEventListener('load', onWindowLoad);
 }

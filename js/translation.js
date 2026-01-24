@@ -13,7 +13,6 @@ function checkOrientation() {
 
 function applyTranslations() {
     document.documentElement.lang = currentLanguage.toLowerCase();
-    // const t = I18N[currentLanguage] || I18N.ES;
     const t = getMergedPack(currentLanguage);
     applyStartScreenTranslations(setText, t);
     applyBurgerMenuTranslations(t);
@@ -206,21 +205,22 @@ function getLocalPack(lang) {
     return I18N[lang] || I18N.ES || {};
 }
 
+
 function getRemotePack(lang) {
     return i18nRemote[lang] || {};
 }
 
 
-// async function loadRemoteLanguage(lang) {
-//     try { await loadLangDocToCache(lang); }
-//     catch (e) { console.warn('Remote i18n failed', e); }
-// }
-
-
 async function loadRemoteLanguage(lang) {
+    if (!canLoadRemoteI18n()) return;
     if (isLangCached(lang)) return;
     try { await loadLangDocToCache(lang); }
     catch (e) { console.warn('Remote i18n failed', e); }
+}
+
+
+function canLoadRemoteI18n() {
+    return typeof db !== 'undefined' && !!db;
 }
 
 
@@ -230,27 +230,7 @@ function isLangCached(lang) {
 
 
 async function loadLangDocToCache(lang) {
-    const doc = await fetchLangDoc(lang);
-    const data = getDocData(doc);
-    saveRemotePack(lang, data);
+    if (typeof fetchI18nToCache !== 'function') return;
+    await fetchI18nToCache(lang, i18nRemote);
+    // console.log('i18n remote loaded:', lang, i18nRemote[lang]);
 }
-
-
-function fetchLangDoc(lang) {
-    return db.collection('i18n').doc(lang).get();
-}
-
-
-function getDocData(doc) {
-    if (!doc || !doc.exists) return null;
-    return doc.data();
-}
-
-
-function saveRemotePack(lang, data) {
-    if (!data) return;
-    i18nRemote[lang] = data;
-}
-
-
-document.addEventListener('DOMContentLoaded', initTranslations);
