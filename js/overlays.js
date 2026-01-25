@@ -212,3 +212,57 @@ function bindOutsideClose(overlayId, cardSelector, onClose) {
         e.stopPropagation();
     });
 }
+
+
+function closeEndOverlayThen(overlayId, after) {
+    runEndOverlayClose(overlayId, after);
+}
+
+
+function runEndOverlayClose(overlayId, after) {
+    const ov = getEl(overlayId);
+    if (!ov) return;
+    const done = createBarrier(2, () => finalizeEndClose(ov, after));
+    startDomFadeOut(ov, done);
+    startCanvasFadeOut(overlayId, done);
+}
+
+
+function createBarrier(count, afterAll) {
+    let left = count;
+    return function markDone() {
+        left -= 1;
+        if (left === 0) afterAll();
+    };
+}
+
+
+function finalizeEndClose(ov, after) {
+    finalizeOverlayHide(ov);
+    after?.();
+}
+
+
+function startDomFadeOut(ov, done) {
+    ov.classList.remove('is-open');
+    waitOverlayFadeOut(ov, done);
+}
+
+
+function startCanvasFadeOut(overlayId, done) {
+    const screen = getCanvasScreenForOverlay(overlayId);
+    if (!screen?.hideSmooth) return done();
+    try {
+        screen.hideSmooth(done);
+    } catch (e) {
+        done();
+    }
+}
+
+
+function getCanvasScreenForOverlay(overlayId) {
+    if (!window.world) return null;
+    if (overlayId === 'winOverlay') return world.winscreen;
+    if (overlayId === 'gameOverOverlay') return world.endscreen;
+    return null;
+}

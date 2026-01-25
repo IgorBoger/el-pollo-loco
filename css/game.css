@@ -42,22 +42,26 @@
     flex-direction: column;
     justify-content: space-between;
     padding: 12px 0 12px;
+    display: flex;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 180ms ease-in-out;
 }
 
 
 .overlay-style,
 .modal-overlay {
     opacity: 0;
-    transform: translateY(10px);
-    transition: opacity 180ms ease, transform 180ms ease;
+    transition: opacity 180ms ease-in-out;
     pointer-events: none;
 }
 
 
+.game-over-overlay.is-open,
+.win-overlay.is-open,
 .overlay-style.is-open,
 .modal-overlay.is-open {
     opacity: 1;
-    transform: translateY(0);
     pointer-events: auto;
 }
 

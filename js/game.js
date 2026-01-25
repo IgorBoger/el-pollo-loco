@@ -47,12 +47,13 @@ function startGame() {
 function restartGame() {
     closeBurgerMenu();
     document.getElementById('pauseBtn')?.classList.add('d-none');
-    closeGameOverOverlay();
-    if (world && typeof world.destroy === "function") {
-        world.destroy();
-    }
-    document.getElementById('startScreen').classList.remove('d-none');
-    closeOverlayThen('gameOverOverlay', () => restartGameCore());
+    destroyWorldIfExists();
+    showStartScreen();
+}
+
+
+function showStartScreen() {
+    document.getElementById('startScreen')?.classList.remove('d-none');
 }
 
 
@@ -108,7 +109,6 @@ function quickRestartGame() {
     showPauseButton();
     setPauseButtonLabel(getMergedPack(currentLanguage));
     hideStartScreen();
-    hideGameOverOverlay();
     destroyWorldIfExists();
     ensureCanvasReady();
     createNewWorld();
@@ -126,30 +126,24 @@ function showPauseButton() {
     pauseBtn?.classList.remove('d-none');
 }
 
-// function updatePauseButtonText() {
-//     setPauseButtonLabel(getMergedPack(currentLanguage));
-// }
 
 function hideStartScreen() {
     document.getElementById('startScreen')?.classList.add('d-none');
 }
 
-function hideGameOverOverlay() {
-    const ov = document.getElementById('gameOverOverlay');
-    ov?.classList.add('d-none');
-    ov?.classList.remove('d-flex');
-}
 
 function destroyWorldIfExists() {
     if (!world || typeof world.destroy !== 'function') return;
     world.destroy();
 }
 
+
 function ensureCanvasReady() {
     if (canvas) return;
     canvas = document.getElementById('canvas');
     setupHiDPICanvas();
 }
+
 
 function createNewWorld() {
     world = new World(canvas, keyBaord);

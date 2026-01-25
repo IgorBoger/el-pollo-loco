@@ -107,12 +107,12 @@ function bindGameOverButtons() {
 
 
 function onGameOverRestartClick() {
-    closeOverlayThen('gameOverOverlay', quickRestartGame);
+    closeEndOverlayThen('gameOverOverlay', quickRestartGame);
 }
 
 
 function onGameOverHomeClick() {
-    closeOverlayThen('gameOverOverlay', restartGame);
+    closeEndOverlayThen('gameOverOverlay', restartGame);
 }
 
 
@@ -123,12 +123,12 @@ function bindWinButtons() {
 
 
 function onNextLevelClick() {
-    closeOverlayThen('winOverlay', quickRestartGame);
+    closeEndOverlayThen('winOverlay', quickRestartGame);
 }
 
 
 function onWinHomeClick() {
-    closeOverlayThen('winOverlay', restartGame);
+    closeEndOverlayThen('winOverlay', restartGame);
 }
 
 

@@ -7,6 +7,7 @@ class OverlayScreen {
         this.fade = 0;
         this.rafId = null;
         this.baseFrame = null;
+        this.onFadeDone = null;
     }
 
 
@@ -50,6 +51,30 @@ class OverlayScreen {
         this.stopFadeLoop();
         this.toggleOverlay(false);
     }
+
+
+    hideSmooth(done) {
+        if (!this.visible) return done?.();
+        this.onFadeDone = done || null;
+        this.fadeOutStep();
+    }
+
+
+    fadeOutStep() {
+        this.fade = Math.max(0, this.fade - this.fadeSpeed);
+        this.draw();
+        if (this.fade > 0) return requestAnimationFrame(() => this.fadeOutStep());
+        this.finishFadeOut();
+    }
+
+
+    finishFadeOut() {
+        this.visible = false;
+        const cb = this.onFadeDone;
+        this.onFadeDone = null;
+        cb?.();
+    }
+
 
 
     toggleOverlay(isOpen) {
