@@ -105,11 +105,6 @@
 }
 
 
-.win-overlay {
-    background: rgba(0, 0, 0, 0.3);
-}
-
-
 .settings-button,
 .close-btn {
     display: inline-flex;
