@@ -168,7 +168,6 @@ canvas {
 #gameContainer:fullscreen #winOverlay,
 #gameContainer:-webkit-full-screen #winOverlay {
     width: 100vw;
-    /* height: 100vh; */
     inset: 0;
 }
 
@@ -190,9 +189,6 @@ canvas {
     image-rendering: auto;
     object-position: 55%;
 }
-
-
-
 
 
 #mobileControls {

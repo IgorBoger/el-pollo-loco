@@ -29,6 +29,7 @@
     transition: transform 0.3s ease-in-out, background 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
     border-top-left-radius: 10px;
     border-bottom-left-radius: 10px;
+    overflow: auto;
 }
 
 
@@ -38,17 +39,14 @@
 }
 
 
-.burger-header {
+.burger-header,
+.settings-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding-bottom: 12px;
-
     border-bottom: 2px solid rgba(255, 255, 255, 0.3);
-    border-image: linear-gradient(to right,
-            transparent,
-            rgba(255, 255, 255, 0.6),
-            transparent) 1;
+    border-image: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.6), transparent) 1;
 }
 
 
@@ -78,6 +76,9 @@
     padding: 10px 14px;
     width: 100%;
     text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 16px;
 }
 
 
@@ -87,10 +88,8 @@
 }
 
 
-.settings-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.menu-icon {
+    width: 30px;
 }
 
 
@@ -118,14 +117,9 @@
     display: flex;
     flex-direction: column;
     gap: 20px;
-    padding: 12px 0;
-
-    border-top: 2px solid rgba(255, 255, 255, 0.3);
+    padding-bottom: 24px;
     border-bottom: 2px solid rgba(255, 255, 255, 0.3);
-    border-image: linear-gradient(to right,
-            transparent,
-            rgba(255, 255, 255, 0.6),
-            transparent) 1;
+    border-image: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.6), transparent) 1;
 }
 
 
@@ -221,11 +215,9 @@
 
 
 .lang-opt.is-active {
-    /* border: 2px solid currentColor; */
     border: 2px solid rgb(155, 200, 2);
     transform: scale(1.02);
 }
-
 
 
 .story-card,
@@ -249,7 +241,6 @@
     justify-content: space-between;
     align-items: center;
     padding: 18px 24px;
-    /* background: linear-gradient(90deg, #ffe7d6, #ffd9b5); */
     background: linear-gradient(270deg, #f3e5da, #f3bc88);
     border-bottom: 2px solid #ffa94d;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
@@ -366,15 +357,18 @@
     gap: 12px;
 }
 
+
 .ranking-confirm-title {
     margin: 0;
     font-size: 22px;
 }
 
+
 .ranking-confirm-text {
     margin: 0;
     font-size: 16px;
 }
+
 
 .ranking-confirm-actions {
     display: flex;
