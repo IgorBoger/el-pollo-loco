@@ -38,9 +38,9 @@ function applyStartScreenTranslations(setText, t) {
 function applyBurgerMenuTranslations(t) {
     setText('restartGame', t.restartGame);
     setText('aboutGame', t.aboutGame);
-    setText('keyHelpButton', t.keyHelpButton);
+    setText('keyHelp', t.keyHelp);
     setText('rankingList', t.rankingList);
-    setText('impressumButton', t.impressumButton);
+    setText('impressum', t.impressum);
 }
 
 

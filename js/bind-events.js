@@ -37,7 +37,7 @@ function setIconSrc(id, src) {
 
 
 function bindBaseGameUiEvents() {
-    bindClick('restartGame', restartGame);
+    bindClick('restartGameBtn', restartGame);
     bindClick('pauseBtn', togglePause);
 }
 
@@ -144,26 +144,26 @@ function bindLangModalOverlayEvents() {
 
 
 function bindStoryOverlayEvents() {
-    bindClick('aboutGame', openStoryOverlay);
+    bindClick('aboutGameBtn', openStoryOverlay);
     bindClick('closeStory', closeStoryOverlay);
 }
 
 
 function bindKeyHelpOverlayEvents() {
-    bindClick('keyHelpButton', openKeyHelpOverlay);
+    bindClick('keyHelpBtn', openKeyHelpOverlay);
     bindClick('keyHelpClose', closeKeyHelpOverlay);
 }
 
 
 function bindImpressumOverlayEvents() {
-    bindClick('impressumButton', openImpressumOverlay);
+    bindClick('impressumBtn', openImpressumOverlay);
     bindClick('impressumClose', closeImpressumOverlay);
 }
 
 
 
 function bindRankingOverlayEvents() {
-    bindClick('rankingList', openRankingOverlay);
+    bindClick('rankingListBtn', openRankingOverlay);
     bindClick('rankingClose', closeRankingOverlay);
 }
 
