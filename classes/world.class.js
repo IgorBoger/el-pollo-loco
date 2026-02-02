@@ -55,11 +55,6 @@ class World {
         this.run();
         this.initCollectables(this.coins, Coin, 200, 50);
         this.initCollectables(this.bottles, Bottle, 100, 150);
-        this.sounds.background.loop = true;
-        this.sounds.background.volume = 0.1;
-        this.sounds.background.muted = isMusicMuted;
-        this.bgBaseVolume = 0.1;
-        this.applyBackgroundBaseVolume();
         this.endscreen = new Endscreen(this.ctx, this.canvas);
         this.winscreen = new Winscreen(this.ctx, this.canvas);
         this.winScheduled = false;
@@ -298,11 +293,10 @@ class World {
     duckBackground() {
         const bg = this.sounds?.background;
         if (!bg) return;
-        this.setBackgroundVolume(this.bgBaseVolume * 0.5);
+        const base = getBackgroundBaseVolume?.() ?? 0.1;
+        this.setBackgroundVolume(base * 0.5);
         clearTimeout(this.bgDuckTimeout);
-        this.bgDuckTimeout = setTimeout(() => {
-            this.setBackgroundVolume(this.bgBaseVolume);
-        }, 180);
+        this.bgDuckTimeout = setTimeout(() => this.setBackgroundVolume(base), 180);
     }
 
 
@@ -310,13 +304,6 @@ class World {
         const bg = this.sounds?.background;
         if (!bg) return;
         bg.volume = vol;
-    }
-
-
-    applyBackgroundBaseVolume() {
-        const bg = this.sounds?.background;
-        if (!bg) return;
-        bg.volume = this.bgBaseVolume;
     }
 
 

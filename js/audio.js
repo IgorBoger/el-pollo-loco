@@ -6,8 +6,13 @@ function getBackgroundAudio() {
 function applyBackgroundSettings(backgroundAudio) {
     if (!backgroundAudio) return;
     backgroundAudio.loop = true;
-    backgroundAudio.volume = 0.1;
+    backgroundAudio.volume = getBackgroundBaseVolume();
     backgroundAudio.muted = isMusicMuted;
+}
+
+
+function getBackgroundBaseVolume() {
+    return 0.1;
 }
 
 
@@ -21,26 +26,20 @@ function playBackgroundIfAllowed() {
 
 function toggleMusic() {
     isMusicMuted = !isMusicMuted;
-    // localStorage.setItem('isMusicMuted', isMusicMuted);
     setMusicMutedSetting(isMusicMuted);
     const icon = document.getElementById('musicIcon');
     if (icon) icon.src = isMusicMuted ? 'img/mute.png' : 'img/speaker.png';
-    const bg = world?.sounds?.background;
-    if (bg) {
-        bg.muted = isMusicMuted;
-        if (!isMusicMuted) {
-            bg.play().catch((e) => console.warn('Musik konnte nicht gestartet werden:', e));
-        } else {
-            bg.pause();
-            bg.currentTime = 0;
-        }
-    }
+    const bg = getBackgroundAudio();
+    if (!bg) return;
+    bg.muted = isMusicMuted;
+    if (!isMusicMuted) playBackgroundIfAllowed();
+    else bg.pause();
+
 }
 
 
 function toggleSound() {
     isSoundMuted = !isSoundMuted;
-    // localStorage.setItem('isSoundMuted', isSoundMuted);
     setSoundMutedSetting(isSoundMuted);
     const icon = document.getElementById('soundIcon');
     if (icon) icon.src = isSoundMuted ? 'img/mute.png' : 'img/speaker.png';

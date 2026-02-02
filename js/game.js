@@ -22,15 +22,6 @@ function init() {
     canvas = document.getElementById('canvas');
     setupHiDPICanvas();
     world = new World(canvas, keyBaord);
-    Object.entries(world.sounds).forEach(([name, sound]) => {
-        if (sound instanceof Audio) {
-            if (name === 'background') {
-                sound.muted = isMusicMuted;
-            } else {
-                sound.muted = isSoundMuted;
-            }
-        }
-    });
 }
 
 
