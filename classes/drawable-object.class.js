@@ -20,6 +20,7 @@ class DrawableObject {
 
 
     drawFrame(ctx) {
+        if (!window.debugHitboxes) return;
         if (this instanceof Character || this instanceof Chicken ||
             this instanceof Coin || this instanceof Bottle ||
             this instanceof Endboss || this instanceof SmallChicken

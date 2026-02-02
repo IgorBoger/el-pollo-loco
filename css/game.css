@@ -175,9 +175,8 @@ canvas {
 #pauseBtn {
     position: absolute;
     bottom: 12px;
-    left: 125px;
-    padding: 6px 12px;
-    font-size: 1.2em;
+    right: 150px;
+    padding: 6px 10px;
     z-index: 20;
 }
 

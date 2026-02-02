@@ -106,21 +106,16 @@ class Character extends MovableObject {
         this.loadImages(this.IMAGES_LONG_IDLE);
         this.applyGravity();
         this.animate();
-
         this.frameOffsetX = 20;
         this.frameWidth = this.width - 40;
-
         this.frameOffsetY = 100;
         this.frameHeight = this.height - 110;
-
-        this.bottle = 100;
     }
 
 
     animate() {
-        // this.animationTimer1 = setInterval(() => {
         setInterval(() => {
-            if (isGamePaused || this.world.stopped) return;
+            if (window.isGamePaused || this.world.stopped) return;
             this.setupWalkSound();
             this.handleWalkSound();
 

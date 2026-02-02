@@ -12,8 +12,10 @@ let isMusicMuted = !!getSetting('isMusicMuted');
 let isSoundMuted = !!getSetting('isSoundMuted');
 let currentLanguage = getSetting('language') || 'ES';
 var isGamePaused = false;
+window.isGamePaused = isGamePaused;
 let gameStartAt = 0;
 const LEADERBOARD_KEY = 'leaderboard';
+window.debugHitboxes = false;
 
 
 function init() {
@@ -33,14 +35,20 @@ function init() {
 
 
 function startGame() {
-    isGamePaused = false;
+    setGamePausedState(false);
     gameStartAt = Date.now();
     const pauseBtn = document.getElementById('pauseBtn');
     pauseBtn.classList.remove('d-none');
-    setPauseButtonLabel(getMergedPack(currentLanguage));
+    updatePauseButtonUi();
     document.getElementById('startScreen').classList.add('d-none');
     init();
     playBackgroundIfAllowed();
+}
+
+
+function setGamePausedState(state) {
+    isGamePaused = state;
+    window.isGamePaused = state;
 }
 
 
@@ -92,9 +100,9 @@ function setLanguageFallback(lang) {
 
 function togglePause() {
     if (!world) return;
-    isGamePaused = !isGamePaused;
+    setGamePausedState(!window.isGamePaused);
     const btn = document.getElementById('pauseBtn');
-    setPauseButtonLabel(getMergedPack(currentLanguage));
+    updatePauseButtonUi();
     if (isGamePaused) {
         world.pauseAllSounds();
         return;
@@ -104,10 +112,20 @@ function togglePause() {
 }
 
 
+function updatePauseButtonUi() {
+    const btn = document.getElementById('pauseBtn');
+    if (!btn) return;
+    const img = btn.querySelector('img');
+    if (!img) return;
+    img.src = window.isGamePaused ? 'img/play.png' : 'img/pause.png';
+    img.alt = window.isGamePaused ? 'Play' : 'Pause';
+}
+
+
 function quickRestartGame() {
-    resumeGameState();
+    setGamePausedState(false);
     showPauseButton();
-    setPauseButtonLabel(getMergedPack(currentLanguage));
+    updatePauseButtonUi();
     hideStartScreen();
     destroyWorldIfExists();
     ensureCanvasReady();
@@ -116,10 +134,6 @@ function quickRestartGame() {
     handleViewportChange?.();
 }
 
-
-function resumeGameState() {
-    isGamePaused = false;
-}
 
 function showPauseButton() {
     const pauseBtn = document.getElementById('pauseBtn');
@@ -151,7 +165,7 @@ function createNewWorld() {
 
 
 function onGameOver(worldInstance) {
-    isGamePaused = true;
+    setGamePausedState(true);
     const pauseBtn = document.getElementById('pauseBtn');
     pauseBtn?.classList.add('d-none');
     worldInstance?.pauseAllSounds();
@@ -161,7 +175,7 @@ function onGameOver(worldInstance) {
 
 
 function onWin(worldInstance) {
-    isGamePaused = true;
+    setGamePausedState(true);
     const pauseBtn = document.getElementById('pauseBtn');
     pauseBtn?.classList.add('d-none');
     worldInstance?.pauseAllSounds?.();

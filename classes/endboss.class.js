@@ -1,10 +1,5 @@
 class Endboss extends MovableObject {
-    // x = 2 * 720; // Standart
-    // y = -50;
-    // height = 500;
-    // width = 420;
-
-    x = 350; // Test
+    x = 2 * 720;
     y = 40;
     height = 400;
     width = 360;
@@ -52,85 +47,46 @@ class Endboss extends MovableObject {
     ];
 
     currentAnimation = null;
-    walkFrameMs = 110;       // etwas ruhiger als Pepe (wirkt schwerer)
-    lastAnimAt = 0;          // Zeitstempel für maybeAdvance
-
-    // Sanfte Bewegung für „echteres“ Gehen (kleines Lerp)
+    walkFrameMs = 110;
+    lastAnimAt = 0;
     baseWalkSpeed = 0.7;
     currentSpeed = 0;
     targetSpeed = 0;
-
-    // Einfache Patrouille (Startbereiche kannst du später feinjustieren)
     patrolLeft = this.x - 100;
     patrolRight = this.x + 100;
-    patrolDir = -1;          // -1 = nach links, 1 = nach rechts
-
-    // Sanftere Drehung (statt schnellem Flip)
-    facing = -1;                 // 1 = schaut nach rechts, -1 = schaut nach links (gleitender Wert)
-    facingThreshold = 0.7;      // Hysterese: erst ab ±0.6 wirklich flippen
-    facingLerp = 0.12;          // wie schnell die Blickrichtung dem Ziel folgt
-
-
-    // === Alert (Telegraphie) ===
+    patrolDir = -1;
+    facing = -1;
+    facingThreshold = 0.7;
+    facingLerp = 0.12;
     alertFrameMs = 300;
     alertDurationMs = 0;
-    // alertFrameMs = 100;       // schneller als Walk
-    // alertDurationMs = 500;    // 0.5 s Vorwarnung
-    alertRange = 120;         // ab dieser Distanz: aufmerken
-    alertUntil = 0;           // Zeitstempel bis wann Alert läuft
-
-    // nach Alert kurz „immun“ gegen neuen Alert
-    postAlertCooldownUntil = 0;   // ms-Zeitstempel
-    // === Nach Alert: kurze Verfolgung ohne neuen Alert ===
-    chaseUntil = 0;           // ms-Zeitstempel bis wann „chase“ läuft
-    // chaseSpeed = 1.0;         // etwas schneller als baseWalkSpeed
-    chaseSpeed = 1.5;         // etwas schneller als baseWalkSpeed
-    // Chase-Status, damit kein neuer Alert dazwischen funkt
+    alertRange = 120;
+    alertUntil = 0;
+    postAlertCooldownUntil = 0;
+    chaseUntil = 0;
+    chaseSpeed = 1.5;
     isChasing = false;
-
-    // === Attack (Dash nach Alert) ===
-    // attackFrameMs = 100;          // schneller Takt für G13–G20
-    attackFrameMs = 100;          // schneller Takt für G13–G20
+    attackFrameMs = 100;
     attackMoveStartFrame = 4;
-    // attackRange = 200;           // nur wenn Pepe noch so nah ist → Attack
-    attackRange = 60;           // nur wenn Pepe noch so nah ist → Attack
-    // attackStartRange = 90;
-    attackDashSpeed = 4;         // Dash-Geschwindigkeit
-    attackUntil = 0;             // Timer für Attack-Dauer
-
-    // 🆕 Treffer erst nach kurzem Sicht-Fenster gültig
-    attackHitDelayMs = 300;    // 200–300ms ist gut
+    attackRange = 60;
+    attackDashSpeed = 4;
+    attackUntil = 0;
+    attackHitDelayMs = 300;
     attackHitAllowedAt = 0;
-
-    // === Aggro (Boss bleibt „im Kampf“, patrouilliert nicht zurück) ===
     aggro = false;
-    aggroKeepRange = 400;  // bleibt im Kampf, solange Pepe innerhalb
-    aggroLoseRange = 900;  // verliert Aggro, wenn Pepe weiter weg
-
-
-    // === Erholungsphase nach Attack ===
-    recoveryAfterAttackMs = 2400;   // Pause nach einer Attacke
-    recoverUntil = 0;               // Timestamp bis wann Pause aktiv ist
-
+    aggroKeepRange = 400;
+    aggroLoseRange = 900;
+    recoveryAfterAttackMs = 2400;
+    recoverUntil = 0;
     isHurtLocked = false;
     recoveryType = null;
-
     deadFrameMs = 160;
     deadAnimEndAt = 0;
-
-    // Sounds......
-
-    // Appear
     appearSoundPlayed = false;
-
-    // Alert
     alertSoundCooldownUntil = 0;
     alertSoundCooldownMs = 1400;
     scheduledAlertSoundAt = 0;
     appearToAlertDelayMs = 950;
-
-
-    // Dead
     deadSoundPlayed = false;
 
 
@@ -866,8 +822,9 @@ class Endboss extends MovableObject {
         return this.getEndbossHitRects().some(r => this.rectsOverlap(r, b));
     }
 
-    // Nur zum Test-Phase
+
     drawFrame(ctx) {
+        if (!window.debugHitboxes) return;
         ctx.lineWidth = 3;
         ctx.strokeStyle = 'blue';
         this.getEndbossHitRects().forEach(r => {

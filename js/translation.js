@@ -23,7 +23,6 @@ function applyTranslations() {
     applySettingsTranslations(t);
     applyLanguageUiTranslations(t);
     applyGameOverWinOverlayTranslations(t);
-    setPauseButtonLabel(t);
     updateLanguageUiState();
 }
 
@@ -134,13 +133,6 @@ function applyGameOverWinOverlayTranslations(t) {
     setText('winQuestion', t.winQuestion);
     setText('winNextLevel', t.winNextLevel);
     setText('winHome', t.winHome);
-}
-
-
-function setPauseButtonLabel(t) {
-    const btn = document.getElementById('pauseBtn');
-    if (!btn) return;
-    btn.textContent = isGamePaused ? t.play : t.pause;
 }
 
 
