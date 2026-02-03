@@ -76,24 +76,21 @@ class Character extends MovableObject {
     bottle = 0;
     deadSoundPlayed = false;
     hurtSoundPlayed = false;
-
     coyoteTimeMs = 120;
     jumpBufferMs = 120;
     lastGroundedAt = 0;
     lastJumpPressedAt = -Infinity;
     prevSpace = false;
     isJumping = false;
-
-    currentAnimation = null; // merkt sich, welche Animation gerade läuft
-    idleTimeoutMs = 15000;              // 15s bis Sleep (Long-Idle)
-    lastActivityAt = performance.now(); // Zeitstempel der letzten Aktivität
-
-    idleFrameMs = 220;   // ruhig atmen
-    sleepFrameMs = 320;  // noch ruhiger
-    walkFrameMs = 80;  // ok für Laufen
-    hurtFrameMs = 140;  // FPS
-    deadFrameMs = 100;  // FPS (optional)
-    lastAnimAt = 0;    // Zeitstempel der letzten Frame-Weiter­schaltung
+    currentAnimation = null;
+    idleTimeoutMs = 15000;
+    lastActivityAt = performance.now();
+    idleFrameMs = 220;
+    sleepFrameMs = 320;
+    walkFrameMs = 80;
+    hurtFrameMs = 140;
+    deadFrameMs = 100;
+    lastAnimAt = 0;
 
 
     constructor() {
@@ -114,95 +111,132 @@ class Character extends MovableObject {
 
 
     animate() {
-        setInterval(() => {
-            if (window.isGamePaused || this.world.stopped) return;
-            this.setupWalkSound();
-            this.handleWalkSound();
-
-            if (this.world.keyBaord.RIGHT && this.x < this.world.level.level_end_x) {
-                this.moveRight();
-                this.otherDirection = false;
-            }
-            if (this.world.keyBaord.LEFT && this.x > this.minX) {
-                this.moveLeft();
-                this.otherDirection = true;
-            }
-
-            const anyKey =
-                this.world.keyBaord.RIGHT ||
-                this.world.keyBaord.LEFT ||
-                this.world.keyBaord.SPACE ||
-                this.world.keyBaord.UP ||
-                this.world.keyBaord.DOWN ||
-                this.world.keyBaord.THROW;
-
-            const doingSomething =
-                anyKey || this.isAboveGround() || this.isHurt();
-
-            if (doingSomething) {
-                this.lastActivityAt = performance.now();
-                this.stopPepeSnoring?.();
-                this.stopPepeCalmBreathing?.();
-            }
-
-            const now = performance.now();
-            this.handleJumpInput(now);
-            this.updateCamera();
-        }, 1000 / 60);
+        this.startMovementLoop();
+        this.startAnimationLoop();
+    }
 
 
-        setInterval(() => {
-            if (isGamePaused || this.world.stopped) return;
-            const now = performance.now();
+    startMovementLoop() {
+        setInterval(() => this.tickMovement(), 1000 / 60);
+    }
 
-            if (this.isDead()) {
-                if (this.currentAnimation !== 'dead') {
-                    this.currentAnimation = 'dead';
-                    this.currentImage = 0;
-                    this.lastAnimAt = 0;
-                }
-                this.maybeAdvance(this.IMAGES_DEAD, now, this.deadFrameMs);
-                this.img = this.imageCache[this.IMAGES_DEAD[this.IMAGES_DEAD.length - 1]];
-                this.setDeadSound();
-                return;
-            }
 
-            if (this.isHurt()) {
-                if (this.currentAnimation !== 'hurt') {
-                    this.currentAnimation = 'hurt';
-                    this.currentImage = 0;
-                    this.lastAnimAt = 0;
-                }
-                this.maybeAdvance(this.IMAGES_HURT, now, this.hurtFrameMs);
-                this.setHurtSound();
-                return;
-            }
+    tickMovement() {
+        if (window.isGamePaused || this.world.stopped) return;
+        this.setupWalkSound();
+        this.handleWalkSound();
+        this.handleHorizontalMovement();
+        this.updateActivityState();
+        const now = performance.now();
+        this.handleJumpInput(now);
+        this.updateCamera();
+    }
 
-            if (this.isAboveGround()) {
-                this.currentAnimation = 'jump';
-                this.updateJumpAnimation();
-                this.hurtSoundPlayed = false;
-                return;
-            }
 
-            if (this.isJumping) {
-                this.img = this.imageCache[this.IMAGES_JUMPING[0]];
-                this.isJumping = false;
-            }
+    handleHorizontalMovement() {
+        if (this.world.keyBaord.RIGHT && this.x < this.world.level.level_end_x) {
+            this.moveRight();
+            this.otherDirection = false;
+        }
+        if (this.world.keyBaord.LEFT && this.x > this.minX) {
+            this.moveLeft();
+            this.otherDirection = true;
+        }
+    }
 
-            if (this.world.keyBaord.RIGHT || this.world.keyBaord.LEFT) {
-                if (this.currentAnimation !== 'walk') {
-                    this.currentAnimation = 'walk';
-                    this.currentImage = 0;
-                    this.lastAnimAt = 0;
-                }
-                this.maybeAdvance(this.IMAGES_WALKING, now, this.walkFrameMs);
-                this.hurtSoundPlayed = false;
-            } else {
-                this.pepeIsSleeping(now);
-                this.hurtSoundPlayed = false;
-            }
-        }, 50);
+
+    updateActivityState() {
+        const doingSomething = this.isDoingSomething();
+        if (!doingSomething) return;
+        this.lastActivityAt = performance.now();
+        this.stopPepeSnoring?.();
+        this.stopPepeCalmBreathing?.();
+    }
+
+
+    isDoingSomething() {
+        return this.isAnyKeyPressed() || this.isAboveGround() || this.isHurt();
+    }
+
+
+    isAnyKeyPressed() {
+        return this.world.keyBaord.RIGHT ||
+            this.world.keyBaord.LEFT ||
+            this.world.keyBaord.SPACE ||
+            this.world.keyBaord.UP ||
+            this.world.keyBaord.DOWN ||
+            this.world.keyBaord.THROW;
+    }
+
+
+    startAnimationLoop() {
+        setInterval(() => this.tickAnimation(), 50);
+    }
+
+
+    tickAnimation() {
+        if (isGamePaused || this.world.stopped) return;
+        const now = performance.now();
+        if (this.handleDeadAnimation(now)) return;
+        if (this.handleHurtAnimation(now)) return;
+        if (this.handleAirAnimation(now)) return;
+        this.handleJumpReset();
+        this.handleWalkOrIdle(now);
+    }
+
+
+    handleDeadAnimation(now) {
+        if (!this.isDead()) return false;
+        this.ensureAnimationState('dead');
+        this.maybeAdvance(this.IMAGES_DEAD, now, this.deadFrameMs);
+        this.img = this.imageCache[this.IMAGES_DEAD[this.IMAGES_DEAD.length - 1]];
+        this.setDeadSound();
+        return true;
+    }
+
+
+    handleHurtAnimation(now) {
+        if (!this.isHurt()) return false;
+        this.ensureAnimationState('hurt');
+        this.maybeAdvance(this.IMAGES_HURT, now, this.hurtFrameMs);
+        this.setHurtSound();
+        return true;
+    }
+
+
+    handleAirAnimation(now) {
+        if (!this.isAboveGround()) return false;
+        this.currentAnimation = 'jump';
+        this.updateJumpAnimation();
+        this.hurtSoundPlayed = false;
+        return true;
+    }
+
+
+    handleJumpReset() {
+        if (!this.isJumping) return;
+        this.img = this.imageCache[this.IMAGES_JUMPING[0]];
+        this.isJumping = false;
+    }
+
+
+    handleWalkOrIdle(now) {
+        if (this.world.keyBaord.RIGHT || this.world.keyBaord.LEFT) {
+            this.ensureAnimationState('walk');
+            this.maybeAdvance(this.IMAGES_WALKING, now, this.walkFrameMs);
+            this.hurtSoundPlayed = false;
+            return;
+        }
+        this.pepeIsSleeping(now);
+        this.hurtSoundPlayed = false;
+    }
+
+
+    ensureAnimationState(name) {
+        if (this.currentAnimation === name) return;
+        this.currentAnimation = name;
+        this.currentImage = 0;
+        this.lastAnimAt = 0;
     }
 
 
@@ -266,14 +300,14 @@ class Character extends MovableObject {
 
 
     getLockBounds() {
-        return { left: 120, right: 500 }; // 🔧 DAS sind deine “Klebepunkte” im Lock
+        return { left: 120, right: 500 };
     }
 
 
     shouldLockCamera(boss) {
         if (!boss) return false;
         const dist = Math.abs((this.x + this.width / 2) - (boss.x + boss.width / 2));
-        return dist < 140; // 🔧 DAS ist der Lock-Radius
+        return dist < 140;
     }
 
 
@@ -285,19 +319,11 @@ class Character extends MovableObject {
 
 
     followCamera() {
-        // this.updateAnchorByInput();
         const vx = this.getViewOffsetX();
         const anchor = this.getAnchorX();
         const desired = -this.x + (anchor - vx);
         this.applyCameraLerp(desired);
     }
-
-
-    // updateAnchorByInput() {
-    //     const kb = this.world?.keyBaord;
-    //     if (kb?.LEFT) this.cameraAnchor = 'right';
-    //     if (kb?.RIGHT) this.cameraAnchor = 'left';
-    // }
 
 
     getAnchorX() {
@@ -395,7 +421,7 @@ class Character extends MovableObject {
 
     maybeAdvance(images, now, frameMs) {
         if ((now - this.lastAnimAt) >= frameMs) {
-            this.playAnimation(images);   // erhöht intern currentImage, setzt img
+            this.playAnimation(images);
             this.lastAnimAt = now;
         }
     }
@@ -404,7 +430,6 @@ class Character extends MovableObject {
     jump() {
         this.speedY = 27.5;
         this.isJumping = true;
-        // this.world.playEffectSound(this.world.sounds.jump);
         this.setupJumpSound();
     }
 
@@ -419,55 +444,100 @@ class Character extends MovableObject {
 
 
     updateJumpAnimation() {
-        if (!this.lastJumpFrameAt) this.lastJumpFrameAt = 0;
+        this.initJumpFrameTimer();
         const now = performance.now();
-        if (now - this.lastJumpFrameAt < 120) return; // nur alle 120ms neues Bild
+        if (this.isJumpFrameThrottled(now)) return;
         this.lastJumpFrameAt = now;
+        const idx = this.getJumpFrameIndex(this.speedY);
+        this.setJumpFrameImage(idx);
+    }
 
-        const up_fast = 0;
-        const up_mid = 2;
-        const up_slow = 3;
-        const apex = 4;
-        const down_slow = 5;
-        const down_mid = 6;
-        const down_fast = 8;
 
-        const vy = this.speedY;
-        let idx;
+    initJumpFrameTimer() {
+        if (!this.lastJumpFrameAt) this.lastJumpFrameAt = 0;
+    }
 
-        if (vy > 12) idx = up_fast;
-        else if (vy > 6) idx = up_mid;
-        else if (vy > 2) idx = up_slow;
-        else if (vy > -2) idx = apex;
-        else if (vy > -8) idx = down_slow;
-        else if (vy > -14) idx = down_mid;
-        else idx = down_fast;
 
+    isJumpFrameThrottled(now) {
+        return now - this.lastJumpFrameAt < 120;
+    }
+
+
+    getJumpFrameIndex(vy) {
+        const up_fast = 0, up_mid = 2, up_slow = 3, apex = 4;
+        const down_slow = 5, down_mid = 6, down_fast = 8;
+        if (vy > 12) return up_fast;
+        if (vy > 6) return up_mid;
+        if (vy > 2) return up_slow;
+        if (vy > -2) return apex;
+        if (vy > -8) return down_slow;
+        if (vy > -14) return down_mid;
+        return down_fast;
+    }
+
+    
+    setJumpFrameImage(idx) {
         const path = this.IMAGES_JUMPING[idx];
         this.img = this.imageCache[path];
     }
 
 
     handleJumpInput(now) {
-        const space = !!this.world?.keyBaord?.SPACE;
+        const space = this.getSpaceState();
+        this.trackJumpPress(space, now);
+        const grounded = this.updateGroundedState(now);
+        if (this.shouldTriggerBufferedJump(now)) {
+            this.triggerBufferedJump();
+        }
+        if (this.shouldResetJumping(grounded)) {
+            this.resetJumping();
+        }
+    }
+
+
+    getSpaceState() {
+        return !!this.world?.keyBaord?.SPACE;
+    }
+
+
+    trackJumpPress(space, now) {
         if (space && !this.prevSpace) {
             this.lastJumpPressedAt = now;
         }
         this.prevSpace = space;
+    }
+
+
+    updateGroundedState(now) {
         const grounded = !this.isAboveGround();
         if (grounded) {
             this.lastGroundedAt = now;
         }
+        return grounded;
+    }
+
+
+    shouldTriggerBufferedJump(now) {
         const withinCoyote = (now - this.lastGroundedAt) <= this.coyoteTimeMs;
         const withinBuffer = (now - this.lastJumpPressedAt) <= this.jumpBufferMs;
-        if (withinBuffer && withinCoyote && !this.isDead()) {
-            this.jump();
-            this.lastJumpPressedAt = -Infinity;
-            this.isJumping = true;
-        }
-        if (grounded && this.isJumping && this.speedY === 0) {
-            this.isJumping = false;
-        }
+        return withinBuffer && withinCoyote && !this.isDead();
+    }
+
+
+    triggerBufferedJump() {
+        this.jump();
+        this.lastJumpPressedAt = -Infinity;
+        this.isJumping = true;
+    }
+
+
+    shouldResetJumping(grounded) {
+        return grounded && this.isJumping && this.speedY === 0;
+    }
+
+
+    resetJumping() {
+        this.isJumping = false;
     }
 
 
@@ -477,7 +547,6 @@ class Character extends MovableObject {
         pepeSnoring.loop = true;
         pepeSnoring.volume = 0.8;
         pepeSnoring.currentTime = 0;
-        // pepeSnoring.play();
         this.world.playEffectSound(pepeSnoring);
     }
 
@@ -495,7 +564,6 @@ class Character extends MovableObject {
         if (!calmBreathing || !calmBreathing.paused || isSoundMuted) return;
         calmBreathing.loop = true;
         calmBreathing.volume = 0.4;
-        // calmBreathing.play();
         this.world.playEffectSound(calmBreathing);
     }
 

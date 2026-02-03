@@ -6,12 +6,7 @@ class DrawableObject {
     img;
     imageCache = {};
     currentImage = 0;
-
-
-    constructor() {
-
-    }
-
+    
 
     draw(ctx) {
         if (!this.img) return;
@@ -20,24 +15,45 @@ class DrawableObject {
 
 
     drawFrame(ctx) {
-        if (!window.debugHitboxes) return;
-        if (this instanceof Character || this instanceof Chicken ||
-            this instanceof Coin || this instanceof Bottle ||
-            this instanceof Endboss || this instanceof SmallChicken
-            || this instanceof ThrowableObject) {
+        if (!this.shouldDrawFrame()) return;
+        const frame = this.getFrameDimensions();
+        this.drawDebugRectangle(ctx, frame);
+    }
 
-            const frameOffsetX = this.frameOffsetX || 0;
-            const frameOffsetY = this.frameOffsetY || 0;
-            const frameWidth = this.frameWidth || this.width;
-            const frameHeight = this.frameHeight || this.height;
 
-            // Blue rectangle
-            ctx.beginPath();
-            ctx.lineWidth = '3';
-            ctx.strokeStyle = 'blue';
-            ctx.rect(frameOffsetX, frameOffsetY, frameWidth, frameHeight);
-            ctx.stroke();
-        }
+    shouldDrawFrame() {
+        if (!window.debugHitboxes) return false;
+        return this.isFrameDrawableInstance();
+    }
+
+
+    isFrameDrawableInstance() {
+        return this instanceof Character ||
+            this instanceof Chicken ||
+            this instanceof Coin ||
+            this instanceof Bottle ||
+            this instanceof Endboss ||
+            this instanceof SmallChicken ||
+            this instanceof ThrowableObject;
+    }
+
+
+    getFrameDimensions() {
+        return {
+            x: this.frameOffsetX || 0,
+            y: this.frameOffsetY || 0,
+            width: this.frameWidth || this.width,
+            height: this.frameHeight || this.height
+        };
+    }
+
+
+    drawDebugRectangle(ctx, frame) {
+        ctx.beginPath();
+        ctx.lineWidth = '3';
+        ctx.strokeStyle = 'blue';
+        ctx.rect(frame.x, frame.y, frame.width, frame.height);
+        ctx.stroke();
     }
 
 

@@ -33,7 +33,6 @@ function runFirestoreTest() {
 
 
 function isFirestoreTestEnabled() {
-    // return true;
     return false;
 }
 
@@ -47,7 +46,6 @@ function getLangDoc(lang) {
 
 
 async function fetchI18nDoc(lang) {
-    // console.log('API fetchI18nDoc:', lang);
     const snap = await getLangDoc(lang).get();
     return snap.exists ? (snap.data() || {}) : {};
 }

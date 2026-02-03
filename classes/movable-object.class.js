@@ -10,68 +10,71 @@ class MovableObject extends DrawableObject {
     lastHit = 0;
     gravityInterval = null;
     lastGravityTime = 0;
-    gravityBaseMs = 25; // entspricht dem alten 1000/40
+    gravityBaseMs = 25;
 
 
-    // character.isColliding(chicken);
     isColliding(mo) {
-
-        // Wenn das Objekt gesammelt wurde, keine Kollision mehr
-        if (this.collected) return false;
-        if (mo.collected) return false;
-
-        const aLeft = this.x + (this.frameOffsetX || 0);
-        const aRight = aLeft + (this.frameWidth || this.width);
-        const aTop = this.y + (this.frameOffsetY || 0);
-        const aBottom = aTop + (this.frameHeight || this.height);
-
-        const bLeft = mo.x + (mo.frameOffsetX || 0);
-        const bRight = bLeft + (mo.frameWidth || mo.width);
-        const bTop = mo.y + (mo.frameOffsetY || 0);
-        const bBottom = bTop + (mo.frameHeight || mo.height);
-
-        return aRight > bLeft &&
-            aLeft < bRight &&
-            aBottom > bTop &&
-            aTop < bBottom;
+        if (this.isCollectedPair(mo)) return false;
+        const a = this.getCollisionBox(this);
+        const b = this.getCollisionBox(mo);
+        return this.boxesOverlap(a, b);
     }
 
 
-    /**
- * Prüft, ob `this` von oben auf `mo` trifft (z.B. Gegner töten durch Draufspringen)
- * @param {MovableObject} mo - das andere Objekt
- * @returns {boolean}
- */
+    isCollectedPair(mo) {
+        return this.collected || mo.collected;
+    }
+
+
+    getCollisionBox(obj) {
+        const left = obj.x + (obj.frameOffsetX || 0);
+        const top = obj.y + (obj.frameOffsetY || 0);
+        const width = obj.frameWidth || obj.width;
+        const height = obj.frameHeight || obj.height;
+        return { left, right: left + width, top, bottom: top + height };
+    }
+
+
+    boxesOverlap(a, b) {
+        return a.right > b.left &&
+            a.left < b.right &&
+            a.bottom > b.top &&
+            a.top < b.bottom;
+    }
+
+
     isCollidingFromTop(mo) {
-        const aLeft = this.x + (this.frameOffsetX || 0);
-        const aRight = aLeft + (this.frameWidth || this.width);
-        const aTop = this.y + (this.frameOffsetY || 0);
-        const aBottom = aTop + (this.frameHeight || this.height);
-        const aMiddleX = aLeft + (aRight - aLeft) / 2; // 👈 bleibt erhalten für Debug
-        const bTop = mo.y + (mo.frameOffsetY || 0);
-        const bBottom = bTop + (mo.frameHeight || mo.height);
-        const bLeft = mo.x + (mo.frameOffsetX || 0);
-        const bRight = bLeft + (mo.frameWidth || mo.width);
-        const horizontalOverlap = aRight > bLeft && aLeft < bRight;
-        const isAbove = aBottom <= bBottom + 5;
-        const isFalling = this.speedY < -1;
-        const result = horizontalOverlap && isAbove && isFalling;
-        return result;
+        const a = this.getCollisionBox(this);
+        const b = this.getCollisionBox(mo);
+        const horizontalOverlap = this.isHorizontalOverlap(a, b);
+        const isAbove = this.isAboveTargetBottom(a, b);
+        const isFalling = this.isFallingFastEnough();
+        return horizontalOverlap && isAbove && isFalling;
+    }
+
+
+    isHorizontalOverlap(a, b) {
+        return a.right > b.left && a.left < b.right;
+    }
+
+
+    isAboveTargetBottom(a, b) {
+        return a.bottom <= b.bottom + 5;
+    }
+
+
+    isFallingFastEnough() {
+        return this.speedY < -1;
     }
 
 
     hit() {
-        console.log(this.constructor.name, 'ist verletzt');
         this.energy -= 20;
-        console.log(this.constructor.name, 'energy is ', this.energy);
-
         if (this instanceof Chicken || this instanceof SmallChicken) {
             this.world.playEffectSound(this.world.sounds.chickenDead);
         }
-
         if (this.energy <= 0) {
             this.energy = 0;
-            console.log(`${this.constructor.name} ist tot:`, this.energy, 'bei X:', this.x.toFixed(0), 'Y:', this.y.toFixed(0));
         } else {
             this.lastHit = new Date().getTime();
         }
@@ -79,16 +82,13 @@ class MovableObject extends DrawableObject {
 
 
     isHurt() {
-        let timePassed = new Date().getTime() - this.lastHit; // Differnce in "MS"
+        let timePassed = new Date().getTime() - this.lastHit;
         timePassed = timePassed / 1000;
-        // console.log(timePassed);
         return timePassed < 1;
-        // return this.energy < 100;
     }
 
 
     isDead() {
-        // return this.energy == 0;
         return this.energy <= 0;
     }
 
@@ -120,10 +120,12 @@ class MovableObject extends DrawableObject {
         return !this.isAboveGround() && this.speedY <= 0;
     }
 
+
     applyGravityStep(delta) {
         this.y -= this.speedY * delta;
         this.speedY -= this.acceleration * delta;
     }
+
 
     snapToGround() {
         if (this.y >= this.minY) {
@@ -133,10 +135,6 @@ class MovableObject extends DrawableObject {
     }
 
 
-    /**
-     * Gibt true zurück, wenn der Charakter in der Luft ist (y < minY).
-     * Gibt false zurück, wenn der Charakter am Boden ist.
-     */
     isAboveGround() {
         if (this instanceof ThrowableObject) {
             return true;
@@ -152,9 +150,7 @@ class MovableObject extends DrawableObject {
 
 
     playAnimation(images) {
-        // if (!images || images.length === 0) return;
-        let i = this.currentImage % images.length; //(% = "Modulo") let i = 7 % 6; => 1; Rest 1
-        // i = 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, so mit ersetzt die "VARIABLE++;"
+        let i = this.currentImage % images.length;
         let path = images[i];
         this.img = this.imageCache[path];
         this.currentImage++;
@@ -169,9 +165,4 @@ class MovableObject extends DrawableObject {
     moveRight() {
         this.x += this.speed;
     }
-
-
-    // jump() {
-    //     this.speedY = 27.5;
-    // }
 }

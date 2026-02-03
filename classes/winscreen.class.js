@@ -13,6 +13,7 @@ class Winscreen extends OverlayScreen {
         super(ctx, canvas);
         this.init(this.winScreenConfig);
     }
+    
 
     show() {
         this.captureBaseFrame();

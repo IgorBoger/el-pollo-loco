@@ -18,9 +18,6 @@ class KeyBaord {
             { action: 'Rechts bewegen', key: 'Pfeil rechts' },
             { action: 'Springen', key: 'Leertaste' },
             { action: 'Werfen', key: 'D' },
-            // { action: 'Ducken', key: 'S / Pfeil runter' },
-            // { action: 'Interagieren', key: 'E' }
-            // → Passe diese Liste an deine tatsächliche Belegung an
         ];
     }
 }

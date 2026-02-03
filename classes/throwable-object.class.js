@@ -2,7 +2,7 @@ class ThrowableObject extends MovableObject {
     height = 70;
     width = 70;
 
-    IMAGES_THROW = [ // 1) Als erstens die Pfade werden angelegt!
+    IMAGES_THROW = [
         'img/6_salsa_bottle/bottle_rotation/1_bottle_rotation.png',
         'img/6_salsa_bottle/bottle_rotation/2_bottle_rotation.png',
         'img/6_salsa_bottle/bottle_rotation/3_bottle_rotation.png',
@@ -10,7 +10,7 @@ class ThrowableObject extends MovableObject {
     ]
 
 
-    IMAGES_SPLASHES = [ // 1 und auch 5) Als erstens wieder die Pfade werden angelegt!
+    IMAGES_SPLASHES = [
         'img/6_salsa_bottle/bottle_rotation/bottle_splash/1_bottle_splash.png',
         'img/6_salsa_bottle/bottle_rotation/bottle_splash/2_bottle_splash.png',
         'img/6_salsa_bottle/bottle_rotation/bottle_splash/3_bottle_splash.png',
@@ -23,22 +23,21 @@ class ThrowableObject extends MovableObject {
 
     constructor(x, y, world, direction = 1) {
         super().loadImage(this.IMAGES_THROW[0]);
-        this.loadImages(this.IMAGES_THROW); // 2) Die Pfade werden hochgeladen!
-        this.loadImages(this.IMAGES_SPLASHES); // 2) Die Pfade werden hochgeladen!
+        this.loadImages(this.IMAGES_THROW);
+        this.loadImages(this.IMAGES_SPLASHES);
         this.x = x;
         this.y = y;
-        this.minY = 330; // 🟡 Bodenhöhe für Flasche (statt 180)
+        this.minY = 330;
         this.world = world;
         this.direction = direction;
-        this.otherDirection = direction === -1; // für Spiegelung beim Zeichnen
+        this.otherDirection = direction === -1;
         this.throw();
-        this.animate(); // 4) Die Animation wird aufgerufen, Flasche dreht sich!
+        this.animate();
     }
 
 
     throw() {
         this.setupThrowSound();
-        console.log('bottle is throw ');
         this.speedY = 20;
         this.applyGravity();
         this.throwInterval = setInterval(() => {
@@ -72,19 +71,41 @@ class ThrowableObject extends MovableObject {
 
 
     splash() {
+        this.setSplashState();
+        this.scheduleSplashCleanup();
+    }
+
+
+    setSplashState() {
         this.isSplashed = true;
         this.speedY = 0;
         this.speed = 0;
-
-
-        setTimeout(() => {
-            clearInterval(this.throwInterval);
-            clearInterval(this.gravityInterval);
-            clearInterval(this.mainInterval);
-            this.world.throwableObject = this.world.throwableObject.filter(obj => obj !== this);
-        }, 300);
     }
-    
+
+
+    scheduleSplashCleanup() {
+        setTimeout(() => this.cleanupSplash(), 300);
+    }
+
+
+    cleanupSplash() {
+        this.clearBottleIntervals();
+        this.removeFromThrowableList();
+    }
+
+
+    clearBottleIntervals() {
+        clearInterval(this.throwInterval);
+        clearInterval(this.gravityInterval);
+        clearInterval(this.mainInterval);
+    }
+
+
+    removeFromThrowableList() {
+        this.world.throwableObject = this.world.throwableObject
+            .filter(obj => obj !== this);
+    }
+
 
     animate() {
         this.mainInterval = setInterval(() => {

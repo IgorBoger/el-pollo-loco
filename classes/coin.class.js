@@ -8,10 +8,8 @@ class Coin extends MovableObject {
         this.y = y;
         this.height = 200;
         this.width = 200;
-
         this.frameOffsetX = 70;
         this.frameWidth = this.width - 140;
-
         this.frameOffsetY = 70;
         this.frameHeight = this.height - 140;
     }

@@ -160,7 +160,6 @@ function toggleActiveClass(el, isActive) {
 }
 
 
-
 function setText(id, text) {
     const el = document.getElementById(id);
     if (!el) return;
@@ -170,7 +169,6 @@ function setText(id, text) {
 
 function setLanguage(lang) {
     currentLanguage = lang;
-    // localStorage.setItem('language', currentLanguage);
     setLanguageSetting(currentLanguage);
     applyTranslations();
     loadRemoteLanguage(currentLanguage).then(applyTranslations);
@@ -224,5 +222,4 @@ function isLangCached(lang) {
 async function loadLangDocToCache(lang) {
     if (typeof fetchI18nToCache !== 'function') return;
     await fetchI18nToCache(lang, i18nRemote);
-    // console.log('i18n remote loaded:', lang, i18nRemote[lang]);
 }

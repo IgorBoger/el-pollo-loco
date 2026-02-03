@@ -42,51 +42,82 @@ class StatusBar extends DrawableObject {
 
     constructor(type = 'health') {
         super();
-        if (type === 'coin') {
-            this.IMAGES = this.IMAGES_COIN;
-            this.x = 20;
-            this.y = 40;
-        } else if (type === 'bottle') {
-            this.IMAGES = this.IMAGES_BOTTLE;
-            this.x = 20;
-            this.y = 80;
-        } else {
-            this.IMAGES = this.IMAGES_HEALTH;
-            this.x = 20;
-            this.y = 0;
-        }
-        if (type === 'endboss') {
-            this.IMAGES = this.IMAGES_ENDBOSS;
-            this.x = 480;
-            this.y = 5;
-        }
-
+        this.applyTypeLayout(type);
         this.loadImages(this.IMAGES);
-        this.setPercentage(
-            type === 'health' || type === 'endboss' ? 100 : 0
-        );
+        this.initDefaultPercentage(type);
     }
 
+
+    applyTypeLayout(type) {
+        this.applyDefaultLayout(type);
+        if (type === 'endboss') this.applyEndbossLayout();
+    }
+
+
+    applyDefaultLayout(type) {
+        if (type === 'coin') return this.applyCoinLayout();
+        if (type === 'bottle') return this.applyBottleLayout();
+        return this.applyHealthLayout();
+    }
+
+
+    applyCoinLayout() {
+        this.IMAGES = this.IMAGES_COIN;
+        this.x = 20;
+        this.y = 40;
+    }
+
+
+    applyBottleLayout() {
+        this.IMAGES = this.IMAGES_BOTTLE;
+        this.x = 20;
+        this.y = 80;
+    }
+
+
+    applyHealthLayout() {
+        this.IMAGES = this.IMAGES_HEALTH;
+        this.x = 20;
+        this.y = 0;
+    }
+
+
+    applyEndbossLayout() {
+        this.IMAGES = this.IMAGES_ENDBOSS;
+        this.x = 480;
+        this.y = 5;
+    }
+
+
+    initDefaultPercentage(type) {
+        const start = this.isFullStartType(type) ? 100 : 0;
+        this.setPercentage(start);
+    }
+
+
+    isFullStartType(type) {
+        return type === 'health' || type === 'endboss';
+    }
+
+
     setPercentage(percentage) {
-        this.percentage = percentage; // => 0...5
+        this.percentage = percentage;
         let path = this.IMAGES[this.resolveImageIndex()];
         this.img = this.imageCache[path];
     }
 
 
     resolveImageIndex() {
-        if (this.percentage == 100) {
-            return 5;
-        } else if (this.percentage >= 80) {
-            return 4;
-        } else if (this.percentage >= 60) {
-            return 3;
-        } else if (this.percentage >= 40) {
-            return 2;
-        } else if (this.percentage >= 20) {
-            return 1;
-        } else {
-            return 0;
-        }
+        return this.getStatusIndex(this.percentage);
+    }
+
+
+    getStatusIndex(value) {
+        if (value === 100) return 5;
+        if (value > 80) return 4;
+        if (value > 60) return 3;
+        if (value > 40) return 2;
+        if (value > 20) return 1;
+        return 0;
     }
 }

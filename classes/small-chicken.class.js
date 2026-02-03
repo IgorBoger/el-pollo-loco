@@ -14,30 +14,47 @@ class SmallChicken extends MovableObject {
 
     constructor() {
         super().loadImage(this.IMAGES_WALKING[0]);
+        this.initWalkImages();
+        this.initDeadImage();
+        this.initSpawnStats();
+        this.initFrameBounds();
+        this.initLoopState();
+    }
+
+
+    initWalkImages() {
         this.loadImages(this.IMAGES_WALKING);
-        // this.loadImage('img/3_enemies_chicken/chicken_small/2_dead/dead.png'); // 🟢 DEAD-Bild vorladen
-        this.loadImage('img/3_enemies_chicken/chicken_small/2_dead/dead.png');
-        this.deadImagePath = 'img/3_enemies_chicken/chicken_small/2_dead/dead.png';
+    }
 
 
+    initDeadImage() {
+        const path = 'img/3_enemies_chicken/chicken_small/2_dead/dead.png';
+        this.loadImage(path);
+        this.deadImagePath = path;
+    }
+
+
+    initSpawnStats() {
         this.x = 250 + Math.random() * 500;
         this.speed = 0.2 + Math.random() * 0.1;
-        // this.animate();
+    }
 
-        // Wird nur für Colisionberechnung gezeichnet, danach muss weg!!!
+
+    initFrameBounds() {
         this.frameOffsetX = 3;
         this.frameWidth = this.width - 8;
-
         this.frameOffsetY = 6;
         this.frameHeight = this.height - 13;
+    }
 
 
+    initLoopState() {
         this.frameMs = 120;
         this.lastFrameTime = 0;
         this.isRemoved = false;
         this.mainInterval = null;
     }
-    
+
 
     animate() {
         this.mainInterval = setInterval(() => {
@@ -53,11 +70,13 @@ class SmallChicken extends MovableObject {
         this.updateWalkingFrames(now);
     }
 
+
     updateWalkingFrames(now) {
         if (!this.shouldAdvanceFrame(now)) return;
         this.playAnimation(this.IMAGES_WALKING);
         this.lastFrameTime = now;
     }
+
 
     shouldAdvanceFrame(now) {
         return (now - this.lastFrameTime) >= this.frameMs;
@@ -72,9 +91,11 @@ class SmallChicken extends MovableObject {
         this.removeFromWorldDelayed();
     }
 
+
     stopSmallChickenLoop() {
         if (this.mainInterval) clearInterval(this.mainInterval);
     }
+    
 
     removeFromWorldDelayed() {
         setTimeout(() => {

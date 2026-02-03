@@ -1,6 +1,3 @@
-/* global currentLanguage, getMergedPack, openRankingClearConfirm */
-
-
 function addLeaderboardEntry(worldInstance, resultKey) {
     const list = getLeaderboard();
     list.push(buildLeaderboardEntry(worldInstance, resultKey));

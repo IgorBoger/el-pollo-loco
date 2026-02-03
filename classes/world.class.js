@@ -5,22 +5,18 @@ class World {
     bottleBar = new StatusBar('bottle');
     endbossBar = new StatusBar('endboss');
     sounds = {
-        background: new Audio('audio/background.mp3'),                  //  Sound-OK
-        pepeWalk: new Audio('audio/pepe_walk.mp3'),                   //  Sound-OK
-        pepeJump: new Audio('audio/pepe_jump.mp3'),                   //  Sound-OK
-        pepeHurt: new Audio('audio/pepe_hurt.mp3'),                   //  Sound-OK
-        pepeDead: new Audio('audio/pepe_dead.mp3'),                   //  Sound-OK
-        pepeSnoring: new Audio('audio/pepe_snoring.mp3'),               //  Sound-
-        pepeCalmBreathing: new Audio('audio/pepe_calm_breathing.mp3'),  //  Sound-OK
-
-        collectedCoin: new Audio('audio/collected_coin.mp3'),                   //  Sound-OK
-        collectedBottle: new Audio('audio/collected_bottle.mp3'),               //  Sound-OK
-        // hit: new Audio('audio/hit.mp3'),                     //  Sound-OK
-
-        thrownBottle: new Audio('audio/thrown_bottle.mp3'),     //  Sound-OK
-        chickenDead: new Audio('audio/chicken_dead.mp3'),       //  Sound-OK
-
-        endbossAppear: new Audio('audio/endboss_appear.mp3'),   //  Sound-OK
+        background: new Audio('audio/background.mp3'),
+        pepeWalk: new Audio('audio/pepe_walk.mp3'),
+        pepeJump: new Audio('audio/pepe_jump.mp3'),
+        pepeHurt: new Audio('audio/pepe_hurt.mp3'),
+        pepeDead: new Audio('audio/pepe_dead.mp3'),
+        pepeSnoring: new Audio('audio/pepe_snoring.mp3'),
+        pepeCalmBreathing: new Audio('audio/pepe_calm_breathing.mp3'),
+        collectedCoin: new Audio('audio/collected_coin.mp3'),
+        collectedBottle: new Audio('audio/collected_bottle.mp3'),
+        thrownBottle: new Audio('audio/thrown_bottle.mp3'),
+        chickenDead: new Audio('audio/chicken_dead.mp3'),
+        endbossAppear: new Audio('audio/endboss_appear.mp3'),
         endbossAlert: new Audio('audio/endboss_alert.mp3'),
         endbossAttack: new Audio('audio/endboss_attack.mp3'),
         endbossHurt: new Audio('audio/endboss_hurt.mp3'),
@@ -29,7 +25,6 @@ class World {
     coins = [];
     bottles = [];
     throwableObject = [];
-    // ALT
     level = level1;
     backgroundTileCount = 1;
     canvas;
@@ -37,40 +32,60 @@ class World {
     keyBaord;
     camera_x = 0;
     lastBottleThrow = 0;
-
     lastDrawLogTime = 0;
 
 
     constructor(canvas, keyBaord) {
+        this.initWorldCore(canvas, keyBaord);
+        this.initWorldBackground();
+        this.initWorldGameLoop();
+        this.initWorldCollectables();
+        this.initWorldScreens();
+        this.winScheduled = false;
+    }
+
+
+    initWorldCore(canvas, keyBaord) {
         this.level = this.cloneLevel(level1);
         this.ctx = canvas.getContext("2d");
         this.canvas = canvas;
         this.keyBaord = keyBaord;
         this.stopped = false;
         this.backgroundObjects = [];
+    }
+
+
+    initWorldBackground() {
         this.initBackground();
         setTimeout(() => this.draw(), 100);
+    }
+
+
+    initWorldGameLoop() {
         this.setWorld();
         this.updateBottleStatusBar();
         this.run();
+    }
+
+
+    initWorldCollectables() {
         this.initCollectables(this.coins, Coin, 200, 50);
         this.initCollectables(this.bottles, Bottle, 100, 150);
+    }
+
+
+    initWorldScreens() {
         this.endscreen = new Endscreen(this.ctx, this.canvas);
         this.winscreen = new Winscreen(this.ctx, this.canvas);
-        this.winScheduled = false;
-
     }
 
 
     cloneLevel(level) {
         const enemies = level.enemies.map(e => new e.constructor());
         const clouds = level.clouds.map(c => new c.constructor());
-
         const backgroundObjects = [];
-
         const layers = [...level.layers];
         const altLayers = [...level.altLayers];
-
         return new Level(enemies, clouds, backgroundObjects, layers, altLayers);
     }
 
@@ -78,7 +93,6 @@ class World {
     setWorld() {
         this.character.world = this;
         this.throwableObject.world = this;
-
         this.level.enemies.forEach(enemy => {
             enemy.world = this;
             enemy.animate?.();
@@ -100,7 +114,6 @@ class World {
         this.collisionWithChicken();
         this.collisionWithCollectable(this.coins, 'coin', this.updateCoinStatusBar);
         this.collisionWithCollectable(this.bottles, 'bottle', this.updateBottleStatusBar);
-
         this.checkBottleHitsEnemies();
     }
 
@@ -112,7 +125,6 @@ class World {
 
     handleEnemyCollision(enemy) {
         if (this.shouldSkipEnemyCollision(enemy)) return;
-        // if (!this.character.isColliding(enemy)) return;
         if (!this.isEndbossAwareCollision(this.character, enemy)) return;
         if (this.handleEndbossAttackCollision(enemy)) return;
         if (this.handleStompCollision(enemy)) return;
@@ -139,6 +151,7 @@ class World {
         enemy.hasHitInCurrentAttack = true;
         return true;
     }
+
 
     applyAttackKnockback(enemy) {
         this.character.speedY = 15;
@@ -195,8 +208,6 @@ class World {
     adjustEndbossAtLeftEdge(enemy) {
         const char = this.character;
         if (!char || !(enemy instanceof Endboss)) return;
-        const minX = (typeof char.minX === 'number') ? char.minX : 0;
-        const charAtEdge = char.x <= minX + 1;
         const charRight = char.x + (char.frameWidth || char.width);
         const gap = 30;
         const desiredBossX = charRight + gap;
@@ -211,12 +222,8 @@ class World {
             if (this.character[propertyName] > 100) this.character[propertyName] = 100;
             updateStatusBarCallback.call(this);
             array.splice(index, 1);
-            if (propertyName === 'coin') {
-                this.playEffectSound(this.sounds.collectedCoin);
-            }
-            if (propertyName === 'bottle') {
-                this.playEffectSound(this.sounds.collectedBottle);
-            }
+            if (propertyName === 'coin') this.playEffectSound(this.sounds.collectedCoin);
+            if (propertyName === 'bottle') this.playEffectSound(this.sounds.collectedBottle);
         }
     }
 
@@ -271,22 +278,62 @@ class World {
 
 
     playEffectSound(sound) {
-        if (!sound) return;
-        const backgroundSounds = sound === this.sounds?.background;
-        if ((backgroundSounds && isMusicMuted) || (!backgroundSounds && isSoundMuted)) return;
+        if (!this.canPlaySound(sound)) return;
         this.duckBackground();
+        this.tryRestartAndPlaySound(sound);
+    }
+
+
+    canPlaySound(sound) {
+        if (!sound) return false;
+        const backgroundSounds = this.isBackgroundSound(sound);
+        if (this.isMutedForSoundType(backgroundSounds)) return false;
+        return true;
+    }
+
+
+    isBackgroundSound(sound) {
+        return sound === this.sounds?.background;
+    }
+
+
+    isMutedForSoundType(backgroundSounds) {
+        if (backgroundSounds) return isMusicMuted;
+        return isSoundMuted;
+    }
+
+
+    tryRestartAndPlaySound(sound) {
         try {
-            sound.pause();
-            sound.currentTime = 0;
-            const playPromise = sound.play();
-            if (!playPromise) return;
-            playPromise.catch(err => {
-                if (err?.name === 'AbortError') return;
-                console.warn('Sound konnte nicht abgespielt werden:', err);
-            });
+            this.restartSound(sound);
+            this.playSoundWithPromiseHandling(sound);
         } catch (err) {
-            console.warn('Fehler beim Abspielen des Sounds:', err);
+            this.warnSoundError('Fehler beim Abspielen des Sounds:', err);
         }
+    }
+
+
+    restartSound(sound) {
+        sound.pause();
+        sound.currentTime = 0;
+    }
+
+
+    playSoundWithPromiseHandling(sound) {
+        const playPromise = sound.play();
+        if (!playPromise) return;
+        playPromise.catch(err => this.handlePlayPromiseError(err));
+    }
+
+
+    handlePlayPromiseError(err) {
+        if (err?.name === 'AbortError') return;
+        this.warnSoundError('Sound konnte nicht abgespielt werden:', err);
+    }
+
+
+    warnSoundError(message, err) {
+        console.warn(message, err);
     }
 
 
@@ -309,9 +356,8 @@ class World {
 
     pauseAllSounds() {
         Object.values(this.sounds).forEach(sound => {
-            if (sound instanceof Audio) {
-                sound.pause();
-            }
+            if (!(sound instanceof Audio)) return;
+            sound.pause();
         });
     }
 
@@ -331,36 +377,81 @@ class World {
 
     checkThrowObject() {
         const now = Date.now();
-        if (this.keyBaord.THROW && this.character.bottle > 0 && now - this.lastBottleThrow > 500) {
-            const direction = this.character.otherDirection ? -1 : 1;
-            const offsetX = direction * 30;
-            const inTheAirY = this.character.y + 140;
-            const baseY = typeof this.character.minY === 'number'
-                ? this.character.minY
-                : this.character.y;
-            const spawnY = baseY + 140;
-            let bottle;
-
-            if (this.character.y < 180) {
-                // Immer 
-                bottle = new ThrowableObject(this.character.x + offsetX, inTheAirY, this, direction); // Wen Pepe in der lüft ist
-            } else {
-                if (direction === -1) {
-                    // Nur am boden nach Links
-                    bottle = new ThrowableObject(this.character.x + offsetX, spawnY, this, direction); // Wen Pepe auf dem Boden ist
-                } else {
-                    // Nur am boden nach Rechts
-                    bottle = new ThrowableObject(this.character.x + 50, spawnY, this, direction); // Wen Pepe auf dem Boden ist
-                }
-            }
-            this.throwableObject.push(bottle);
-            this.character.bottle -= 5;
-            if (this.character.bottle < 0) this.character.bottle = 0;
-            this.updateBottleStatusBar();
-            this.lastBottleThrow = now;
-        }
+        if (!this.canThrowBottle(now)) return;
+        const direction = this.getThrowDirection();
+        const bottle = this.createThrowableBottle(direction);
+        this.addBottleToWorld(bottle);
+        this.consumeBottleAndUpdate(now);
     }
 
+
+    canThrowBottle(now) {
+        return this.keyBaord.THROW &&
+            this.character.bottle > 0 &&
+            now - this.lastBottleThrow > 500;
+    }
+
+
+    getThrowDirection() {
+        return this.character.otherDirection ? -1 : 1;
+    }
+
+
+    createThrowableBottle(direction) {
+        const pos = this.getBottleSpawnPosition(direction);
+        return new ThrowableObject(pos.x, pos.y, this, direction);
+    }
+
+
+    getBottleSpawnPosition(direction) {
+        if (this.isCharacterInAir()) return this.getAirBottlePosition(direction);
+        return this.getGroundBottlePosition(direction);
+    }
+
+
+    isCharacterInAir() {
+        return this.character.y < 180;
+    }
+
+
+    getAirBottlePosition(direction) {
+        const offsetX = direction * 30;
+        return { x: this.character.x + offsetX, y: this.character.y + 140 };
+    }
+
+
+    getGroundBottlePosition(direction) {
+        const y = this.getGroundSpawnY();
+        if (direction === -1) return this.getGroundLeftBottlePosition(y, direction);
+        return { x: this.character.x + 50, y };
+    }
+
+
+    getGroundLeftBottlePosition(y, direction) {
+        const offsetX = direction * 30;
+        return { x: this.character.x + offsetX, y };
+    }
+
+
+    getGroundSpawnY() {
+        const baseY = typeof this.character.minY === 'number'
+            ? this.character.minY
+            : this.character.y;
+        return baseY + 140;
+    }
+
+
+    addBottleToWorld(bottle) {
+        this.throwableObject.push(bottle);
+    }
+
+
+    consumeBottleAndUpdate(now) {
+        this.character.bottle -= 5;
+        if (this.character.bottle < 0) this.character.bottle = 0;
+        this.updateBottleStatusBar();
+        this.lastBottleThrow = now;
+    }
 
 
     updateHealthStatusBar() {
@@ -392,15 +483,10 @@ class World {
     }
 
 
-    debugBackgrounds() {
-        console.table(this.backgroundObjects);
-    }
-
-
     initBackground() {
-        for (let i = -1; i < this.backgroundTileCount; i++) { // var -2
+        for (let i = -1; i < this.backgroundTileCount; i++) {
             const xPos = i * 720;
-            const currentLayers = i % 2 === 0 ? this.level.layers : this.level.altLayers; // ersetz die if - else abfrage
+            const currentLayers = i % 2 === 0 ? this.level.layers : this.level.altLayers;
             this.addTile(xPos, currentLayers);
         }
     }
@@ -416,9 +502,29 @@ class World {
     draw() {
         if (this.stopped) return;
         const start = performance.now();
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.clearWorldCanvas();
+        this.drawWorldObjectsWithCamera();
+        this.drawStatusBars();
+        this.scheduleGameOverIfDead();
+        this.checkWinCondition();
+        this.requestNextFrame();
+    }
 
+
+    clearWorldCanvas() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+
+
+    drawWorldObjectsWithCamera() {
         this.ctx.translate(this.camera_x, 0);
+        this.drawWorldObjects();
+        this.tryAddNextBackgroundTile();
+        this.ctx.translate(-this.camera_x, 0);
+    }
+
+
+    drawWorldObjects() {
         this.addObjectsToMap(this.level.backgroundObjects);
         this.addObjectsToMap(this.level.clouds);
         this.addToMap(this.character);
@@ -426,47 +532,55 @@ class World {
         this.addObjectsToMap(this.bottles);
         this.addObjectsToMap(this.level.enemies);
         this.addObjectsToMap(this.throwableObject);
-        if (this.character.x + this.canvas.width > this.backgroundTileCount * 720) {
-            this.addBackgroundTile(this.backgroundTileCount);
-            this.backgroundTileCount++;
-        }
-        this.ctx.translate(-this.camera_x, 0);
+    }
 
-        // ::::::::::Zeigen nach dem "camera_x" Reset zeichnen/Oder "statusBar" x = -100; - geben,
+
+    tryAddNextBackgroundTile() {
+        if (this.character.x + this.canvas.width <= this.backgroundTileCount * 720) return;
+        this.addBackgroundTile(this.backgroundTileCount);
+        this.backgroundTileCount++;
+    }
+
+
+    drawStatusBars() {
         this.addToMap(this.healthBar);
         this.addToMap(this.coinBar);
         this.addToMap(this.bottleBar);
         this.addToMap(this.endbossBar);
+    }
 
-        const end = performance.now();
-        const duration = end - start;
-        // Nur alle 2 Sekunden loggen – wenn langsam
-        const now = Date.now();
-        if (duration > 30 && now - this.lastDrawLogTime > 2000) {
-            console.warn(`⚠️ draw() dauerte ${Math.round(duration)} ms`);
-            this.lastDrawLogTime = now;
-        }
 
-        if (this.character.isDead()) {
-            if (!this.gameOverScheduled) {
-                this.gameOverScheduled = true;
-                const boss = this.level.enemies.find(e => e instanceof Endboss);
-                const restBoss = (boss?.currentAnimation === 'attack')
-                    ? Math.max(0, (boss.attackUntil || 0) - performance.now())
-                    : 0;
-                setTimeout(() => {
-                    this.stopped = true;
-                    this.endscreen.show();
+    scheduleGameOverIfDead() {
+        if (!this.character.isDead()) return;
+        if (this.gameOverScheduled) return;
+        this.gameOverScheduled = true;
+        this.scheduleGameOverTimeout();
+    }
 
-                    if (typeof onGameOver === 'function') {
-                        onGameOver(this);
-                    }
 
-                }, Math.min(1200, restBoss + 500));
-            }
-        }
+    scheduleGameOverTimeout() {
+        const boss = this.level.enemies.find(e => e instanceof Endboss);
+        const restBoss = (boss?.currentAnimation === 'attack')
+            ? Math.max(0, (boss.attackUntil || 0) - performance.now())
+            : 0;
+        setTimeout(() => this.finishGameOver(), Math.min(1200, restBoss + 500));
+    }
 
-        this.checkWinCondition();
+
+    finishGameOver() {
+        this.stopped = true;
+        this.endscreen.show();
+        this.callOnGameOverIfExists();
+    }
+
+
+    callOnGameOverIfExists() {
+        if (typeof onGameOver !== 'function') return;
+        onGameOver(this);
+    }
+
+
+    requestNextFrame() {
         let self = this;
         requestAnimationFrame(function () {
             self.draw();
@@ -519,11 +633,8 @@ class World {
 
     addToMap(mo) {
         this.ctx.save();
-        if (mo.otherDirection) {
-            this.flipImage(mo);
-        } else {
-            this.flipImageBack(mo);
-        }
+        if (mo.otherDirection) this.flipImage(mo);
+        if (!mo.otherDirection) this.flipImageBack(mo);
         mo.draw(this.ctx);
         mo.drawFrame(this.ctx);
         this.ctx.restore();
@@ -544,19 +655,38 @@ class World {
     destroy() {
         this.stopAllEnemies();
         this.stopped = true;
-        if (this.runTimer) {
-            clearInterval(this.runTimer);
-            this.runTimer = null;
-        }
+        this.stopRunTimer();
         this.resetAllSounds();
+        this.hideScreens();
+        this.resetEndStates();
+        this.resetWorldObjects();
+        this.clearWorldCanvas();
+    }
+
+
+    stopRunTimer() {
+        if (!this.runTimer) return;
+        clearInterval(this.runTimer);
+        this.runTimer = null;
+    }
+
+
+    hideScreens() {
         this.endscreen?.hide();
         this.winscreen?.hide();
+    }
+
+
+    resetEndStates() {
         this.winScheduled = false;
         this.gameOverScheduled = false;
+    }
+
+
+    resetWorldObjects() {
         this.throwableObject = [];
         this.coins = [];
         this.bottles = [];
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
 
@@ -567,10 +697,9 @@ class World {
 
     resetAllSounds() {
         Object.values(this.sounds).forEach(sound => {
-            if (sound instanceof Audio) {
-                sound.pause();
-                sound.currentTime = 0;
-            }
+            if (!(sound instanceof Audio)) return;
+            sound.pause();
+            sound.currentTime = 0;
         });
     }
 

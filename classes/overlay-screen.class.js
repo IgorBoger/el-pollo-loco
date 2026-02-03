@@ -76,7 +76,6 @@ class OverlayScreen {
     }
 
 
-
     toggleOverlay(isOpen) {
         const ov = document.getElementById(this.overlayId);
         if (!ov) return;
