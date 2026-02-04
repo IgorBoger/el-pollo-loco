@@ -1,3 +1,9 @@
+/**
+ * Handles key release events and updates keyboard state accordingly.
+ *
+ * @param {KeyboardEvent} event
+ * @returns {void}
+ */
 document.addEventListener("keyup", function (event) {
     if (event.key === "ArrowLeft") keyBaord.LEFT = false;
     if (event.key === "ArrowRight") keyBaord.RIGHT = false;
@@ -6,6 +12,13 @@ document.addEventListener("keyup", function (event) {
 });
 
 
+/**
+ * Handles key press events and updates keyboard state accordingly.
+ * Also closes open overlays when Escape is pressed.
+ *
+ * @param {KeyboardEvent} event
+ * @returns {void}
+ */
 document.addEventListener("keydown", function (event) {
     if (event.key === "ArrowLeft") keyBaord.LEFT = true;
     if (event.key === "ArrowRight") keyBaord.RIGHT = true;
@@ -22,11 +35,14 @@ document.addEventListener("keydown", function (event) {
         closeRankingOverlay();
         closeImpressumOverlay();
     }
-
-
 });
 
 
+/**
+ * Initializes mobile control buttons and binds input handlers.
+ *
+ * @returns {void}
+ */
 function addMobileButtonsFunction() {
     buttons.forEach((btn) => {
         const el = document.getElementById(btn.id);
@@ -36,6 +52,13 @@ function addMobileButtonsFunction() {
 }
 
 
+/**
+ * Binds all interaction handlers to a mobile control button.
+ *
+ * @param {HTMLElement} el
+ * @param {string} actionKey
+ * @returns {void}
+ */
 function bindMobileControl(el, actionKey) {
     preventContextMenu(el);
     bindPointerPressBlock(el);
@@ -44,6 +67,11 @@ function bindMobileControl(el, actionKey) {
 }
 
 
+/**
+ * Updates the visibility of mobile controls depending on device and screen size.
+ *
+ * @returns {void}
+ */
 function updateMobileControlsVisibility() {
     const mobileControls = getMobileControlsElement();
     if (!mobileControls) return;
@@ -51,38 +79,77 @@ function updateMobileControlsVisibility() {
     hideMobileControls(mobileControls);
 }
 
+
+/**
+ * Returns the mobile controls container element.
+ *
+ * @returns {HTMLElement|null}
+ */
 function getMobileControlsElement() {
     return document.getElementById('mobileControls');
 }
 
 
+/**
+ * Determines whether mobile controls should be shown.
+ *
+ * @returns {boolean}
+ */
 function shouldShowMobileControls() {
     return isMobileDevice() || isSmallScreen();
 }
 
 
+/**
+ * Checks if the current device is a mobile device.
+ *
+ * @returns {boolean}
+ */
 function isMobileDevice() {
     return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 }
 
 
+/**
+ * Checks if the viewport width is considered small.
+ *
+ * @returns {boolean}
+ */
 function isSmallScreen() {
     return window.innerWidth < 800;
 }
 
 
+/**
+ * Shows the mobile controls element.
+ *
+ * @param {HTMLElement} mobileControls
+ * @returns {void}
+ */
 function showMobileControls(mobileControls) {
     mobileControls.classList.remove('d-none');
     mobileControls.classList.add('d-flex');
 }
 
 
+/**
+ * Hides the mobile controls element.
+ *
+ * @param {HTMLElement} mobileControls
+ * @returns {void}
+ */
 function hideMobileControls(mobileControls) {
     mobileControls.classList.remove('d-flex');
     mobileControls.classList.add('d-none');
 }
 
 
+/**
+ * Prevents the context menu on touch and pointer interactions.
+ *
+ * @param {HTMLElement} el
+ * @returns {void}
+ */
 function preventContextMenu(el) {
     if (!el) return;
     el.addEventListener('contextmenu', (e) => {
@@ -93,6 +160,12 @@ function preventContextMenu(el) {
 }
 
 
+/**
+ * Binds pointer press blocking to prevent right-click interactions.
+ *
+ * @param {HTMLElement} el
+ * @returns {void}
+ */
 function bindPointerPressBlock(el) {
     el.addEventListener('pointerdown', (e) => handlePointerDown(el, e), { passive: false });
     el.addEventListener('pointerup', () => toggleRightClickPressBlock(el, false), { passive: true });
@@ -101,6 +174,13 @@ function bindPointerPressBlock(el) {
 }
 
 
+/**
+ * Handles pointer down events and detects right mouse button presses.
+ *
+ * @param {HTMLElement} el
+ * @param {PointerEvent} e
+ * @returns {void}
+ */
 function handlePointerDown(el, e) {
     const isRightMouse = e.pointerType === 'mouse' && e.button === 2;
     toggleRightClickPressBlock(el, isRightMouse);
@@ -108,6 +188,13 @@ function handlePointerDown(el, e) {
 }
 
 
+/**
+ * Binds touch input handlers for a mobile control.
+ *
+ * @param {HTMLElement} el
+ * @param {string} actionKey
+ * @returns {void}
+ */
 function bindTouchControls(el, actionKey) {
     el.addEventListener('touchstart', (e) => touchPress(el, actionKey, e), { passive: false });
     el.addEventListener('touchend', (e) => touchRelease(el, actionKey, e), { passive: false });
@@ -115,6 +202,14 @@ function bindTouchControls(el, actionKey) {
 }
 
 
+/**
+ * Handles touch press interactions.
+ *
+ * @param {HTMLElement} el
+ * @param {string} actionKey
+ * @param {TouchEvent} e
+ * @returns {void}
+ */
 function touchPress(el, actionKey, e) {
     e.preventDefault();
     el.classList.add('is-pressed');
@@ -122,11 +217,26 @@ function touchPress(el, actionKey, e) {
 }
 
 
+/**
+ * Sets a keyboard action state.
+ *
+ * @param {string} actionKey
+ * @param {boolean} state
+ * @returns {void}
+ */
 function setKey(actionKey, state) {
     keyBaord[actionKey] = state;
 }
 
 
+/**
+ * Handles touch release interactions.
+ *
+ * @param {HTMLElement} el
+ * @param {string} actionKey
+ * @param {TouchEvent} e
+ * @returns {void}
+ */
 function touchRelease(el, actionKey, e) {
     e.preventDefault();
     el.classList.remove('is-pressed');
@@ -134,6 +244,13 @@ function touchRelease(el, actionKey, e) {
 }
 
 
+/**
+ * Binds mouse input handlers for a control.
+ *
+ * @param {HTMLElement} el
+ * @param {string} actionKey
+ * @returns {void}
+ */
 function bindMouseControls(el, actionKey) {
     el.addEventListener('mousedown', (e) => mousePress(actionKey, e), { passive: false });
     el.addEventListener('mouseup', (e) => mouseRelease(actionKey, e), { passive: true });
@@ -141,22 +258,46 @@ function bindMouseControls(el, actionKey) {
 }
 
 
+/**
+ * Handles mouse press events.
+ *
+ * @param {string} actionKey
+ * @param {MouseEvent} e
+ * @returns {void}
+ */
 function mousePress(actionKey, e) {
     if (!isLeftClick(e)) { e.preventDefault(); return; }
     setKey(actionKey, true);
 }
 
 
+/**
+ * Handles mouse release events.
+ *
+ * @param {string} actionKey
+ * @param {MouseEvent} e
+ * @returns {void}
+ */
 function mouseRelease(actionKey, e) {
     if (isLeftClick(e)) setKey(actionKey, false);
 }
 
 
+/**
+ * Resets all mobile control keys.
+ *
+ * @returns {void}
+ */
 function resetMobileKeys() {
     buttons.forEach((b) => setKey(b.key, false));
 }
 
 
+/**
+ * Adds safety guards to release keys on blur or visibility change.
+ *
+ * @returns {void}
+ */
 function addReleaseGuards() {
     window.addEventListener('blur', resetMobileKeys);
     document.addEventListener('visibilitychange', () => {
@@ -165,11 +306,24 @@ function addReleaseGuards() {
 }
 
 
+/**
+ * Checks whether the mouse event was triggered by the left mouse button.
+ *
+ * @param {MouseEvent} e
+ * @returns {boolean}
+ */
 function isLeftClick(e) {
     return e && e.button === 0;
 }
 
 
+/**
+ * Toggles blocking of right-click visual press effects.
+ *
+ * @param {HTMLElement} el
+ * @param {boolean} isBlocked
+ * @returns {void}
+ */
 function toggleRightClickPressBlock(el, isBlocked) {
     if (!el) return;
     el.classList.toggle('no-active-press', isBlocked);

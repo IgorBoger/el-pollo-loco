@@ -1,3 +1,7 @@
+/**
+ * Represents the game world.
+ * Manages rendering, collisions, game loop, sounds, enemies, collectibles and screens.
+ */
 class World {
     character = new Character();
     healthBar = new StatusBar('health');
@@ -35,6 +39,11 @@ class World {
     lastDrawLogTime = 0;
 
 
+    /**
+     * Creates a new game world instance.
+     * @param {HTMLCanvasElement} canvas - The canvas element.
+     * @param {KeyBaord} keyBaord - Keyboard input handler.
+     */
     constructor(canvas, keyBaord) {
         this.initWorldCore(canvas, keyBaord);
         this.initWorldBackground();
@@ -45,6 +54,11 @@ class World {
     }
 
 
+    /**
+     * Initializes core world references and state.
+     * @param {HTMLCanvasElement} canvas
+     * @param {KeyBaord} keyBaord
+     */
     initWorldCore(canvas, keyBaord) {
         this.level = this.cloneLevel(level1);
         this.ctx = canvas.getContext("2d");
@@ -55,12 +69,18 @@ class World {
     }
 
 
+    /**
+     * Initializes background rendering and starts the first draw.
+     */
     initWorldBackground() {
         this.initBackground();
         setTimeout(() => this.draw(), 100);
     }
 
 
+    /**
+     * Initializes game loop and world references.
+     */
     initWorldGameLoop() {
         this.setWorld();
         this.updateBottleStatusBar();
@@ -68,18 +88,29 @@ class World {
     }
 
 
+    /**
+     * Initializes collectible objects.
+     */
     initWorldCollectables() {
         this.initCollectables(this.coins, Coin, 200, 50);
         this.initCollectables(this.bottles, Bottle, 100, 150);
     }
 
 
+    /**
+     * Initializes win and end screens.
+     */
     initWorldScreens() {
         this.endscreen = new Endscreen(this.ctx, this.canvas);
         this.winscreen = new Winscreen(this.ctx, this.canvas);
     }
 
 
+    /**
+     * Creates a deep clone of a level definition.
+     * @param {Level} level
+     * @returns {Level}
+     */
     cloneLevel(level) {
         const enemies = level.enemies.map(e => new e.constructor());
         const clouds = level.clouds.map(c => new c.constructor());
@@ -90,6 +121,9 @@ class World {
     }
 
 
+    /**
+     * Assigns world references to all relevant objects.
+     */
     setWorld() {
         this.character.world = this;
         this.throwableObject.world = this;
@@ -100,6 +134,9 @@ class World {
     }
 
 
+    /**
+     * Starts the main collision and logic loop.
+     */
     run() {
         this.runTimer = setInterval(() => {
             if (isGamePaused || this.stopped) return;
@@ -110,6 +147,9 @@ class World {
     }
 
 
+    /**
+     * Checks all collision types.
+     */
     checkCollisions() {
         this.collisionWithChicken();
         this.collisionWithCollectable(this.coins, 'coin', this.updateCoinStatusBar);
@@ -118,11 +158,18 @@ class World {
     }
 
 
+    /**
+     * Checks collisions between the character and enemies.
+     */
     collisionWithChicken() {
         this.level.enemies.forEach(enemy => this.handleEnemyCollision(enemy));
     }
 
 
+    /**
+     * Handles collision logic with a specific enemy.
+     * @param {*} enemy
+     */
     handleEnemyCollision(enemy) {
         if (this.shouldSkipEnemyCollision(enemy)) return;
         if (!this.isEndbossAwareCollision(this.character, enemy)) return;
@@ -133,11 +180,21 @@ class World {
     }
 
 
+    /**
+     * Determines whether enemy collision should be skipped.
+     * @param {*} enemy
+     * @returns {boolean}
+     */
     shouldSkipEnemyCollision(enemy) {
         return enemy.isDead() || this.character.isDead();
     }
 
 
+    /**
+     * Handles collisions during an endboss attack.
+     * @param {*} enemy
+     * @returns {boolean}
+     */
     handleEndbossAttackCollision(enemy) {
         if (!(enemy instanceof Endboss)) return false;
         if (!enemy.isAttackAnim()) return false;
@@ -153,12 +210,20 @@ class World {
     }
 
 
-    applyAttackKnockback(enemy) {
+    /**
+     * Applies knockback to the character after attack.
+     */
+    applyAttackKnockback() {
         this.character.speedY = 15;
         this.keepCharacterInsideBounds();
     }
 
 
+    /**
+     * Handles stomp collisions.
+     * @param {*} enemy
+     * @returns {boolean}
+     */
     handleStompCollision(enemy) {
         if (!this.isChickenEnemy(enemy)) return false;
         if (!this.character.isCollidingFromTop(enemy)) return false;
@@ -167,11 +232,20 @@ class World {
     }
 
 
+    /**
+     * Determines whether an enemy is a chicken type.
+     * @param {*} enemy
+     * @returns {boolean}
+     */
     isChickenEnemy(enemy) {
         return enemy instanceof Chicken || enemy instanceof SmallChicken;
     }
 
 
+    /**
+     * Kills a chicken enemy.
+     * @param {*} enemy
+     */
     killChicken(enemy) {
         enemy.energy = 0;
         enemy.lastHit = Date.now();
@@ -179,12 +253,22 @@ class World {
     }
 
 
+    /**
+     * Checks whether endboss body hits are temporarily blocked.
+     * @param {*} enemy
+     * @returns {boolean}
+     */
     isEndbossBodyHitBlocked(enemy) {
         if (!(enemy instanceof Endboss)) return false;
         return performance.now() < (enemy.postAlertCooldownUntil || 0);
     }
 
 
+    /**
+     * Applies damage to the character with cooldown.
+     * @param {*} enemy
+     * @param {number} cooldownMs
+     */
     applyCharacterHit(enemy, cooldownMs) {
         const now = Date.now();
         if (enemy.lastHitOnCharacter && now - enemy.lastHitOnCharacter <= cooldownMs) return;
@@ -194,6 +278,9 @@ class World {
     }
 
 
+    /**
+     * Ensures the character stays within level bounds.
+     */
     keepCharacterInsideBounds() {
         const c = this.character;
         if (!c) return;
@@ -205,6 +292,10 @@ class World {
     }
 
 
+    /**
+     * Adjusts endboss position when colliding at left edge.
+     * @param {*} enemy
+     */
     adjustEndbossAtLeftEdge(enemy) {
         const char = this.character;
         if (!char || !(enemy instanceof Endboss)) return;
@@ -215,6 +306,12 @@ class World {
     }
 
 
+    /**
+     * Handles collisions with collectible items.
+     * @param {Array} array
+     * @param {string} propertyName
+     * @param {Function} updateStatusBarCallback
+     */
     collisionWithCollectable(array, propertyName, updateStatusBarCallback) {
         const index = array.findIndex(item => this.character.isColliding(item));
         if (index !== -1) {
@@ -228,6 +325,9 @@ class World {
     }
 
 
+    /**
+     * Checks collisions between bottles and enemies.
+     */
     checkBottleHitsEnemies() {
         const now = new Date().getTime();
         this.level.enemies.forEach(enemy => {
@@ -242,6 +342,12 @@ class World {
     }
 
 
+    /**
+     * Handles endboss hit by bottle.
+     * @param {*} enemy
+     * @param {*} bottle
+     * @param {number} now
+     */
     hitEndbossWithBottle(enemy, bottle, now) {
         this.stopEndbossActionSounds();
         const cd = 250;
@@ -256,12 +362,19 @@ class World {
     }
 
 
+    /**
+     * Stops all active endboss action sounds.
+     */
     stopEndbossActionSounds() {
         const sounds = [this.sounds.endbossAppear, this.sounds.endbossAlert, this.sounds.endbossAttack];
         sounds.forEach(s => this.stopSound(s));
     }
 
 
+    /**
+     * Stops and resets a sound.
+     * @param {Audio} sound
+     */
     stopSound(sound) {
         if (!sound) return;
         sound.pause();
@@ -269,6 +382,11 @@ class World {
     }
 
 
+    /**
+     * Kills a chicken enemy using a bottle.
+     * @param {*} enemy
+     * @param {*} bottle
+     */
     killChickenWithBottle(enemy, bottle) {
         enemy.energy = 0;
         enemy.lastHit = new Date().getTime();
@@ -277,6 +395,10 @@ class World {
     }
 
 
+    /**
+     * Plays a sound effect with background ducking.
+     * @param {Audio} sound
+     */
     playEffectSound(sound) {
         if (!this.canPlaySound(sound)) return;
         this.duckBackground();
@@ -284,6 +406,11 @@ class World {
     }
 
 
+    /**
+     * Determines whether a sound is allowed to play.
+     * @param {Audio} sound
+     * @returns {boolean}
+     */
     canPlaySound(sound) {
         if (!sound) return false;
         const backgroundSounds = this.isBackgroundSound(sound);
@@ -292,51 +419,70 @@ class World {
     }
 
 
+    /**
+     * Checks whether a sound is the background track.
+     * @param {Audio} sound
+     * @returns {boolean}
+     */
     isBackgroundSound(sound) {
         return sound === this.sounds?.background;
     }
 
 
+    /**
+    * Returns whether playback should be muted depending on sound type.
+    * Uses global mute flags for music and sound effects.
+    * @param {boolean} backgroundSounds - True if the requested sound is background music.
+    * @returns {boolean} True if the sound type is currently muted.
+    */
     isMutedForSoundType(backgroundSounds) {
         if (backgroundSounds) return isMusicMuted;
         return isSoundMuted;
     }
 
 
+    /**
+     * Restarts and plays a sound with error handling.
+     * @param {Audio} sound
+     */
     tryRestartAndPlaySound(sound) {
         try {
             this.restartSound(sound);
             this.playSoundWithPromiseHandling(sound);
         } catch (err) {
-            this.warnSoundError('Fehler beim Abspielen des Sounds:', err);
+            console.log('Fehler beim Abspielen des Sounds:', err);
         }
     }
 
 
+    /**
+     * Restarts a sound.
+     * @param {Audio} sound
+     */
     restartSound(sound) {
         sound.pause();
         sound.currentTime = 0;
     }
 
 
+    /**
+     * Handles play promise rejections.
+     * @param {*} sound
+     */
     playSoundWithPromiseHandling(sound) {
         const playPromise = sound.play();
         if (!playPromise) return;
-        playPromise.catch(err => this.handlePlayPromiseError(err));
+        playPromise.catch(err => {
+            if (err?.name !== 'AbortError') {
+                console.log('Sound konnte nicht abgespielt werden:', err);
+            }
+        });
     }
 
 
-    handlePlayPromiseError(err) {
-        if (err?.name === 'AbortError') return;
-        this.warnSoundError('Sound konnte nicht abgespielt werden:', err);
-    }
-
-
-    warnSoundError(message, err) {
-        console.warn(message, err);
-    }
-
-
+    /**
+    * Temporarily lowers background music volume.
+    */
     duckBackground() {
         const bg = this.sounds?.background;
         if (!bg) return;
@@ -347,6 +493,10 @@ class World {
     }
 
 
+    /**
+     * Sets background music volume.
+     * @param {number} vol
+     */
     setBackgroundVolume(vol) {
         const bg = this.sounds?.background;
         if (!bg) return;
@@ -354,14 +504,23 @@ class World {
     }
 
 
+    /**
+     * Pauses all sounds.
+     */
     pauseAllSounds() {
         Object.values(this.sounds).forEach(sound => {
-            if (!(sound instanceof Audio)) return;
-            sound.pause();
+            if (sound instanceof Audio) sound.pause();
         });
     }
 
 
+    /**
+     * Initializes collectibles across level segments.
+     * @param {Array} array
+     * @param {Function} ClassRef
+     * @param {number} offsetMinX
+     * @param {number} offsetMaxX
+     */
     initCollectables(array, ClassRef, offsetMinX = 200, offsetMaxX = 50) {
         const segments = 5;
         const segmentWidth = this.level.level_end_x / segments;
@@ -375,6 +534,9 @@ class World {
     }
 
 
+    /**
+     * Handles bottle throwing input.
+     */
     checkThrowObject() {
         const now = Date.now();
         if (!this.canThrowBottle(now)) return;
@@ -385,6 +547,11 @@ class World {
     }
 
 
+    /**
+     * Determines whether a bottle can be thrown.
+     * @param {number} now
+     * @returns {boolean}
+     */
     canThrowBottle(now) {
         return this.keyBaord.THROW &&
             this.character.bottle > 0 &&
@@ -392,34 +559,62 @@ class World {
     }
 
 
+    /**
+     * Returns the throw direction based on character facing.
+     * @returns {number}
+     */
     getThrowDirection() {
         return this.character.otherDirection ? -1 : 1;
     }
 
 
+    /**
+     * Creates a throwable bottle instance.
+     * @param {number} direction
+     * @returns {ThrowableObject}
+     */
     createThrowableBottle(direction) {
         const pos = this.getBottleSpawnPosition(direction);
         return new ThrowableObject(pos.x, pos.y, this, direction);
     }
 
 
+    /**
+     * Resolves bottle spawn position.
+     * @param {number} direction
+     * @returns {{x:number, y:number}}
+     */
     getBottleSpawnPosition(direction) {
         if (this.isCharacterInAir()) return this.getAirBottlePosition(direction);
         return this.getGroundBottlePosition(direction);
     }
 
 
+    /**
+     * Checks whether the character is in the air.
+     * @returns {boolean}
+     */
     isCharacterInAir() {
         return this.character.y < 180;
     }
 
 
+    /**
+     * Gets bottle spawn position while in air.
+     * @param {number} direction
+     * @returns {{x:number, y:number}}
+     */
     getAirBottlePosition(direction) {
         const offsetX = direction * 30;
         return { x: this.character.x + offsetX, y: this.character.y + 140 };
     }
 
 
+    /**
+     * Gets bottle spawn position while on ground.
+     * @param {number} direction
+     * @returns {{x:number, y:number}}
+     */
     getGroundBottlePosition(direction) {
         const y = this.getGroundSpawnY();
         if (direction === -1) return this.getGroundLeftBottlePosition(y, direction);
@@ -427,12 +622,22 @@ class World {
     }
 
 
+    /**
+     * Gets left-facing ground bottle spawn position.
+     * @param {number} y
+     * @param {number} direction
+     * @returns {{x:number, y:number}}
+     */
     getGroundLeftBottlePosition(y, direction) {
         const offsetX = direction * 30;
         return { x: this.character.x + offsetX, y };
     }
 
 
+    /**
+     * Calculates ground spawn y-position.
+     * @returns {number}
+     */
     getGroundSpawnY() {
         const baseY = typeof this.character.minY === 'number'
             ? this.character.minY
@@ -441,11 +646,19 @@ class World {
     }
 
 
+    /**
+     * Adds a bottle to the world.
+     * @param {ThrowableObject} bottle
+     */
     addBottleToWorld(bottle) {
         this.throwableObject.push(bottle);
     }
 
 
+    /**
+     * Consumes a bottle and updates state.
+     * @param {number} now
+     */
     consumeBottleAndUpdate(now) {
         this.character.bottle -= 5;
         if (this.character.bottle < 0) this.character.bottle = 0;
@@ -454,26 +667,42 @@ class World {
     }
 
 
+    /**
+     * Updates health status bar.
+     */
     updateHealthStatusBar() {
         this.healthBar.setPercentage(this.character.energy);
     }
 
 
+    /**
+     * Updates coin status bar.
+     */
     updateCoinStatusBar() {
         this.coinBar.setPercentage(this.character.coin);
     }
 
 
+    /**
+     * Updates bottle status bar.
+     */
     updateBottleStatusBar() {
         this.bottleBar.setPercentage(this.character.bottle);
     }
 
 
+    /**
+     * Updates endboss status bar.
+     * @param {*} endboss
+     */
     updateEndbossStatusBar(endboss) {
         this.endbossBar.setPercentage(endboss.energy);
     }
 
 
+    /**
+     * Checks bottles hitting the ground.
+     */
     checkBottleOnGround() {
         this.throwableObject.forEach((bottle) => {
             if (!bottle.isSplashed && bottle.isOnGround()) {
@@ -483,6 +712,9 @@ class World {
     }
 
 
+    /**
+     * Initializes background tiles.
+     */
     initBackground() {
         for (let i = -1; i < this.backgroundTileCount; i++) {
             const xPos = i * 720;
@@ -492,6 +724,11 @@ class World {
     }
 
 
+    /**
+     * Adds a background tile at a given position.
+     * @param {number} xPos
+     * @param {string[]} layers
+     */
     addTile(xPos, layers) {
         layers.forEach(imagePath => {
             this.level.backgroundObjects.push(new BackgroundObject(imagePath, xPos));
@@ -499,6 +736,9 @@ class World {
     }
 
 
+    /**
+     * Main draw loop.
+     */
     draw() {
         if (this.stopped) return;
         const start = performance.now();
@@ -511,11 +751,17 @@ class World {
     }
 
 
+    /**
+     * Clears the canvas.
+     */
     clearWorldCanvas() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
 
+    /**
+     * Draws world objects with camera translation.
+     */
     drawWorldObjectsWithCamera() {
         this.ctx.translate(this.camera_x, 0);
         this.drawWorldObjects();
@@ -524,6 +770,9 @@ class World {
     }
 
 
+    /**
+     * Draws all world objects.
+     */
     drawWorldObjects() {
         this.addObjectsToMap(this.level.backgroundObjects);
         this.addObjectsToMap(this.level.clouds);
@@ -535,6 +784,9 @@ class World {
     }
 
 
+    /**
+     * Adds next background tile if needed.
+     */
     tryAddNextBackgroundTile() {
         if (this.character.x + this.canvas.width <= this.backgroundTileCount * 720) return;
         this.addBackgroundTile(this.backgroundTileCount);
@@ -542,6 +794,9 @@ class World {
     }
 
 
+    /**
+     * Draws all status bars.
+     */
     drawStatusBars() {
         this.addToMap(this.healthBar);
         this.addToMap(this.coinBar);
@@ -550,6 +805,9 @@ class World {
     }
 
 
+    /**
+     * Schedules game over when character is dead.
+     */
     scheduleGameOverIfDead() {
         if (!this.character.isDead()) return;
         if (this.gameOverScheduled) return;
@@ -558,6 +816,9 @@ class World {
     }
 
 
+    /**
+     * Schedules delayed game over.
+     */
     scheduleGameOverTimeout() {
         const boss = this.level.enemies.find(e => e instanceof Endboss);
         const restBoss = (boss?.currentAnimation === 'attack')
@@ -567,6 +828,9 @@ class World {
     }
 
 
+    /**
+     * Finalizes game over.
+     */
     finishGameOver() {
         this.stopped = true;
         this.endscreen.show();
@@ -574,12 +838,18 @@ class World {
     }
 
 
+    /**
+    * Calls the global game-over callback if it exists.
+    */
     callOnGameOverIfExists() {
         if (typeof onGameOver !== 'function') return;
         onGameOver(this);
     }
 
 
+    /**
+     * Requests next animation frame.
+     */
     requestNextFrame() {
         let self = this;
         requestAnimationFrame(function () {
@@ -588,21 +858,30 @@ class World {
     }
 
 
+    /**
+     * Checks win condition.
+     */
     checkWinCondition() {
         const boss = this.getEndboss();
-        if (!boss || !boss.isDead?.()) return;
-        if (!boss.isDeadAnimFinished?.()) return;
+        if (!boss || !boss.isDead?.() || !boss.isDeadAnimFinished?.()) return;
         if (this.winScheduled || this.gameOverScheduled) return;
         this.winScheduled = true;
         setTimeout(() => this.showWin(), 1200);
     }
 
 
+    /**
+     * Returns the endboss instance.
+     * @returns {*|null}
+     */
     getEndboss() {
         return this.level?.enemies?.find(e => e instanceof Endboss) || null;
     }
 
 
+    /**
+     * Shows the win screen.
+     */
     showWin() {
         this.stopped = true;
         this.winscreen.show();
@@ -610,6 +889,9 @@ class World {
     }
 
 
+    /**
+     * Draws a static frame without game loop.
+     */
     drawStaticFrame() {
         this.stopped = false;
         this.draw();
@@ -617,6 +899,10 @@ class World {
     }
 
 
+    /**
+     * Adds a new background tile dynamically.
+     * @param {number} tileIndex
+     */
     addBackgroundTile(tileIndex) {
         const xPos = tileIndex * 720;
         const currentLayers = tileIndex % 2 === 0 ? this.level.layers : this.level.altLayers;
@@ -624,13 +910,19 @@ class World {
     }
 
 
+    /**
+     * Adds multiple objects to the map.
+     * @param {Array} objects
+     */
     addObjectsToMap(objects) {
-        objects.forEach(obj => {
-            this.addToMap(obj);
-        });
+        objects.forEach(obj => this.addToMap(obj));
     }
 
 
+    /**
+     * Draws a single object to the map.
+     * @param {*} mo
+     */
     addToMap(mo) {
         this.ctx.save();
         if (mo.otherDirection) this.flipImage(mo);
@@ -641,17 +933,28 @@ class World {
     }
 
 
+    /**
+     * Flips drawing context horizontally.
+     * @param {*} mo
+     */
     flipImage(mo) {
         this.ctx.translate(mo.x + mo.width, mo.y);
         this.ctx.scale(-1, 1);
     }
 
 
+    /**
+     * Resets context after flipping.
+     * @param {*} mo
+     */
     flipImageBack(mo) {
         this.ctx.translate(mo.x, mo.y);
     }
 
 
+    /**
+     * Destroys the world and resets all state.
+     */
     destroy() {
         this.stopAllEnemies();
         this.stopped = true;
@@ -664,6 +967,9 @@ class World {
     }
 
 
+    /**
+     * Stops the main run timer.
+     */
     stopRunTimer() {
         if (!this.runTimer) return;
         clearInterval(this.runTimer);
@@ -671,18 +977,27 @@ class World {
     }
 
 
+    /**
+     * Hides all overlay screens.
+     */
     hideScreens() {
         this.endscreen?.hide();
         this.winscreen?.hide();
     }
 
 
+    /**
+     * Resets win/game over state flags.
+     */
     resetEndStates() {
         this.winScheduled = false;
         this.gameOverScheduled = false;
     }
 
 
+    /**
+     * Resets world object collections.
+     */
     resetWorldObjects() {
         this.throwableObject = [];
         this.coins = [];
@@ -690,11 +1005,17 @@ class World {
     }
 
 
+    /**
+     * Stops all enemies.
+     */
     stopAllEnemies() {
         this.level?.enemies?.forEach(enemy => enemy.stop?.());
     }
 
 
+    /**
+     * Stops and resets all sounds.
+     */
     resetAllSounds() {
         Object.values(this.sounds).forEach(sound => {
             if (!(sound instanceof Audio)) return;
@@ -704,6 +1025,12 @@ class World {
     }
 
 
+    /**
+     * Performs collision check with endboss awareness.
+     * @param {*} a
+     * @param {*} b
+     * @returns {boolean}
+     */
     isEndbossAwareCollision(a, b) {
         if (a instanceof Endboss) return a.isColliding(b);
         if (b instanceof Endboss) return b.isColliding(a);

@@ -1,3 +1,7 @@
+/**
+ * Displays a status bar (health, coin, bottle, endboss) using image steps.
+ * @extends DrawableObject
+ */
 class StatusBar extends DrawableObject {
     height = 50;
     width = 150;
@@ -40,6 +44,10 @@ class StatusBar extends DrawableObject {
     percentage = 0;
 
 
+    /**
+     * Creates a status bar of a given type.
+     * @param {string} [type='health'] - Status bar type.
+     */
     constructor(type = 'health') {
         super();
         this.applyTypeLayout(type);
@@ -48,12 +56,20 @@ class StatusBar extends DrawableObject {
     }
 
 
+    /**
+     * Applies layout and image set for a given type.
+     * @param {string} type - Status bar type.
+     */
     applyTypeLayout(type) {
         this.applyDefaultLayout(type);
         if (type === 'endboss') this.applyEndbossLayout();
     }
 
 
+    /**
+     * Applies the default layout for coin/bottle/health.
+     * @param {string} type - Status bar type.
+     */
     applyDefaultLayout(type) {
         if (type === 'coin') return this.applyCoinLayout();
         if (type === 'bottle') return this.applyBottleLayout();
@@ -61,6 +77,9 @@ class StatusBar extends DrawableObject {
     }
 
 
+    /**
+     * Applies coin layout and image list.
+     */
     applyCoinLayout() {
         this.IMAGES = this.IMAGES_COIN;
         this.x = 20;
@@ -68,6 +87,9 @@ class StatusBar extends DrawableObject {
     }
 
 
+    /**
+     * Applies bottle layout and image list.
+     */
     applyBottleLayout() {
         this.IMAGES = this.IMAGES_BOTTLE;
         this.x = 20;
@@ -75,6 +97,9 @@ class StatusBar extends DrawableObject {
     }
 
 
+    /**
+     * Applies health layout and image list.
+     */
     applyHealthLayout() {
         this.IMAGES = this.IMAGES_HEALTH;
         this.x = 20;
@@ -82,6 +107,9 @@ class StatusBar extends DrawableObject {
     }
 
 
+    /**
+     * Applies endboss layout and image list.
+     */
     applyEndbossLayout() {
         this.IMAGES = this.IMAGES_ENDBOSS;
         this.x = 480;
@@ -89,17 +117,30 @@ class StatusBar extends DrawableObject {
     }
 
 
+    /**
+     * Initializes the start percentage depending on status bar type.
+     * @param {string} type - Status bar type.
+     */
     initDefaultPercentage(type) {
         const start = this.isFullStartType(type) ? 100 : 0;
         this.setPercentage(start);
     }
 
 
+    /**
+     * Determines whether a given type starts at 100%.
+     * @param {string} type - Status bar type.
+     * @returns {boolean}
+     */
     isFullStartType(type) {
         return type === 'health' || type === 'endboss';
     }
 
 
+    /**
+     * Sets the percentage and updates the image accordingly.
+     * @param {number} percentage - Percentage value.
+     */
     setPercentage(percentage) {
         this.percentage = percentage;
         let path = this.IMAGES[this.resolveImageIndex()];
@@ -107,11 +148,20 @@ class StatusBar extends DrawableObject {
     }
 
 
+    /**
+     * Resolves the image index for the current percentage.
+     * @returns {number}
+     */
     resolveImageIndex() {
         return this.getStatusIndex(this.percentage);
     }
 
 
+    /**
+     * Converts a percentage value into a status bar image index.
+     * @param {number} value - Percentage value.
+     * @returns {number}
+     */
     getStatusIndex(value) {
         if (value === 100) return 5;
         if (value > 80) return 4;

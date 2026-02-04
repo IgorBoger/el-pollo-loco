@@ -1,3 +1,6 @@
+/**
+ * Stores keyboard input states and provides key binding information.
+ */
 class KeyBaord {
     LEFT = false;
     RIGHT = false;
@@ -7,11 +10,10 @@ class KeyBaord {
     THROW = false;
 
 
-    constructor() {
-
-    }
-
-
+    /**
+     * Returns the key bindings used in the game.
+     * @returns {{action: string, key: string}[]}
+     */
     getKeyBindings() {
         return [
             { action: 'Links bewegen', key: 'Pfeil links' },

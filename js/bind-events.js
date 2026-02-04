@@ -1,5 +1,12 @@
 bootstrapUi();
 
+
+/**
+ * Handles initial UI setup once the window load event fires.
+ * Binds all UI events and installs global guards/listeners.
+ *
+ * @returns {void}
+ */
 function onWindowLoad() {
     initUiOnLoad();
     bindBaseGameUiEvents();
@@ -16,6 +23,11 @@ function onWindowLoad() {
 }
 
 
+/**
+ * Initializes UI state on load (translations, viewport, mobile buttons, audio icons).
+ *
+ * @returns {void}
+ */
 function initUiOnLoad() {
     initTranslations();
     handleViewportChange();
@@ -24,47 +36,91 @@ function initUiOnLoad() {
 }
 
 
+/**
+ * Sets the initial icon sources for music and sound based on current mute states.
+ *
+ * @returns {void}
+ */
 function setAudioIcons() {
     setIconSrc('musicIcon', isMusicMuted ? 'img/mute.png' : 'img/speaker.png');
     setIconSrc('soundIcon', isSoundMuted ? 'img/mute.png' : 'img/speaker.png');
 }
 
 
+/**
+ * Sets the "src" attribute for an element by id, if the element exists.
+ *
+ * @param {string} id - The element id.
+ * @param {string} src - The image source path to set.
+ * @returns {void}
+ */
 function setIconSrc(id, src) {
     const el = document.getElementById(id);
     if (el) el.src = src;
 }
 
 
+/**
+ * Binds base game UI events like restart and pause.
+ *
+ * @returns {void}
+ */
 function bindBaseGameUiEvents() {
     bindClick('restartGameBtn', restartGame);
     bindClick('pauseBtn', togglePause);
 }
 
 
+/**
+ * Binds a click handler to an element by id, if the element exists.
+ *
+ * @param {string} id - The element id.
+ * @param {Function} fn - The click handler function.
+ * @returns {void}
+ */
 function bindClick(id, fn) {
     document.getElementById(id)?.addEventListener('click', fn);
 }
 
 
+/**
+ * Binds burger menu open/close button events.
+ *
+ * @returns {void}
+ */
 function bindBurgerUiEvents() {
     bindClick('burgerBtn', toggleBurgerMenu);
     bindClick('burgerClose', closeBurgerMenu);
 }
 
 
+/**
+ * Binds UI events for toggling music and sound effects.
+ *
+ * @returns {void}
+ */
 function bindAudioToggleEvents() {
     bindClick('musicToggle', toggleMusic);
     bindClick('soundToggle', toggleSound);
 }
 
 
+/**
+ * Binds events for opening and closing the settings overlay.
+ *
+ * @returns {void}
+ */
 function bindSettingsOverlayEvents() {
     bindClick('openSettings', openSettingsOverlay);
     bindClick('closeSettings', closeSettingsOverlay);
 }
 
 
+/**
+ * Binds all overlay open/close related events.
+ *
+ * @returns {void}
+ */
 function bindOverlayOpenCloseEvents() {
     bindStoryOverlayEvents();
     bindKeyHelpOverlayEvents();
@@ -75,6 +131,11 @@ function bindOverlayOpenCloseEvents() {
 }
 
 
+/**
+ * Binds "click outside to close" behavior for overlays.
+ *
+ * @returns {void}
+ */
 function bindOverlayOutsideCloseEvents() {
     bindOutsideClose('storyOverlay', '#storyOverlay .story-card', closeStoryOverlay);
     bindOutsideClose('keyHelpOverlay', '#keyHelpOverlay .key-help-card', closeKeyHelpOverlay);
@@ -84,6 +145,11 @@ function bindOverlayOutsideCloseEvents() {
 }
 
 
+/**
+ * Binds delegated click handling for language option buttons inside the language overlay.
+ *
+ * @returns {void}
+ */
 function bindOverlayContentDelegation() {
     const container = document.querySelector('#langOverlay .modal-content');
     if (!container) return;
@@ -94,80 +160,149 @@ function bindOverlayContentDelegation() {
 }
 
 
+/**
+ * Binds endscreen-related button events (game over and win screens).
+ *
+ * @returns {void}
+ */
 function bindEndscreenButtons() {
     bindGameOverButtons();
     bindWinButtons();
 }
 
 
+/**
+ * Binds button events for the game over overlay.
+ *
+ * @returns {void}
+ */
 function bindGameOverButtons() {
     bindClick('restartBtn', onGameOverRestartClick);
     bindClick('homeBtn', onGameOverHomeClick);
 }
 
 
+/**
+ * Handles the game over restart action (close overlay then quick restart).
+ *
+ * @returns {void}
+ */
 function onGameOverRestartClick() {
     closeEndOverlayThen('gameOverOverlay', quickRestartGame);
 }
 
 
+/**
+ * Handles the game over home action (close overlay then return to start screen).
+ *
+ * @returns {void}
+ */
 function onGameOverHomeClick() {
     closeEndOverlayThen('gameOverOverlay', restartGame);
 }
 
 
+/**
+ * Binds button events for the win overlay.
+ *
+ * @returns {void}
+ */
 function bindWinButtons() {
     bindClick('nextLevelBtn', onNextLevelClick);
     bindClick('winHomeBtn', onWinHomeClick);
 }
 
 
+/**
+ * Handles the next level action (close overlay then quick restart).
+ *
+ * @returns {void}
+ */
 function onNextLevelClick() {
     closeEndOverlayThen('winOverlay', quickRestartGame);
 }
 
 
+/**
+ * Handles the win home action (close overlay then return to start screen).
+ *
+ * @returns {void}
+ */
 function onWinHomeClick() {
     closeEndOverlayThen('winOverlay', restartGame);
 }
 
 
+/**
+ * Installs a global click handler for closing UI panels when clicking outside.
+ *
+ * @returns {void}
+ */
 function bindGlobalOutsideClose() {
     document.addEventListener('click', outsideCloseHandler);
 }
 
 
+/**
+ * Binds events for opening and closing the language modal overlay.
+ *
+ * @returns {void}
+ */
 function bindLangModalOverlayEvents() {
     bindClick('langToggle', openLangModal);
     bindClick('langClose', closeLangModal);
 }
 
 
+/**
+ * Binds events for opening and closing the story overlay.
+ *
+ * @returns {void}
+ */
 function bindStoryOverlayEvents() {
     bindClick('aboutGameBtn', openStoryOverlay);
     bindClick('closeStory', closeStoryOverlay);
 }
 
 
+/**
+ * Binds events for opening and closing the key help overlay.
+ *
+ * @returns {void}
+ */
 function bindKeyHelpOverlayEvents() {
     bindClick('keyHelpBtn', openKeyHelpOverlay);
     bindClick('keyHelpClose', closeKeyHelpOverlay);
 }
 
 
+/**
+ * Binds events for opening and closing the impressum overlay.
+ *
+ * @returns {void}
+ */
 function bindImpressumOverlayEvents() {
     bindClick('impressumBtn', openImpressumOverlay);
     bindClick('impressumClose', closeImpressumOverlay);
 }
 
 
-
+/**
+ * Binds events for opening and closing the ranking overlay.
+ *
+ * @returns {void}
+ */
 function bindRankingOverlayEvents() {
     bindClick('rankingListBtn', openRankingOverlay);
     bindClick('rankingClose', closeRankingOverlay);
 }
 
 
+/**
+ * Binds events for ranking clear confirmation overlay actions.
+ *
+ * @returns {void}
+ */
 function bindRankingClearOverlayEvents() {
     bindClick('rankingClear', onClearRankingClick);
     bindClick('rankingClearOk', onRankingClearConfirm);
@@ -176,11 +311,24 @@ function bindRankingClearOverlayEvents() {
 }
 
 
+/**
+ * Binds an event listener to an element by id, if the element exists.
+ *
+ * @param {string} id - The element id.
+ * @param {string} type - The event type (e.g. "click").
+ * @param {Function} fn - The handler function.
+ * @returns {void}
+ */
 function bindEvent(id, type, fn) {
     document.getElementById(id)?.addEventListener(type, fn);
 }
 
 
+/**
+ * Binds viewport-related events that require recalculating layout/canvas scaling.
+ *
+ * @returns {void}
+ */
 function bindViewportEvents() {
     window.addEventListener('resize', handleViewportChange, { passive: true });
     window.addEventListener('orientationchange', handleViewportChange);
@@ -188,6 +336,12 @@ function bindViewportEvents() {
 }
 
 
+/**
+ * Handles global outside clicks to close the settings or burger menu when appropriate.
+ *
+ * @param {MouseEvent} e - The click event.
+ * @returns {void}
+ */
 function outsideCloseHandler(e) {
     if (shouldIgnoreOutsideClose()) return;
     if (shouldCloseSettingsByOutsideClick(e)) {
@@ -198,6 +352,11 @@ function outsideCloseHandler(e) {
 }
 
 
+/**
+ * Checks whether outside close handling should be ignored because an overlay is open.
+ *
+ * @returns {boolean} True if outside close should be ignored.
+ */
 function shouldIgnoreOutsideClose() {
     return isOverlayOpen('langOverlay')
         || isOverlayOpen('keyHelpOverlay')
@@ -207,12 +366,24 @@ function shouldIgnoreOutsideClose() {
 }
 
 
+/**
+ * Checks whether an overlay is currently open (not hidden via "d-none").
+ *
+ * @param {string} id - The overlay element id.
+ * @returns {boolean} True if the overlay is open.
+ */
 function isOverlayOpen(id) {
     const el = document.getElementById(id);
     return el && !el.classList.contains('d-none');
 }
 
 
+/**
+ * Determines whether the settings overlay should close due to an outside click.
+ *
+ * @param {MouseEvent} e - The click event.
+ * @returns {boolean} True if settings should close.
+ */
 function shouldCloseSettingsByOutsideClick(e) {
     const settings = document.getElementById('settingsOverlay');
     const burgerBtn = document.getElementById('burgerBtn');
@@ -223,6 +394,12 @@ function shouldCloseSettingsByOutsideClick(e) {
 }
 
 
+/**
+ * Determines whether the burger menu should close due to an outside click.
+ *
+ * @param {MouseEvent} e - The click event.
+ * @returns {boolean} True if burger menu should close.
+ */
 function shouldCloseBurgerByOutsideClick(e) {
     const burger = document.getElementById('burgerMenu');
     const burgerBtn = document.getElementById('burgerBtn');
@@ -233,6 +410,11 @@ function shouldCloseBurgerByOutsideClick(e) {
 }
 
 
+/**
+ * Bootstraps UI initialization by registering the window load handler.
+ *
+ * @returns {void}
+ */
 function bootstrapUi() {
     window.addEventListener('load', onWindowLoad);
 }

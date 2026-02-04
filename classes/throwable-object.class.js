@@ -1,3 +1,8 @@
+/**
+ * Represents a throwable bottle object with rotation and splash animations.
+ * Handles throwing motion, gravity, splash cleanup and removal from the world list.
+ * @extends MovableObject
+ */
 class ThrowableObject extends MovableObject {
     height = 70;
     width = 70;
@@ -21,6 +26,13 @@ class ThrowableObject extends MovableObject {
     isSplashed = false;
 
 
+    /**
+     * Creates a throwable object at the given position and starts its motion.
+     * @param {number} x - Start x-position.
+     * @param {number} y - Start y-position.
+     * @param {object} world - World reference for sounds and removal.
+     * @param {number} [direction=1] - Throw direction (1 right, -1 left).
+     */
     constructor(x, y, world, direction = 1) {
         super().loadImage(this.IMAGES_THROW[0]);
         this.loadImages(this.IMAGES_THROW);
@@ -36,6 +48,9 @@ class ThrowableObject extends MovableObject {
     }
 
 
+    /**
+     * Starts the throw movement and gravity.
+     */
     throw() {
         this.setupThrowSound();
         this.speedY = 20;
@@ -47,6 +62,10 @@ class ThrowableObject extends MovableObject {
     }
 
 
+    /**
+     * Applies bottle gravity using an internal interval.
+     * Overrides the base gravity behavior for this object.
+     */
     applyGravity() {
         this.gravityInterval = setInterval(() => {
             if (isGamePaused) return;
@@ -55,12 +74,18 @@ class ThrowableObject extends MovableObject {
     }
 
 
+    /**
+     * Applies one gravity step for the bottle.
+     */
     applyBottleGravityStep() {
         this.y -= this.speedY;
         this.speedY -= this.acceleration;
     }
 
 
+    /**
+     * Plays the throw sound effect if available.
+     */
     setupThrowSound() {
         const throwSound = this.world?.sounds?.thrownBottle;
         if (throwSound) {
@@ -70,12 +95,18 @@ class ThrowableObject extends MovableObject {
     }
 
 
+    /**
+     * Triggers the splash state and schedules cleanup.
+     */
     splash() {
         this.setSplashState();
         this.scheduleSplashCleanup();
     }
 
 
+    /**
+     * Sets the object into the splashed state and stops movement values.
+     */
     setSplashState() {
         this.isSplashed = true;
         this.speedY = 0;
@@ -83,17 +114,26 @@ class ThrowableObject extends MovableObject {
     }
 
 
+    /**
+     * Schedules splash cleanup after a short delay.
+     */
     scheduleSplashCleanup() {
         setTimeout(() => this.cleanupSplash(), 300);
     }
 
 
+    /**
+     * Cleans up after a splash by stopping intervals and removing the object.
+     */
     cleanupSplash() {
         this.clearBottleIntervals();
         this.removeFromThrowableList();
     }
 
 
+    /**
+     * Clears all active bottle intervals.
+     */
     clearBottleIntervals() {
         clearInterval(this.throwInterval);
         clearInterval(this.gravityInterval);
@@ -101,12 +141,18 @@ class ThrowableObject extends MovableObject {
     }
 
 
+    /**
+     * Removes this object from the world's throwable list.
+     */
     removeFromThrowableList() {
         this.world.throwableObject = this.world.throwableObject
             .filter(obj => obj !== this);
     }
 
 
+    /**
+     * Starts the animation loop for rotation and splash frames.
+     */
     animate() {
         this.mainInterval = setInterval(() => {
             if (isGamePaused) return;

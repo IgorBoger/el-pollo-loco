@@ -1,4 +1,14 @@
+/**
+ * Base class for fullscreen overlay screens with fade animations.
+ * Handles image loading, fading and visibility toggling.
+ */
 class OverlayScreen {
+
+    /**
+     * Creates a new overlay screen instance.
+     * @param {CanvasRenderingContext2D} ctx - Canvas rendering context.
+     * @param {HTMLCanvasElement} canvas - The canvas element.
+     */
     constructor(ctx, canvas) {
         this.ctx = ctx;
         this.canvas = canvas;
@@ -11,12 +21,20 @@ class OverlayScreen {
     }
 
 
+    /**
+     * Initializes the overlay using a configuration object.
+     * @param {Object} cfg - Overlay configuration.
+     */
     init(cfg) {
         this.applyConfig(cfg);
         this.createImage();
     }
 
 
+    /**
+     * Applies configuration values to the overlay.
+     * @param {Object} cfg - Overlay configuration.
+     */
     applyConfig(cfg) {
         this.overlayId = cfg.overlayId;
         this.imageSrc = cfg.imageSrc;
@@ -25,6 +43,9 @@ class OverlayScreen {
     }
 
 
+    /**
+     * Creates and loads the overlay image.
+     */
     createImage() {
         this.image = new Image();
         this.image.src = this.imageSrc;
@@ -32,12 +53,18 @@ class OverlayScreen {
     }
 
 
+    /**
+     * Called once the overlay image has finished loading.
+     */
     onImageLoaded() {
         this.loaded = true;
         if (this.visible) this.draw();
     }
 
 
+    /**
+     * Shows the overlay and starts the fade-in animation.
+     */
     show() {
         this.visible = true;
         this.fade = 0;
@@ -46,6 +73,9 @@ class OverlayScreen {
     }
 
 
+    /**
+     * Hides the overlay immediately and stops animations.
+     */
     hide() {
         this.visible = false;
         this.stopFadeLoop();
@@ -53,6 +83,10 @@ class OverlayScreen {
     }
 
 
+    /**
+     * Hides the overlay smoothly and calls a callback when finished.
+     * @param {Function} done - Callback executed after fade-out.
+     */
     hideSmooth(done) {
         if (!this.visible) return done?.();
         this.onFadeDone = done || null;
@@ -60,6 +94,9 @@ class OverlayScreen {
     }
 
 
+    /**
+     * Performs one fade-out animation step.
+     */
     fadeOutStep() {
         this.fade = Math.max(0, this.fade - this.fadeSpeed);
         this.draw();
@@ -68,6 +105,9 @@ class OverlayScreen {
     }
 
 
+    /**
+     * Finalizes fade-out and triggers completion callback.
+     */
     finishFadeOut() {
         this.visible = false;
         const cb = this.onFadeDone;
@@ -76,6 +116,10 @@ class OverlayScreen {
     }
 
 
+    /**
+     * Toggles the overlay DOM element visibility.
+     * @param {boolean} isOpen - Whether the overlay should be visible.
+     */
     toggleOverlay(isOpen) {
         const ov = document.getElementById(this.overlayId);
         if (!ov) return;
@@ -84,12 +128,18 @@ class OverlayScreen {
     }
 
 
+    /**
+     * Starts the fade-in animation loop.
+     */
     startFadeLoop() {
         this.stopFadeLoop();
         this.rafId = requestAnimationFrame(() => this.fadeStep());
     }
 
 
+    /**
+     * Stops the fade animation loop.
+     */
     stopFadeLoop() {
         if (!this.rafId) return;
         cancelAnimationFrame(this.rafId);
@@ -97,6 +147,9 @@ class OverlayScreen {
     }
 
 
+    /**
+     * Performs one fade-in animation step.
+     */
     fadeStep() {
         if (!this.visible) return;
         this.fade = Math.min(1, this.fade + this.fadeSpeed);
@@ -105,6 +158,9 @@ class OverlayScreen {
     }
 
 
+    /**
+     * Draws the overlay to the canvas.
+     */
     draw() {
         if (!this.visible) return;
         this.ctx.save();
@@ -114,6 +170,9 @@ class OverlayScreen {
     }
 
 
+    /**
+     * Draws the overlay image to the canvas.
+     */
     drawScreenImage() {
         if (!this.loaded) return;
         this.ctx.globalAlpha = this.fade * (this.imageAlpha ?? 1);
@@ -122,6 +181,9 @@ class OverlayScreen {
     }
 
 
+    /**
+     * Captures the current canvas frame as a background image.
+     */
     captureBaseFrame() {
         this.baseFrame = document.createElement('canvas');
         this.baseFrame.width = this.canvas.width;
@@ -131,12 +193,18 @@ class OverlayScreen {
     }
 
 
+    /**
+     * Prepares the canvas for drawing.
+     */
     prepareDraw() {
         this.ctx.save();
         this.ctx.setTransform(1, 0, 0, 1, 0, 0);
     }
 
 
+    /**
+     * Draws the captured base frame.
+     */
     drawBaseFrame() {
         if (!this.baseFrame) return;
         this.ctx.globalAlpha = 1;
@@ -144,6 +212,9 @@ class OverlayScreen {
     }
 
 
+    /**
+     * Draws the overlay using the captured base frame.
+     */
     drawWithBaseFrame() {
         if (!this.visible) return;
         this.prepareDraw();

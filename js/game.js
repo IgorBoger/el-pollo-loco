@@ -18,6 +18,11 @@ const LEADERBOARD_KEY = 'leaderboard';
 window.debugHitboxes = false;
 
 
+/**
+ * Initializes the game canvas and creates a new world instance.
+ *
+ * @returns {void}
+ */
 function init() {
     canvas = document.getElementById('canvas');
     setupHiDPICanvas();
@@ -25,6 +30,11 @@ function init() {
 }
 
 
+/**
+ * Starts the game and initializes runtime state.
+ *
+ * @returns {void}
+ */
 function startGame() {
     setGamePausedState(false);
     gameStartAt = Date.now();
@@ -37,12 +47,23 @@ function startGame() {
 }
 
 
+/**
+ * Sets the global paused state of the game.
+ *
+ * @param {boolean} state
+ * @returns {void}
+ */
 function setGamePausedState(state) {
     isGamePaused = state;
     window.isGamePaused = state;
 }
 
 
+/**
+ * Restarts the game and returns to the start screen.
+ *
+ * @returns {void}
+ */
 function restartGame() {
     closeBurgerMenu();
     document.getElementById('pauseBtn')?.classList.add('d-none');
@@ -51,17 +72,33 @@ function restartGame() {
 }
 
 
+/**
+ * Displays the start screen.
+ *
+ * @returns {void}
+ */
 function showStartScreen() {
     document.getElementById('startScreen')?.classList.remove('d-none');
 }
 
 
+/**
+ * Restarts the game core without UI resets.
+ *
+ * @returns {void}
+ */
 function restartGameCore() {
     if (world && typeof world.destroy === "function") world.destroy();
     document.getElementById('startScreen').classList.remove('d-none');
 }
 
 
+/**
+ * Handles language option click events.
+ *
+ * @param {MouseEvent} e
+ * @returns {void}
+ */
 function onLangOptionClick(e) {
     const lang = getLangFromClick(e);
     if (!lang) return;
@@ -70,18 +107,36 @@ function onLangOptionClick(e) {
 }
 
 
+/**
+ * Extracts the language code from a language option click.
+ *
+ * @param {MouseEvent} e
+ * @returns {string|undefined}
+ */
 function getLangFromClick(e) {
     const btn = e.target.closest('.lang-opt');
     return btn?.getAttribute('data-lang');
 }
 
 
+/**
+ * Applies a language change using the available language handler.
+ *
+ * @param {string} lang
+ * @returns {void}
+ */
 function applyLanguageChange(lang) {
     if (typeof setLanguage === 'function') return setLanguage(lang);
     setLanguageFallback(lang);
 }
 
 
+/**
+ * Applies a fallback language change.
+ *
+ * @param {string} lang
+ * @returns {void}
+ */
 function setLanguageFallback(lang) {
     currentLanguage = lang;
     localStorage.setItem('language', currentLanguage);
@@ -89,6 +144,11 @@ function setLanguageFallback(lang) {
 }
 
 
+/**
+ * Toggles the paused state of the game.
+ *
+ * @returns {void}
+ */
 function togglePause() {
     if (!world) return;
     setGamePausedState(!window.isGamePaused);
@@ -103,6 +163,11 @@ function togglePause() {
 }
 
 
+/**
+ * Updates the pause button icon based on game state.
+ *
+ * @returns {void}
+ */
 function updatePauseButtonUi() {
     const btn = document.getElementById('pauseBtn');
     if (!btn) return;
@@ -113,6 +178,11 @@ function updatePauseButtonUi() {
 }
 
 
+/**
+ * Quickly restarts the game without returning to the start screen.
+ *
+ * @returns {void}
+ */
 function quickRestartGame() {
     setGamePausedState(false);
     showPauseButton();
@@ -126,23 +196,43 @@ function quickRestartGame() {
 }
 
 
+/**
+ * Shows the pause button.
+ *
+ * @returns {void}
+ */
 function showPauseButton() {
     const pauseBtn = document.getElementById('pauseBtn');
     pauseBtn?.classList.remove('d-none');
 }
 
 
+/**
+ * Hides the start screen.
+ *
+ * @returns {void}
+ */
 function hideStartScreen() {
     document.getElementById('startScreen')?.classList.add('d-none');
 }
 
 
+/**
+ * Destroys the current world instance if it exists.
+ *
+ * @returns {void}
+ */
 function destroyWorldIfExists() {
     if (!world || typeof world.destroy !== 'function') return;
     world.destroy();
 }
 
 
+/**
+ * Ensures the canvas element is available and ready.
+ *
+ * @returns {void}
+ */
 function ensureCanvasReady() {
     if (canvas) return;
     canvas = document.getElementById('canvas');
@@ -150,11 +240,22 @@ function ensureCanvasReady() {
 }
 
 
+/**
+ * Creates a new world instance.
+ *
+ * @returns {void}
+ */
 function createNewWorld() {
     world = new World(canvas, keyBaord);
 }
 
 
+/**
+ * Handles game over logic.
+ *
+ * @param {World} worldInstance
+ * @returns {void}
+ */
 function onGameOver(worldInstance) {
     setGamePausedState(true);
     const pauseBtn = document.getElementById('pauseBtn');
@@ -165,6 +266,12 @@ function onGameOver(worldInstance) {
 }
 
 
+/**
+ * Handles win logic.
+ *
+ * @param {World} worldInstance
+ * @returns {void}
+ */
 function onWin(worldInstance) {
     setGamePausedState(true);
     const pauseBtn = document.getElementById('pauseBtn');

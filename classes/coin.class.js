@@ -1,7 +1,16 @@
+/**
+ * Represents a collectible coin in the world.
+ * @extends MovableObject
+ */
 class Coin extends MovableObject {
     collected = false;
 
 
+    /**
+     * Creates a coin at the given position.
+     * @param {number} x - The x-position of the coin.
+     * @param {number} y - The y-position of the coin.
+     */
     constructor(x, y) {
         super().loadImage('img/8_coin/coin_1.png');
         this.x = x;

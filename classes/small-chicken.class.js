@@ -1,10 +1,12 @@
+/**
+ * Represents a small chicken enemy with walking animation and death handling.
+ * @extends MovableObject
+ */
 class SmallChicken extends MovableObject {
-    // x = 150 + Math.random() * 500;
     y = 380;
     height = 50;
     width = 50;
-    // speed = 0.3;
-    // speed = 0.15 + Math.random() * 0.2;
+
     IMAGES_WALKING = [
         'img/3_enemies_chicken/chicken_small/1_walk/1_w.png',
         'img/3_enemies_chicken/chicken_small/1_walk/2_w.png',
@@ -12,6 +14,9 @@ class SmallChicken extends MovableObject {
     ];
 
 
+    /**
+     * Creates a small chicken and initializes all animation and state values.
+     */
     constructor() {
         super().loadImage(this.IMAGES_WALKING[0]);
         this.initWalkImages();
@@ -22,11 +27,17 @@ class SmallChicken extends MovableObject {
     }
 
 
+    /**
+     * Loads walking animation images.
+     */
     initWalkImages() {
         this.loadImages(this.IMAGES_WALKING);
     }
 
 
+    /**
+     * Loads and stores the dead image.
+     */
     initDeadImage() {
         const path = 'img/3_enemies_chicken/chicken_small/2_dead/dead.png';
         this.loadImage(path);
@@ -34,12 +45,18 @@ class SmallChicken extends MovableObject {
     }
 
 
+    /**
+     * Initializes random spawn position and movement speed.
+     */
     initSpawnStats() {
         this.x = 250 + Math.random() * 500;
         this.speed = 0.2 + Math.random() * 0.1;
     }
 
 
+    /**
+     * Sets hitbox and frame boundaries.
+     */
     initFrameBounds() {
         this.frameOffsetX = 3;
         this.frameWidth = this.width - 8;
@@ -48,6 +65,9 @@ class SmallChicken extends MovableObject {
     }
 
 
+    /**
+     * Initializes animation timing and loop state.
+     */
     initLoopState() {
         this.frameMs = 120;
         this.lastFrameTime = 0;
@@ -56,6 +76,9 @@ class SmallChicken extends MovableObject {
     }
 
 
+    /**
+     * Starts the update loop for movement and animation.
+     */
     animate() {
         this.mainInterval = setInterval(() => {
             if (isGamePaused) return;
@@ -64,6 +87,10 @@ class SmallChicken extends MovableObject {
     }
 
 
+    /**
+     * Updates movement and animation for the current frame.
+     * @param {number} now - Current timestamp.
+     */
     updateSmallChicken(now) {
         if (this.isDead()) return this.handleDeath();
         this.moveLeft();
@@ -71,6 +98,10 @@ class SmallChicken extends MovableObject {
     }
 
 
+    /**
+     * Advances walking animation frames when the frame interval is reached.
+     * @param {number} now - Current timestamp.
+     */
     updateWalkingFrames(now) {
         if (!this.shouldAdvanceFrame(now)) return;
         this.playAnimation(this.IMAGES_WALKING);
@@ -78,11 +109,19 @@ class SmallChicken extends MovableObject {
     }
 
 
+    /**
+     * Determines whether the next animation frame should be displayed.
+     * @param {number} now - Current timestamp.
+     * @returns {boolean}
+     */
     shouldAdvanceFrame(now) {
         return (now - this.lastFrameTime) >= this.frameMs;
     }
 
 
+    /**
+     * Handles the death state and schedules removal from the world.
+     */
     handleDeath() {
         if (this.isRemoved) return;
         this.isRemoved = true;
@@ -92,11 +131,17 @@ class SmallChicken extends MovableObject {
     }
 
 
+    /**
+     * Stops the internal update loop.
+     */
     stopSmallChickenLoop() {
         if (this.mainInterval) clearInterval(this.mainInterval);
     }
-    
 
+
+    /**
+     * Removes the small chicken from the world after a delay.
+     */
     removeFromWorldDelayed() {
         setTimeout(() => {
             if (!this.world) return;

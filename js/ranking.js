@@ -1,3 +1,10 @@
+/**
+ * Adds a leaderboard entry for the current game run.
+ *
+ * @param {World} worldInstance
+ * @param {string} resultKey
+ * @returns {void}
+ */
 function addLeaderboardEntry(worldInstance, resultKey) {
     const list = getLeaderboard();
     list.push(buildLeaderboardEntry(worldInstance, resultKey));
@@ -6,6 +13,11 @@ function addLeaderboardEntry(worldInstance, resultKey) {
 }
 
 
+/**
+ * Retrieves the leaderboard from localStorage.
+ *
+ * @returns {Array}
+ */
 function getLeaderboard() {
     const raw = localStorage.getItem(LEADERBOARD_KEY);
     if (!raw) return [];
@@ -14,6 +26,13 @@ function getLeaderboard() {
 }
 
 
+/**
+ * Builds a leaderboard entry object from the current game state.
+ *
+ * @param {World} worldInstance
+ * @param {string} resultKey
+ * @returns {Object}
+ */
 function buildLeaderboardEntry(worldInstance, resultKey) {
     return {
         coins: worldInstance?.character?.coin || 0,
@@ -24,22 +43,44 @@ function buildLeaderboardEntry(worldInstance, resultKey) {
 }
 
 
+/**
+ * Returns the current game run duration in milliseconds.
+ *
+ * @returns {number}
+ */
 function getRunDurationMs() {
     if (!gameStartAt) return 0;
     return Math.max(0, Date.now() - gameStartAt);
 }
 
 
+/**
+ * Sorts leaderboard entries by coins (desc) and time (asc).
+ *
+ * @param {Array} list
+ * @returns {Array}
+ */
 function sortLeaderboard(list) {
     return list.sort((a, b) => (b.coins - a.coins) || (a.timeMs - b.timeMs));
 }
 
 
+/**
+ * Saves the leaderboard to localStorage.
+ *
+ * @param {Array} list
+ * @returns {void}
+ */
 function saveLeaderboard(list) {
     localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(list));
 }
 
 
+/**
+ * Renders the ranking list table.
+ *
+ * @returns {void}
+ */
 function renderRankingList() {
     const tbody = document.getElementById('rankingTbody');
     if (!tbody) return;
@@ -50,12 +91,23 @@ function renderRankingList() {
 }
 
 
+/**
+ * Clears the ranking table body.
+ *
+ * @returns {void}
+ */
 function clearRankingTable() {
     const tbody = document.getElementById('rankingTbody');
     if (tbody) tbody.innerHTML = '';
 }
 
 
+/**
+ * Toggles the visibility of the empty ranking message.
+ *
+ * @param {boolean} isEmpty
+ * @returns {void}
+ */
 function setRankingEmptyVisible(isEmpty) {
     const empty = document.getElementById('rankingEmpty');
     if (!empty) return;
@@ -63,6 +115,14 @@ function setRankingEmptyVisible(isEmpty) {
 }
 
 
+/**
+ * Appends a ranking row to the table body.
+ *
+ * @param {HTMLElement} tbody
+ * @param {number} idx
+ * @param {Object} entry
+ * @returns {void}
+ */
 function appendRankingRow(tbody, idx, entry) {
     const tr = document.createElement('tr');
     const resultText = getResultLabel(entry);
@@ -71,6 +131,12 @@ function appendRankingRow(tbody, idx, entry) {
 }
 
 
+/**
+ * Returns the localized result label for a ranking entry.
+ *
+ * @param {Object} entry
+ * @returns {string}
+ */
 function getResultLabel(entry) {
     const t = getMergedPack(currentLanguage);
     const key = entry?.resultKey || '';
@@ -80,6 +146,12 @@ function getResultLabel(entry) {
 }
 
 
+/**
+ * Formats a duration in milliseconds as mm:ss.
+ *
+ * @param {number} ms
+ * @returns {string}
+ */
 function formatDuration(ms) {
     const total = Math.floor(ms / 1000);
     const m = String(Math.floor(total / 60)).padStart(2, '0');
@@ -88,11 +160,21 @@ function formatDuration(ms) {
 }
 
 
+/**
+ * Clears all leaderboard entries.
+ *
+ * @returns {void}
+ */
 function clearLeaderboard() {
     localStorage.removeItem(LEADERBOARD_KEY);
 }
 
 
+/**
+ * Updates the enabled state of the ranking clear button.
+ *
+ * @returns {void}
+ */
 function setClearRankingState() {
     const btn = document.getElementById('rankingClear');
     if (!btn) return;
@@ -100,16 +182,31 @@ function setClearRankingState() {
 }
 
 
+/**
+ * Checks whether leaderboard entries exist.
+ *
+ * @returns {boolean}
+ */
 function hasLeaderboardEntries() {
     return getLeaderboard().length > 0;
 }
 
 
+/**
+ * Handles the ranking clear button click.
+ *
+ * @returns {void}
+ */
 function onClearRankingClick() {
     openRankingClearConfirm();
 }
 
 
+/**
+ * Sets texts for the ranking clear confirmation overlay.
+ *
+ * @returns {void}
+ */
 function setRankingClearConfirmTexts() {
     const txt = getRankingClearTexts();
     setTextById('rankingClearTitle', txt.title);
@@ -119,6 +216,11 @@ function setRankingClearConfirmTexts() {
 }
 
 
+/**
+ * Returns localized texts for the ranking clear confirmation.
+ *
+ * @returns {Object}
+ */
 function getRankingClearTexts() {
     const t = getMergedPack(currentLanguage);
     return {
@@ -130,6 +232,13 @@ function getRankingClearTexts() {
 }
 
 
+/**
+ * Sets text content for an element by id.
+ *
+ * @param {string} id
+ * @param {string} text
+ * @returns {void}
+ */
 function setTextById(id, text) {
     const el = document.getElementById(id);
     if (!el) return;
@@ -137,6 +246,11 @@ function setTextById(id, text) {
 }
 
 
+/**
+ * Confirms leaderboard clearing.
+ *
+ * @returns {void}
+ */
 function onRankingClearConfirm() {
     clearLeaderboard();
     renderRankingList();
@@ -145,11 +259,22 @@ function onRankingClearConfirm() {
 }
 
 
+/**
+ * Cancels leaderboard clearing.
+ *
+ * @returns {void}
+ */
 function onRankingClearCancel() {
     closeRankingClearConfirm();
 }
 
 
+/**
+ * Handles outside click on ranking clear overlay understands.
+ *
+ * @param {MouseEvent} e
+ * @returns {void}
+ */
 function onRankingClearOverlayClick(e) {
     if (e.target.id !== 'rankingClearOverlay') return;
     closeRankingClearConfirm();

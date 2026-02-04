@@ -1,3 +1,8 @@
+/**
+ * Fits the canvas pixel size to its CSS size and applies viewport transform.
+ *
+ * @returns {void}
+ */
 function fitCanvasToCssSize() {
     const canvasData = getCanvasData();
     if (!canvasData) return;
@@ -9,6 +14,11 @@ function fitCanvasToCssSize() {
 }
 
 
+/**
+ * Returns canvas element and its 2D context.
+ *
+ * @returns {{c: HTMLCanvasElement, ctx: CanvasRenderingContext2D}|null}
+ */
 function getCanvasData() {
     const c = document.getElementById('canvas');
     if (!c) return null;
@@ -17,6 +27,12 @@ function getCanvasData() {
 }
 
 
+/**
+ * Calculates canvas pixel metrics based on CSS size and device pixel ratio.
+ *
+ * @param {HTMLCanvasElement} c
+ * @returns {{pxW: number, pxH: number}|null}
+ */
 function getCanvasMetrics(c) {
     const dpr = Math.max(1, window.devicePixelRatio || 1);
     const cssW = Math.round(c.clientWidth);
@@ -26,6 +42,14 @@ function getCanvasMetrics(c) {
 }
 
 
+/**
+ * Synchronizes the canvas internal pixel size.
+ *
+ * @param {HTMLCanvasElement} c
+ * @param {number} pxW
+ * @param {number} pxH
+ * @returns {void}
+ */
 function syncCanvasPixelSize(c, pxW, pxH) {
     if (c.width !== pxW || c.height !== pxH) {
         c.width = pxW;
@@ -34,6 +58,13 @@ function syncCanvasPixelSize(c, pxW, pxH) {
 }
 
 
+/**
+ * Calculates scale and offsets for the viewport transform.
+ *
+ * @param {number} pxW
+ * @param {number} pxH
+ * @returns {{scale: number, offX: number, offY: number}}
+ */
 function calcViewportTransform(pxW, pxH) {
     const BASE_W = 720, BASE_H = 480;
     const scale = Math.min(pxW / BASE_W, pxH / BASE_H);
@@ -43,6 +74,13 @@ function calcViewportTransform(pxW, pxH) {
 }
 
 
+/**
+ * Applies the viewport transform to the canvas context.
+ *
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {{scale: number, offX: number, offY: number}} t
+ * @returns {void}
+ */
 function applyViewportTransform(ctx, t) {
     window.viewOffsetX = t.offX / t.scale;
     ctx.setTransform(t.scale, 0, 0, t.scale, t.offX, t.offY);
@@ -50,17 +88,32 @@ function applyViewportTransform(ctx, t) {
 }
 
 
+/**
+ * Handles viewport change events using requestAnimationFrame throttling.
+ *
+ * @returns {void}
+ */
 function handleViewportChange() {
     if (isViewportRafRunning()) return;
     scheduleViewportRaf();
 }
 
 
+/**
+ * Checks whether a viewport RAF task is already scheduled.
+ *
+ * @returns {boolean}
+ */
 function isViewportRafRunning() {
     return Boolean(_viewportRaf);
 }
 
 
+/**
+ * Schedules a viewport update via requestAnimationFrame.
+ *
+ * @returns {void}
+ */
 function scheduleViewportRaf() {
     _viewportRaf = requestAnimationFrame(() => {
         runViewportRafTasks();
@@ -69,6 +122,11 @@ function scheduleViewportRaf() {
 }
 
 
+/**
+ * Executes all viewport-related update tasks.
+ *
+ * @returns {void}
+ */
 function runViewportRafTasks() {
     fitCanvasToCssSize();
     drawEndscreenIfNeeded();
@@ -77,12 +135,22 @@ function runViewportRafTasks() {
 }
 
 
+/**
+ * Draws the endscreen frame if required.
+ *
+ * @returns {void}
+ */
 function drawEndscreenIfNeeded() {
     if (!shouldDrawEndscreen()) return;
     drawEndscreenFrame();
 }
 
 
+/**
+ * Determines whether the endscreen should be drawn.
+ *
+ * @returns {boolean}
+ */
 function shouldDrawEndscreen() {
     return Boolean(world
         && world.character?.isDead?.()
@@ -90,17 +158,32 @@ function shouldDrawEndscreen() {
 }
 
 
+/**
+ * Draws a single endscreen frame.
+ *
+ * @returns {void}
+ */
 function drawEndscreenFrame() {
     world.drawStaticFrame?.();
     world.endscreen.draw();
 }
 
 
+/**
+ * Clears the viewport RAF state.
+ *
+ * @returns {void}
+ */
 function clearViewportRaf() {
     _viewportRaf = null;
 }
 
 
+/**
+ * Initializes the HiDPI canvas setup.
+ *
+ * @returns {void}
+ */
 function setupHiDPICanvas() {
     fitCanvasToCssSize();
 }

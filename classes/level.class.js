@@ -1,3 +1,6 @@
+/**
+ * Represents a game level container holding all level objects and layers.
+ */
 class Level {
     enemies;
     clouds;
@@ -6,6 +9,15 @@ class Level {
     altLayers;
     level_end_x = 2 * 720;
 
+
+    /**
+     * Creates a level with enemies, clouds, background objects and layer definitions.
+     * @param {*} enemies - Enemy list for the level.
+     * @param {*} clouds - Cloud list for the level.
+     * @param {*} backgroundObjects - Background objects for the level.
+     * @param {*} layers - Main layer definitions.
+     * @param {*} altLayers - Alternative layer definitions.
+     */
     constructor(enemies, clouds, backgroundObjects, layers, altLayers) {
         this.enemies = enemies;
         this.clouds = clouds;

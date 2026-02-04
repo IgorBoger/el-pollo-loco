@@ -1,3 +1,8 @@
+/**
+ * Toggles the visibility state of the burger menu.
+ *
+ * @returns {void}
+ */
 function toggleBurgerMenu() {
     const menu = document.getElementById('burgerMenu');
     const isOpen = menu.classList.contains('open');
@@ -11,6 +16,11 @@ function toggleBurgerMenu() {
 }
 
 
+/**
+ * Closes the burger menu if it is currently open.
+ *
+ * @returns {void}
+ */
 function closeBurgerMenu() {
     const menu = document.getElementById('burgerMenu');
     if (!menu) return;
@@ -27,6 +37,11 @@ function closeBurgerMenu() {
 }
 
 
+/**
+ * Opens the settings overlay and hides the burger menu.
+ *
+ * @returns {void}
+ */
 function openSettingsOverlay() {
     const burger = document.getElementById('burgerMenu');
     const settings = document.getElementById('settingsOverlay');
@@ -37,6 +52,11 @@ function openSettingsOverlay() {
 }
 
 
+/**
+ * Closes the settings overlay and restores the burger menu.
+ *
+ * @returns {void}
+ */
 function closeSettingsOverlay() {
     const burger = document.getElementById('burgerMenu');
     const settings = document.getElementById('settingsOverlay');
@@ -47,6 +67,11 @@ function closeSettingsOverlay() {
 }
 
 
+/**
+ * Toggles fullscreen mode for the game container.
+ *
+ * @returns {void}
+ */
 function toggleFullscreen() {
     const el = document.getElementById('gameContainer');
     if (document.fullscreenElement) {

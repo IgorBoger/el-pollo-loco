@@ -1,3 +1,7 @@
+/**
+ * Endscreen overlay shown when the game is over.
+ * @extends OverlayScreen
+ */
 class Endscreen extends OverlayScreen {
 
     endScreenConfig = {
@@ -9,6 +13,12 @@ class Endscreen extends OverlayScreen {
         fadeSpeed: 0.06
     };
 
+
+    /**
+     * Creates the endscreen overlay.
+     * @param {CanvasRenderingContext2D} ctx - Canvas rendering context.
+     * @param {HTMLCanvasElement} canvas - The canvas element.
+     */
     constructor(ctx, canvas) {
         super(ctx, canvas);
         this.init(this.endScreenConfig);
@@ -16,12 +26,18 @@ class Endscreen extends OverlayScreen {
     }
 
 
+    /**
+     * Shows the endscreen and captures the current base frame.
+     */
     show() {
         this.captureBaseFrame();
         super.show();
     }
 
 
+    /**
+     * Draws the endscreen using the captured base frame.
+     */
     draw() {
         this.drawWithBaseFrame();
     }

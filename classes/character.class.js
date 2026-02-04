@@ -1,3 +1,7 @@
+/**
+ * Represents the main player character (Pepe).
+ * Handles movement, animations, camera behavior and character-related sound effects.
+ */
 class Character extends MovableObject {
 
     IMAGES_WALKING = [
@@ -93,6 +97,9 @@ class Character extends MovableObject {
     lastAnimAt = 0;
 
 
+    /**
+     * Creates the character, loads animation assets and starts physics/loops.
+     */
     constructor() {
         super().loadImage(this.IMAGES_WALKING[0]);
         this.loadImages(this.IMAGES_WALKING);
@@ -110,17 +117,32 @@ class Character extends MovableObject {
     }
 
 
+    /**
+     * Starts movement and animation loops.
+     *
+     * @returns {void}
+     */
     animate() {
         this.startMovementLoop();
         this.startAnimationLoop();
     }
 
 
+    /**
+     * Starts the movement loop (60 FPS).
+     *
+     * @returns {void}
+     */
     startMovementLoop() {
         setInterval(() => this.tickMovement(), 1000 / 60);
     }
 
 
+    /**
+     * Runs one movement tick: input, movement, sounds, jump buffer and camera.
+     *
+     * @returns {void}
+     */
     tickMovement() {
         if (window.isGamePaused || this.world.stopped) return;
         this.setupWalkSound();
@@ -133,6 +155,11 @@ class Character extends MovableObject {
     }
 
 
+    /**
+     * Applies horizontal movement based on keyboard input.
+     *
+     * @returns {void}
+     */
     handleHorizontalMovement() {
         if (this.world.keyBaord.RIGHT && this.x < this.world.level.level_end_x) {
             this.moveRight();
@@ -145,6 +172,11 @@ class Character extends MovableObject {
     }
 
 
+    /**
+     * Updates activity state and stops idle sounds when the character is active.
+     *
+     * @returns {void}
+     */
     updateActivityState() {
         const doingSomething = this.isDoingSomething();
         if (!doingSomething) return;
@@ -154,11 +186,21 @@ class Character extends MovableObject {
     }
 
 
+    /**
+     * Checks whether the character is currently performing any activity.
+     *
+     * @returns {boolean}
+     */
     isDoingSomething() {
         return this.isAnyKeyPressed() || this.isAboveGround() || this.isHurt();
     }
 
 
+    /**
+     * Checks whether any relevant movement/action key is pressed.
+     *
+     * @returns {boolean}
+     */
     isAnyKeyPressed() {
         return this.world.keyBaord.RIGHT ||
             this.world.keyBaord.LEFT ||
@@ -169,11 +211,21 @@ class Character extends MovableObject {
     }
 
 
+    /**
+     * Starts the animation loop.
+     *
+     * @returns {void}
+     */
     startAnimationLoop() {
         setInterval(() => this.tickAnimation(), 50);
     }
 
 
+    /**
+     * Runs one animation tick and selects the correct animation state.
+     *
+     * @returns {void}
+     */
     tickAnimation() {
         if (isGamePaused || this.world.stopped) return;
         const now = performance.now();
@@ -185,6 +237,12 @@ class Character extends MovableObject {
     }
 
 
+    /**
+     * Handles the dead animation state.
+     *
+     * @param {number} now
+     * @returns {boolean} True if handled.
+     */
     handleDeadAnimation(now) {
         if (!this.isDead()) return false;
         this.ensureAnimationState('dead');
@@ -195,6 +253,12 @@ class Character extends MovableObject {
     }
 
 
+    /**
+     * Handles the hurt animation state.
+     *
+     * @param {number} now
+     * @returns {boolean} True if handled.
+     */
     handleHurtAnimation(now) {
         if (!this.isHurt()) return false;
         this.ensureAnimationState('hurt');
@@ -204,6 +268,12 @@ class Character extends MovableObject {
     }
 
 
+    /**
+     * Handles in-air animation state.
+     *
+     * @param {number} now
+     * @returns {boolean} True if handled.
+     */
     handleAirAnimation(now) {
         if (!this.isAboveGround()) return false;
         this.currentAnimation = 'jump';
@@ -213,6 +283,11 @@ class Character extends MovableObject {
     }
 
 
+    /**
+     * Resets jump flag once the character is no longer in jump animation.
+     *
+     * @returns {void}
+     */
     handleJumpReset() {
         if (!this.isJumping) return;
         this.img = this.imageCache[this.IMAGES_JUMPING[0]];
@@ -220,6 +295,12 @@ class Character extends MovableObject {
     }
 
 
+    /**
+     * Handles walk animation or idle/sleep animation depending on input.
+     *
+     * @param {number} now
+     * @returns {void}
+     */
     handleWalkOrIdle(now) {
         if (this.world.keyBaord.RIGHT || this.world.keyBaord.LEFT) {
             this.ensureAnimationState('walk');
@@ -232,6 +313,12 @@ class Character extends MovableObject {
     }
 
 
+    /**
+     * Ensures the animation state is set and resets frame timer when changed.
+     *
+     * @param {string} name
+     * @returns {void}
+     */
     ensureAnimationState(name) {
         if (this.currentAnimation === name) return;
         this.currentAnimation = name;
@@ -240,6 +327,11 @@ class Character extends MovableObject {
     }
 
 
+    /**
+     * Updates the camera depending on endboss proximity and lock state.
+     *
+     * @returns {void}
+     */
     updateCamera() {
         const boss = this.getEndboss();
         if (this.isCameraLocked()) return this.updateLockedCamera(boss);
@@ -248,16 +340,32 @@ class Character extends MovableObject {
     }
 
 
+    /**
+     * Returns the endboss instance from the current level.
+     *
+     * @returns {Endboss|undefined}
+     */
     getEndboss() {
         return this.world.level.enemies.find(e => e instanceof Endboss);
     }
 
 
+    /**
+     * Checks whether camera is currently locked.
+     *
+     * @returns {boolean}
+     */
     isCameraLocked() {
         return !!this.cameraLocked;
     }
 
 
+    /**
+     * Updates the camera while locked and decides when to unlock again.
+     *
+     * @param {Endboss|undefined} boss
+     * @returns {void}
+     */
     updateLockedCamera(boss) {
         this.world.camera_x = this.cameraLockX;
         if (!boss) return this.unlockCamera();
@@ -267,6 +375,11 @@ class Character extends MovableObject {
     }
 
 
+    /**
+     * Unlocks the camera and updates the anchor direction.
+     *
+     * @returns {void}
+     */
     unlockCamera() {
         this.cameraLocked = false;
         this.cameraLockX = null;
@@ -274,6 +387,12 @@ class Character extends MovableObject {
     }
 
 
+    /**
+     * Checks if the character has passed the boss enough to unlock.
+     *
+     * @param {Endboss} boss
+     * @returns {boolean}
+     */
     hasPassedBoss(boss) {
         const cL = this.x, cR = this.x + this.width;
         const bL = boss.x, bR = boss.x + boss.width;
@@ -281,6 +400,11 @@ class Character extends MovableObject {
     }
 
 
+    /**
+     * Checks whether the character is at the edge of the lock bounds.
+     *
+     * @returns {boolean}
+     */
     isAtLockEdge() {
         const vx = this.getViewOffsetX();
         const screenX = this.getScreenX(vx);
@@ -289,21 +413,43 @@ class Character extends MovableObject {
     }
 
 
+    /**
+     * Returns the current view offset X from the global viewport transform.
+     *
+     * @returns {number}
+     */
     getViewOffsetX() {
         return window.viewOffsetX || 0;
     }
 
 
+    /**
+     * Calculates the character's screen X position.
+     *
+     * @param {number} vx
+     * @returns {number}
+     */
     getScreenX(vx) {
         return this.x + (this.world.camera_x || 0) + vx;
     }
 
 
+    /**
+     * Returns camera lock bounds.
+     *
+     * @returns {{left: number, right: number}}
+     */
     getLockBounds() {
         return { left: 120, right: 500 };
     }
 
 
+    /**
+     * Determines if the camera should lock based on boss distance.
+     *
+     * @param {Endboss|undefined} boss
+     * @returns {boolean}
+     */
     shouldLockCamera(boss) {
         if (!boss) return false;
         const dist = Math.abs((this.x + this.width / 2) - (boss.x + boss.width / 2));
@@ -311,6 +457,11 @@ class Character extends MovableObject {
     }
 
 
+    /**
+     * Locks the camera at the current camera position.
+     *
+     * @returns {void}
+     */
     lockCamera() {
         this.cameraLocked = true;
         this.cameraLockX = this.world.camera_x;
@@ -318,6 +469,11 @@ class Character extends MovableObject {
     }
 
 
+    /**
+     * Makes the camera follow the character with smoothing.
+     *
+     * @returns {void}
+     */
     followCamera() {
         const vx = this.getViewOffsetX();
         const anchor = this.getAnchorX();
@@ -326,12 +482,23 @@ class Character extends MovableObject {
     }
 
 
+    /**
+     * Returns the desired camera anchor X position.
+     *
+     * @returns {number}
+     */
     getAnchorX() {
         const b = this.getLockBounds();
         return this.cameraAnchor === 'right' ? b.right : 100;
     }
 
 
+    /**
+     * Applies a lerp step to the camera x position.
+     *
+     * @param {number} desired
+     * @returns {void}
+     */
     applyCameraLerp(desired) {
         const t = this.getCameraLerpFactor();
         const has = typeof this.world.camera_x === 'number';
@@ -340,11 +507,21 @@ class Character extends MovableObject {
     }
 
 
+    /**
+     * Returns the lerp factor for camera smoothing.
+     *
+     * @returns {number}
+     */
     getCameraLerpFactor() {
         return 0.12;
     }
 
 
+    /**
+     * Configures the walking sound loop and base volume.
+     *
+     * @returns {void}
+     */
     setupWalkSound() {
         const walkSound = this.world.sounds.pepeWalk;
         if (!walkSound) return;
@@ -353,6 +530,11 @@ class Character extends MovableObject {
     }
 
 
+    /**
+     * Plays or pauses the walking sound depending on movement input.
+     *
+     * @returns {void}
+     */
     handleWalkSound() {
         const walkSound = this.world.sounds.pepeWalk;
         if (!walkSound) return;
@@ -364,6 +546,11 @@ class Character extends MovableObject {
     }
 
 
+    /**
+     * Plays the hurt sound once when entering hurt state.
+     *
+     * @returns {void}
+     */
     setHurtSound() {
         if (this.hurtSoundPlayed) return;
         const hurtSound = this.world?.sounds?.pepeHurt;
@@ -375,6 +562,11 @@ class Character extends MovableObject {
     }
 
 
+    /**
+     * Plays the dead sound once when entering dead state.
+     *
+     * @returns {void}
+     */
     setDeadSound() {
         if (this.deadSoundPlayed) return;
         const deadSound = this.world?.sounds?.pepeDead;
@@ -386,6 +578,12 @@ class Character extends MovableObject {
     }
 
 
+    /**
+     * Decides whether the character is sleeping or idling based on inactivity time.
+     *
+     * @param {number} now
+     * @returns {void}
+     */
     pepeIsSleeping(now) {
         const isSleeping = (now - this.lastActivityAt) >= this.idleTimeoutMs;
         if (isSleeping) {
@@ -396,6 +594,12 @@ class Character extends MovableObject {
     }
 
 
+    /**
+     * Executes sleeping animation and plays snoring sound when needed.
+     *
+     * @param {number} now
+     * @returns {void}
+     */
     sleeping(now) {
         this.stopPepeCalmBreathing?.();
         if (this.currentAnimation !== 'sleep') {
@@ -408,6 +612,12 @@ class Character extends MovableObject {
     }
 
 
+    /**
+     * Executes idle animation and plays calm breathing sound when needed.
+     *
+     * @param {number} now
+     * @returns {void}
+     */
     idle(now) {
         if (this.currentAnimation !== 'idle') {
             this.currentAnimation = 'idle';
@@ -419,6 +629,14 @@ class Character extends MovableObject {
     }
 
 
+    /**
+     * Advances the animation frames when the configured frame time is reached.
+     *
+     * @param {string[]} images
+     * @param {number} now
+     * @param {number} frameMs
+     * @returns {void}
+     */
     maybeAdvance(images, now, frameMs) {
         if ((now - this.lastAnimAt) >= frameMs) {
             this.playAnimation(images);
@@ -427,6 +645,11 @@ class Character extends MovableObject {
     }
 
 
+    /**
+     * Triggers a jump and starts the jump sound.
+     *
+     * @returns {void}
+     */
     jump() {
         this.speedY = 27.5;
         this.isJumping = true;
@@ -434,6 +657,11 @@ class Character extends MovableObject {
     }
 
 
+    /**
+     * Configures and plays the jump sound.
+     *
+     * @returns {void}
+     */
     setupJumpSound() {
         const jumpSound = this.world?.sounds?.pepeJump;
         if (!jumpSound) return;
@@ -443,6 +671,11 @@ class Character extends MovableObject {
     }
 
 
+    /**
+     * Updates jump animation frame based on vertical speed.
+     *
+     * @returns {void}
+     */
     updateJumpAnimation() {
         this.initJumpFrameTimer();
         const now = performance.now();
@@ -453,16 +686,33 @@ class Character extends MovableObject {
     }
 
 
+    /**
+     * Initializes the jump frame timer field.
+     *
+     * @returns {void}
+     */
     initJumpFrameTimer() {
         if (!this.lastJumpFrameAt) this.lastJumpFrameAt = 0;
     }
 
 
+    /**
+     * Checks whether jump frame updates are throttled.
+     *
+     * @param {number} now
+     * @returns {boolean}
+     */
     isJumpFrameThrottled(now) {
         return now - this.lastJumpFrameAt < 120;
     }
 
 
+    /**
+     * Calculates the jump frame index based on vertical velocity.
+     *
+     * @param {number} vy
+     * @returns {number}
+     */
     getJumpFrameIndex(vy) {
         const up_fast = 0, up_mid = 2, up_slow = 3, apex = 4;
         const down_slow = 5, down_mid = 6, down_fast = 8;
@@ -475,13 +725,25 @@ class Character extends MovableObject {
         return down_fast;
     }
 
-    
+
+    /**
+     * Sets the current jump frame image by index.
+     *
+     * @param {number} idx
+     * @returns {void}
+     */
     setJumpFrameImage(idx) {
         const path = this.IMAGES_JUMPING[idx];
         this.img = this.imageCache[path];
     }
 
 
+    /**
+     * Handles jump input with coyote time and jump buffering.
+     *
+     * @param {number} now
+     * @returns {void}
+     */
     handleJumpInput(now) {
         const space = this.getSpaceState();
         this.trackJumpPress(space, now);
@@ -495,11 +757,23 @@ class Character extends MovableObject {
     }
 
 
+    /**
+     * Returns the current space key state.
+     *
+     * @returns {boolean}
+     */
     getSpaceState() {
         return !!this.world?.keyBaord?.SPACE;
     }
 
 
+    /**
+     * Tracks jump press timings for buffered jump logic.
+     *
+     * @param {boolean} space
+     * @param {number} now
+     * @returns {void}
+     */
     trackJumpPress(space, now) {
         if (space && !this.prevSpace) {
             this.lastJumpPressedAt = now;
@@ -508,6 +782,12 @@ class Character extends MovableObject {
     }
 
 
+    /**
+     * Updates grounded state and stores last grounded timestamp.
+     *
+     * @param {number} now
+     * @returns {boolean}
+     */
     updateGroundedState(now) {
         const grounded = !this.isAboveGround();
         if (grounded) {
@@ -517,6 +797,12 @@ class Character extends MovableObject {
     }
 
 
+    /**
+     * Determines whether a buffered jump should trigger.
+     *
+     * @param {number} now
+     * @returns {boolean}
+     */
     shouldTriggerBufferedJump(now) {
         const withinCoyote = (now - this.lastGroundedAt) <= this.coyoteTimeMs;
         const withinBuffer = (now - this.lastJumpPressedAt) <= this.jumpBufferMs;
@@ -524,6 +810,11 @@ class Character extends MovableObject {
     }
 
 
+    /**
+     * Triggers the buffered jump action.
+     *
+     * @returns {void}
+     */
     triggerBufferedJump() {
         this.jump();
         this.lastJumpPressedAt = -Infinity;
@@ -531,16 +822,32 @@ class Character extends MovableObject {
     }
 
 
+    /**
+     * Determines whether jumping flag should be reset.
+     *
+     * @param {boolean} grounded
+     * @returns {boolean}
+     */
     shouldResetJumping(grounded) {
         return grounded && this.isJumping && this.speedY === 0;
     }
 
 
+    /**
+     * Resets jumping flag.
+     *
+     * @returns {void}
+     */
     resetJumping() {
         this.isJumping = false;
     }
 
 
+    /**
+     * Plays the snoring sound while sleeping (if allowed).
+     *
+     * @returns {void}
+     */
     playPepeSnoring() {
         const pepeSnoring = this.world?.sounds?.pepeSnoring;
         if (!pepeSnoring || isSoundMuted || isGamePaused || this.world?.stopped) return;
@@ -551,6 +858,11 @@ class Character extends MovableObject {
     }
 
 
+    /**
+     * Stops the snoring sound.
+     *
+     * @returns {void}
+     */
     stopPepeSnoring() {
         const pepeSnoring = this.world?.sounds?.pepeSnoring;
         if (!pepeSnoring) return;
@@ -559,6 +871,11 @@ class Character extends MovableObject {
     }
 
 
+    /**
+     * Plays calm breathing sound during idle (if allowed).
+     *
+     * @returns {void}
+     */
     playPepeCalmBreating() {
         const calmBreathing = this.world?.sounds?.pepeCalmBreathing;
         if (!calmBreathing || !calmBreathing.paused || isSoundMuted) return;
@@ -568,6 +885,11 @@ class Character extends MovableObject {
     }
 
 
+    /**
+     * Stops calm breathing sound.
+     *
+     * @returns {void}
+     */
     stopPepeCalmBreathing() {
         const calmBreathing = this.world?.sounds?.pepeCalmBreathing;
         if (!calmBreathing) return;

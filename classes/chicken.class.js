@@ -1,3 +1,8 @@
+/**
+ * Represents a standard chicken enemy that walks left,
+ * plays walking animations and gets removed after death.
+ * @extends MovableObject
+ */
 class Chicken extends MovableObject {
     y = 360;
     height = 70;
@@ -10,6 +15,9 @@ class Chicken extends MovableObject {
     ];
 
 
+    /**
+     * Creates a new chicken instance with randomized position and speed.
+     */
     constructor() {
         super().loadImage(this.IMAGES_WALKING[0]);
         this.loadImages(this.IMAGES_WALKING);
@@ -28,6 +36,10 @@ class Chicken extends MovableObject {
     }
 
 
+    /**
+     * Starts the animation and movement loop for the chicken.
+     * Respects the global pause state.
+     */
     animate() {
         this.mainInterval = setInterval(() => {
             if (isGamePaused) return;
@@ -37,6 +49,10 @@ class Chicken extends MovableObject {
     }
 
 
+    /**
+     * Updates the chicken state for the current frame.
+     * @param {number} now - Current timestamp.
+     */
     updateChicken(now) {
         if (this.isDead()) return this.handleDeath();
         this.moveLeft();
@@ -44,18 +60,30 @@ class Chicken extends MovableObject {
     }
 
 
+    /**
+     * Updates walking animation frames if the frame interval is reached.
+     * @param {number} now - Current timestamp.
+     */
     updateWalkingFrames(now) {
         if (!this.shouldAdvanceFrame(now)) return;
         this.playAnimation(this.IMAGES_WALKING);
         this.lastFrameTime = now;
     }
-    
 
+
+    /**
+     * Checks whether the next animation frame should be displayed.
+     * @param {number} now - Current timestamp.
+     * @returns {boolean}
+     */
     shouldAdvanceFrame(now) {
         return (now - this.lastFrameTime) >= this.frameMs;
     }
 
 
+    /**
+     * Handles the chicken death state and schedules its removal.
+     */
     handleDeath() {
         if (this.isRemoved) return;
         this.isRemoved = true;
@@ -65,11 +93,17 @@ class Chicken extends MovableObject {
     }
 
 
+    /**
+     * Stops the internal update interval.
+     */
     stopChickenLoop() {
         if (this.mainInterval) clearInterval(this.mainInterval);
     }
 
 
+    /**
+     * Removes the chicken from the world after a delay.
+     */
     removeFromWorldDelayed() {
         setTimeout(() => {
             if (!this.world) return;
