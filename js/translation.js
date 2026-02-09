@@ -63,6 +63,7 @@ function applyBurgerMenuTranslations(t) {
     setText('keyHelp', t.keyHelp);
     setText('rankingList', t.rankingList);
     setText('impressum', t.impressum);
+    setText('copyright', t.copyright);
 }
 
 
