@@ -58,8 +58,20 @@ function getMobileControlsElement() {
  * @returns {boolean}
  */
 function shouldShowMobileControls() {
-    return isMobileDevice() || isSmallScreen();
+    return isMobileDevice() || isSmallScreen() || isTouchInput();
 }
+
+
+/**
+ * Detects if the current device likely supports touch input.
+ *
+ * @returns {boolean}
+ */
+function isTouchInput() {
+    if (window.matchMedia?.('(pointer: coarse)').matches) return true;
+    return ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+}
+
 
 
 /**

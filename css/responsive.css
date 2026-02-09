@@ -8,7 +8,9 @@
     .burger-btn,
     .control-btn,
     #fullscreenBtn,
-    .game-over-btn {
+    .game-over-btn,
+    .next-level-text,
+    .win-btn {
         padding: 6px 10px;
         font-size: 16px;
     }
@@ -17,7 +19,10 @@
         right: 150px;
     }
 
-    .game-over-btn img {
+    .game-over-btn img,
+    .win-btn img,
+    #startButton img,
+    .icon-img {
         width: 30px;
         height: 30px;
     }
@@ -68,6 +73,50 @@
 }
 
 
+@media only screen and (max-width: 560px) {
+
+    .burger-overlay,
+    .settings-overlay {
+        padding: 12px;
+    }
+
+    .settings-header {
+        padding: 0 0 12px 12px;
+    }
+
+    h2 {
+        font-size: 16px;
+    }
+
+    .setting-row {
+        font-size: 14px;
+        padding-left: 12px;
+    }
+
+    .language-btn {
+        font-size: 16px;
+    }
+}
+
+
+@media only screen and (max-width: 530px) {
+
+    .burger-header {
+        padding: 8px;
+    }
+
+    .burger-overlay ul {
+        gap: 8px;
+    }
+
+    .burger-overlay,
+    .settings-overlay {
+        gap: 8px;
+        padding: 12px;
+    }
+}
+
+
 @media only screen and (max-width: 500px) {
 
     #titleGame {
@@ -80,14 +129,21 @@
 
     .burger-overlay,
     .settings-overlay {
-        padding: 12px;
-        width: 220px;
+        width: 60%;
         gap: 8px;
     }
 
     .burger-header,
     .settings-header {
         padding-bottom: 8px;
+    }
+
+    .game-over-btn img,
+    .win-btn img,
+    #startButton img,
+    .icon-img {
+        width: 24px;
+        height: 24px;
     }
 
     .menu-btn {
@@ -99,8 +155,6 @@
         grid-auto-rows: 56px;
         gap: 4px;
     }
-
-
 
     .menu-icon {
         width: 36px;
@@ -117,32 +171,75 @@
 }
 
 
-@media only screen and (max-width: 400px) {
-
-    .burger-overlay,
-    .settings-overlay {
-        padding: 6px;
-        gap: 0;
-    }
-
-    .burger-header,
-    .settings-header {
-        padding-bottom: 8px;
-    }
+@media only screen and (max-width: 460px) {
 
     .burger-overlay ul {
         grid-auto-rows: 48px;
     }
 
-    .burger-overlay.open,
-    .settings-overlay.open {
+    .burger-overlay,
+    .settings-overlay {
+        gap: 8px;
+        padding: 8px;
+    }
+}
+
+
+@media only screen and (max-width: 430px) {
+
+    .burger-overlay,
+    .settings-overlay {
+        padding: 6px;
+    }
+}
+
+
+@media only screen and (max-width: 400px) {
+
+    .burger-header {
+        padding: 0 0 8px;
+    }
+
+    .burger-overlay ul {
+        grid-auto-rows: 36px;
+    }
+
+    .burger-overlay,
+    .settings-overlay {
         gap: 6px;
     }
 
     .setting-block {
         gap: 12px;
     }
+
+    .menu-btn {
+        height: 32px;
+    }
+
+    .menu-icon {
+        width: 24px;
+        height: 24px;
+    }
+
+    .copyright {
+        font-size: 8px;
+    }
+
+    h2,
+    .setting-row,
+    .language-btn {
+        font-size: 12px;
+    }
 }
+
+
+@media (pointer: coarse) and (min-width: 721px) and (max-width: 1280px) {
+    #gameContainer {
+        border-radius: 0;
+    }
+}
+
 
 
 @media (orientation: landscape) and (max-height: 480px) {
