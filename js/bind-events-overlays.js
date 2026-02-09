@@ -35,10 +35,19 @@ function bindOverlayOutsideCloseEvents() {
 function bindOverlayContentDelegation() {
     const container = document.querySelector('#langOverlay .modal-content');
     if (!container) return;
-    container.addEventListener('click', (e) => {
-        onLangOptionClick(e);
-        e.stopPropagation();
-    });
+    container.addEventListener('click', onLangModalContentClick);
+}
+
+
+/**
+ * Handles delegated clicks inside the language modal content.
+ *
+ * @param {MouseEvent} e
+ * @returns {void}
+ */
+function onLangModalContentClick(e) {
+    onLangOptionClick(e);
+    e.stopPropagation();
 }
 
 
@@ -247,7 +256,7 @@ function shouldCloseSettingsByOutsideClick(e) {
     if (!settings) return false;
     return settings.classList.contains('open')
         && !settings.contains(e.target)
-        && e.target !== burgerBtn;
+        && !burgerBtn?.contains(e.target);
 }
 
 
@@ -263,5 +272,5 @@ function shouldCloseBurgerByOutsideClick(e) {
     if (!burger) return false;
     return burger.classList.contains('open')
         && !burger.contains(e.target)
-        && e.target !== burgerBtn;
+        && !burgerBtn?.contains(e.target);
 }

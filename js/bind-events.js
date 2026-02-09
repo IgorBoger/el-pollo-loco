@@ -9,17 +9,16 @@ bootstrapUi();
  */
 function onWindowLoad() {
     initUiOnLoad();
+    bindKeyboardEvents();
     bindBaseGameUiEvents();
     bindBurgerUiEvents();
     bindAudioToggleEvents();
     bindSettingsOverlayEvents();
-
     bindOverlayOpenCloseEvents();
     bindOverlayOutsideCloseEvents();
     bindOverlayContentDelegation();
     bindEndscreenButtons();
     bindGlobalOutsideClose();
-
     bindViewportEvents();
     addReleaseGuards();
 }
@@ -91,8 +90,20 @@ function bindClick(id, fn) {
  * @returns {void}
  */
 function bindBurgerUiEvents() {
-    bindClick('burgerBtn', toggleBurgerMenu);
+    bindClick('burgerBtn', onBurgerButtonClick);
     bindClick('burgerClose', closeBurgerMenu);
+}
+
+
+/**
+ * Handles burger button clicks and prevents global outside-close interference.
+ *
+ * @param {MouseEvent} e
+ * @returns {void}
+ */
+function onBurgerButtonClick(e) {
+    e.stopPropagation();
+    toggleBurgerMenu();
 }
 
 

@@ -1,41 +1,3 @@
-/**
- * Handles key release events and updates keyboard state accordingly.
- *
- * @param {KeyboardEvent} event
- * @returns {void}
- */
-document.addEventListener("keyup", function (event) {
-    if (event.key === "ArrowLeft") keyBaord.LEFT = false;
-    if (event.key === "ArrowRight") keyBaord.RIGHT = false;
-    if (event.key === " ") keyBaord.SPACE = false;
-    if (event.key === "d") keyBaord.THROW = false;
-});
-
-
-/**
- * Handles key press events and updates keyboard state accordingly.
- * Also closes open overlays when Escape is pressed.
- *
- * @param {KeyboardEvent} event
- * @returns {void}
- */
-document.addEventListener("keydown", function (event) {
-    if (event.key === "ArrowLeft") keyBaord.LEFT = true;
-    if (event.key === "ArrowRight") keyBaord.RIGHT = true;
-    if (event.key === " ") keyBaord.SPACE = true;
-    if (event.key === "d") keyBaord.THROW = true;
-    if (event.key === "Escape") {
-        if (typeof isOverlayOpen === 'function' && isOverlayOpen('rankingClearOverlay')) {
-            closeRankingClearConfirm();
-            return;
-        }
-        closeKeyHelpOverlay();
-        closeStoryOverlay();
-        closeLangModal();
-        closeRankingOverlay();
-        closeImpressumOverlay();
-    }
-});
 
 
 /**
@@ -300,9 +262,17 @@ function resetMobileKeys() {
  */
 function addReleaseGuards() {
     window.addEventListener('blur', resetMobileKeys);
-    document.addEventListener('visibilitychange', () => {
-        if (document.hidden) resetMobileKeys();
-    });
+    document.addEventListener('visibilitychange', onVisibilityChangeReleaseKeys);
+}
+
+
+/**
+ * Releases mobile keys when the document gets hidden.
+ *
+ * @returns {void}
+ */
+function onVisibilityChangeReleaseKeys() {
+    if (document.hidden) resetMobileKeys();
 }
 
 

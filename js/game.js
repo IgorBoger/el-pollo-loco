@@ -15,7 +15,8 @@ var isGamePaused = false;
 window.isGamePaused = isGamePaused;
 let gameStartAt = 0;
 const LEADERBOARD_KEY = 'leaderboard';
-window.debugHitboxes = false;
+// // window.debugHitboxes = false;
+// window.debugHitboxes = true;
 
 
 /**
