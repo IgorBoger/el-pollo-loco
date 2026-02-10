@@ -1,7 +1,7 @@
 /**
  * Initializes background tiles.
  */
-World.prototype.initBackground = function() {
+World.prototype.initBackground = function () {
     for (let i = -1; i < this.backgroundTileCount; i++) {
         const xPos = i * 720;
         const currentLayers = i % 2 === 0 ? this.level.layers : this.level.altLayers;
@@ -15,7 +15,7 @@ World.prototype.initBackground = function() {
  * @param {number} xPos
  * @param {string[]} layers
  */
-World.prototype.addTile = function(xPos, layers) {
+World.prototype.addTile = function (xPos, layers) {
     layers.forEach(imagePath => {
         this.level.backgroundObjects.push(new BackgroundObject(imagePath, xPos));
     });
@@ -25,9 +25,10 @@ World.prototype.addTile = function(xPos, layers) {
 /**
  * Main draw loop.
  */
-World.prototype.draw = function() {
+World.prototype.draw = function () {
     if (this.stopped) return;
-    const start = performance.now();
+    const now = performance.now();
+    this.updateWorldAnimations(now);
     this.clearWorldCanvas();
     this.drawWorldObjectsWithCamera();
     this.drawStatusBars();
@@ -40,7 +41,7 @@ World.prototype.draw = function() {
 /**
  * Clears the canvas.
  */
-World.prototype.clearWorldCanvas = function() {
+World.prototype.clearWorldCanvas = function () {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 }
 
@@ -48,7 +49,7 @@ World.prototype.clearWorldCanvas = function() {
 /**
  * Draws world objects with camera translation.
  */
-World.prototype.drawWorldObjectsWithCamera = function() {
+World.prototype.drawWorldObjectsWithCamera = function () {
     this.ctx.translate(this.camera_x, 0);
     this.drawWorldObjects();
     this.tryAddNextBackgroundTile();
@@ -59,7 +60,7 @@ World.prototype.drawWorldObjectsWithCamera = function() {
 /**
  * Draws all world objects.
  */
-World.prototype.drawWorldObjects = function() {
+World.prototype.drawWorldObjects = function () {
     this.addObjectsToMap(this.level.backgroundObjects);
     this.addObjectsToMap(this.level.clouds);
     this.addToMap(this.character);
@@ -73,7 +74,7 @@ World.prototype.drawWorldObjects = function() {
 /**
  * Adds next background tile if needed.
  */
-World.prototype.tryAddNextBackgroundTile = function() {
+World.prototype.tryAddNextBackgroundTile = function () {
     if (this.character.x + this.canvas.width <= this.backgroundTileCount * 720) return;
     this.addBackgroundTile(this.backgroundTileCount);
     this.backgroundTileCount++;
@@ -83,7 +84,7 @@ World.prototype.tryAddNextBackgroundTile = function() {
 /**
  * Draws all status bars.
  */
-World.prototype.drawStatusBars = function() {
+World.prototype.drawStatusBars = function () {
     this.addToMap(this.healthBar);
     this.addToMap(this.coinBar);
     this.addToMap(this.bottleBar);
@@ -94,7 +95,7 @@ World.prototype.drawStatusBars = function() {
 /**
  * Draws a static frame without game loop.
  */
-World.prototype.drawStaticFrame = function() {
+World.prototype.drawStaticFrame = function () {
     this.stopped = false;
     this.draw();
     this.stopped = true;
@@ -105,7 +106,7 @@ World.prototype.drawStaticFrame = function() {
  * Adds a new background tile dynamically.
  * @param {number} tileIndex
  */
-World.prototype.addBackgroundTile = function(tileIndex) {
+World.prototype.addBackgroundTile = function (tileIndex) {
     const xPos = tileIndex * 720;
     const currentLayers = tileIndex % 2 === 0 ? this.level.layers : this.level.altLayers;
     this.addTile(xPos, currentLayers);
@@ -116,7 +117,7 @@ World.prototype.addBackgroundTile = function(tileIndex) {
  * Adds multiple objects to the map.
  * @param {Array} objects
  */
-World.prototype.addObjectsToMap = function(objects) {
+World.prototype.addObjectsToMap = function (objects) {
     objects.forEach(obj => this.addToMap(obj));
 }
 
@@ -125,7 +126,7 @@ World.prototype.addObjectsToMap = function(objects) {
  * Draws a single object to the map.
  * @param {*} mo
  */
-World.prototype.addToMap = function(mo) {
+World.prototype.addToMap = function (mo) {
     this.ctx.save();
     if (mo.otherDirection) this.flipImage(mo);
     if (!mo.otherDirection) this.flipImageBack(mo);
@@ -139,7 +140,7 @@ World.prototype.addToMap = function(mo) {
  * Flips drawing context horizontally.
  * @param {*} mo
  */
-World.prototype.flipImage = function(mo) {
+World.prototype.flipImage = function (mo) {
     this.ctx.translate(mo.x + mo.width, mo.y);
     this.ctx.scale(-1, 1);
 }
@@ -149,6 +150,6 @@ World.prototype.flipImage = function(mo) {
  * Resets context after flipping.
  * @param {*} mo
  */
-World.prototype.flipImageBack = function(mo) {
+World.prototype.flipImageBack = function (mo) {
     this.ctx.translate(mo.x, mo.y);
 }

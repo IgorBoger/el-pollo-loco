@@ -1,7 +1,7 @@
 /**
  * Starts the main collision and logic loop.
  */
-World.prototype.run = function() {
+World.prototype.run = function () {
     this.runTimer = setInterval(() => {
         if (isGamePaused || this.stopped) return;
         this.checkCollisions();
@@ -14,7 +14,7 @@ World.prototype.run = function() {
 /**
  * Updates health status bar.
  */
-World.prototype.updateHealthStatusBar = function() {
+World.prototype.updateHealthStatusBar = function () {
     this.healthBar.setPercentage(this.character.energy);
 }
 
@@ -22,7 +22,7 @@ World.prototype.updateHealthStatusBar = function() {
 /**
  * Updates coin status bar.
  */
-World.prototype.updateCoinStatusBar = function() {
+World.prototype.updateCoinStatusBar = function () {
     this.coinBar.setPercentage(this.character.coin);
 }
 
@@ -30,7 +30,7 @@ World.prototype.updateCoinStatusBar = function() {
 /**
  * Updates bottle status bar.
  */
-World.prototype.updateBottleStatusBar = function() {
+World.prototype.updateBottleStatusBar = function () {
     this.bottleBar.setPercentage(this.character.bottle);
 }
 
@@ -39,7 +39,7 @@ World.prototype.updateBottleStatusBar = function() {
  * Updates endboss status bar.
  * @param {*} endboss
  */
-World.prototype.updateEndbossStatusBar = function(endboss) {
+World.prototype.updateEndbossStatusBar = function (endboss) {
     this.endbossBar.setPercentage(endboss.energy);
 }
 
@@ -47,7 +47,7 @@ World.prototype.updateEndbossStatusBar = function(endboss) {
 /**
  * Schedules game over when character is dead.
  */
-World.prototype.scheduleGameOverIfDead = function() {
+World.prototype.scheduleGameOverIfDead = function () {
     if (!this.character.isDead()) return;
     if (this.gameOverScheduled) return;
     this.gameOverScheduled = true;
@@ -58,7 +58,7 @@ World.prototype.scheduleGameOverIfDead = function() {
 /**
  * Schedules delayed game over.
  */
-World.prototype.scheduleGameOverTimeout = function() {
+World.prototype.scheduleGameOverTimeout = function () {
     const boss = this.level.enemies.find(e => e instanceof Endboss);
     const restBoss = (boss?.currentAnimation === 'attack')
         ? Math.max(0, (boss.attackUntil || 0) - performance.now())
@@ -70,7 +70,7 @@ World.prototype.scheduleGameOverTimeout = function() {
 /**
  * Finalizes game over.
  */
-World.prototype.finishGameOver = function() {
+World.prototype.finishGameOver = function () {
     this.stopped = true;
     this.endscreen.show();
     this.callOnGameOverIfExists();
@@ -80,7 +80,7 @@ World.prototype.finishGameOver = function() {
 /**
 * Calls the global game-over callback if it exists.
 */
-World.prototype.callOnGameOverIfExists = function() {
+World.prototype.callOnGameOverIfExists = function () {
     if (typeof onGameOver !== 'function') return;
     onGameOver(this);
 }
@@ -89,7 +89,7 @@ World.prototype.callOnGameOverIfExists = function() {
 /**
  * Requests next animation frame.
  */
-World.prototype.requestNextFrame = function() {
+World.prototype.requestNextFrame = function () {
     let self = this;
     requestAnimationFrame(function () {
         self.draw();
@@ -100,7 +100,7 @@ World.prototype.requestNextFrame = function() {
 /**
  * Checks win condition.
  */
-World.prototype.checkWinCondition = function() {
+World.prototype.checkWinCondition = function () {
     const boss = this.getEndboss();
     if (!boss || !boss.isDead?.() || !boss.isDeadAnimFinished?.()) return;
     if (this.winScheduled || this.gameOverScheduled) return;
@@ -113,7 +113,7 @@ World.prototype.checkWinCondition = function() {
  * Returns the endboss instance.
  * @returns {*|null}
  */
-World.prototype.getEndboss = function() {
+World.prototype.getEndboss = function () {
     return this.level?.enemies?.find(e => e instanceof Endboss) || null;
 }
 
@@ -121,7 +121,7 @@ World.prototype.getEndboss = function() {
 /**
  * Shows the win screen.
  */
-World.prototype.showWin = function() {
+World.prototype.showWin = function () {
     this.stopped = true;
     this.winscreen.show();
     if (typeof onWin === 'function') onWin(this);
@@ -131,7 +131,7 @@ World.prototype.showWin = function() {
 /**
  * Destroys the world and resets all state.
  */
-World.prototype.destroy = function() {
+World.prototype.destroy = function () {
     this.stopAllEnemies();
     this.stopped = true;
     this.stopRunTimer();
@@ -146,7 +146,7 @@ World.prototype.destroy = function() {
 /**
  * Stops the main run timer.
  */
-World.prototype.stopRunTimer = function() {
+World.prototype.stopRunTimer = function () {
     if (!this.runTimer) return;
     clearInterval(this.runTimer);
     this.runTimer = null;
@@ -156,7 +156,7 @@ World.prototype.stopRunTimer = function() {
 /**
  * Hides all overlay screens.
  */
-World.prototype.hideScreens = function() {
+World.prototype.hideScreens = function () {
     this.endscreen?.hide();
     this.winscreen?.hide();
 }
@@ -165,7 +165,7 @@ World.prototype.hideScreens = function() {
 /**
  * Resets win/game over state flags.
  */
-World.prototype.resetEndStates = function() {
+World.prototype.resetEndStates = function () {
     this.winScheduled = false;
     this.gameOverScheduled = false;
 }
@@ -174,7 +174,7 @@ World.prototype.resetEndStates = function() {
 /**
  * Resets world object collections.
  */
-World.prototype.resetWorldObjects = function() {
+World.prototype.resetWorldObjects = function () {
     this.throwableObject = [];
     this.coins = [];
     this.bottles = [];
@@ -184,6 +184,28 @@ World.prototype.resetWorldObjects = function() {
 /**
  * Stops all enemies.
  */
-World.prototype.stopAllEnemies = function() {
+World.prototype.stopAllEnemies = function () {
     this.level?.enemies?.forEach(enemy => enemy.stop?.());
+}
+
+
+/**
+ * Updates world animation state once per frame.
+ * @param {number} now
+ * @returns {void}
+ */
+World.prototype.updateWorldAnimations = function (now) {
+    this.updateCoinAnimations(now);
+}
+
+
+
+/**
+ * Updates animations for all coins in the world.
+ * @param {number} now
+ * @returns {void}
+ */
+World.prototype.updateCoinAnimations = function (now) {
+    if (!this.coins?.length) return;
+    this.coins.forEach(c => c.updateAnimation?.(now));
 }
