@@ -1,6 +1,5 @@
 /**
  * Starts the movement loop (60 FPS).
- *
  * @returns {void}
  */
 Character.prototype.startMovementLoop = function () {
@@ -10,7 +9,6 @@ Character.prototype.startMovementLoop = function () {
 
 /**
  * Runs one movement tick: input, movement, sounds, jump buffer and camera.
- *
  * @returns {void}
  */
 Character.prototype.tickMovement = function () {
@@ -27,7 +25,6 @@ Character.prototype.tickMovement = function () {
 
 /**
  * Applies horizontal movement based on keyboard input.
- *
  * @returns {void}
  */
 Character.prototype.handleHorizontalMovement = function () {
@@ -44,7 +41,6 @@ Character.prototype.handleHorizontalMovement = function () {
 
 /**
  * Updates activity state and stops idle sounds when the character is active.
- *
  * @returns {void}
  */
 Character.prototype.updateActivityState = function () {
@@ -58,7 +54,6 @@ Character.prototype.updateActivityState = function () {
 
 /**
  * Checks whether the character is currently performing any activity.
- *
  * @returns {boolean}
  */
 Character.prototype.isDoingSomething = function () {
@@ -68,7 +63,6 @@ Character.prototype.isDoingSomething = function () {
 
 /**
  * Checks whether any relevant movement/action key is pressed.
- *
  * @returns {boolean}
  */
 Character.prototype.isAnyKeyPressed = function () {
@@ -83,7 +77,6 @@ Character.prototype.isAnyKeyPressed = function () {
 
 /**
  * Updates the camera depending on endboss proximity and lock state.
- *
  * @returns {void}
  */
 Character.prototype.updateCamera = function () {
@@ -96,7 +89,6 @@ Character.prototype.updateCamera = function () {
 
 /**
  * Returns the endboss instance from the current level.
- *
  * @returns {Endboss|undefined}
  */
 Character.prototype.getEndboss = function () {
@@ -106,7 +98,6 @@ Character.prototype.getEndboss = function () {
 
 /**
  * Checks whether camera is currently locked.
- *
  * @returns {boolean}
  */
 Character.prototype.isCameraLocked = function () {
@@ -116,22 +107,20 @@ Character.prototype.isCameraLocked = function () {
 
 /**
  * Updates the camera while locked and decides when to unlock again.
- *
  * @param {Endboss|undefined} boss
  * @returns {void}
  */
 Character.prototype.updateLockedCamera = function (boss) {
     this.world.camera_x = this.cameraLockX;
     if (!boss) return this.unlockCamera();
-    if (!this.hasPassedBoss(boss)) return;
-    if (!this.isAtLockEdge()) return;
+    if (!this.shouldUnlockCamera(boss)) return;
+    // if (!this.isAtLockEdge()) return;
     this.unlockCamera();
 };
 
 
 /**
  * Unlocks the camera and updates the anchor direction.
- *
  * @returns {void}
  */
 Character.prototype.unlockCamera = function () {
@@ -142,34 +131,29 @@ Character.prototype.unlockCamera = function () {
 
 
 /**
- * Checks if the character has passed the boss enough to unlock.
- *
+ * Unlocks camera when the character retreats far enough from the boss.
  * @param {Endboss} boss
  * @returns {boolean}
  */
-Character.prototype.hasPassedBoss = function (boss) {
-    const cL = this.x, cR = this.x + this.width;
-    const bL = boss.x, bR = boss.x + boss.width;
-    return this.lockDir === 'right' ? (cL > bR + 20) : (cR < bL - 20);
+Character.prototype.shouldUnlockCamera = function (boss) {
+    return this.getBossDistance(boss) > 220;
 };
 
 
 /**
- * Checks whether the character is at the edge of the lock bounds.
- *
- * @returns {boolean}
+ * Returns current horizontal distance between character center and boss center.
+ * @param {Endboss} boss
+ * @returns {number}
  */
-Character.prototype.isAtLockEdge = function () {
-    const vx = this.getViewOffsetX();
-    const screenX = this.getScreenX(vx);
-    const b = this.getLockBounds();
-    return this.lockDir === 'right' ? screenX >= b.right : screenX <= b.left;
+Character.prototype.getBossDistance = function (boss) {
+    const c = this.x + this.width / 2;
+    const b = boss.x + boss.width / 2;
+    return Math.abs(c - b);
 };
 
 
 /**
  * Returns the current view offset X from the global viewport transform.
- *
  * @returns {number}
  */
 Character.prototype.getViewOffsetX = function () {
@@ -178,19 +162,7 @@ Character.prototype.getViewOffsetX = function () {
 
 
 /**
- * Calculates the character's screen X position.
- *
- * @param {number} vx
- * @returns {number}
- */
-Character.prototype.getScreenX = function (vx) {
-    return this.x + (this.world.camera_x || 0) + vx;
-};
-
-
-/**
  * Returns camera lock bounds.
- *
  * @returns {{left: number, right: number}}
  */
 Character.prototype.getLockBounds = function () {
@@ -200,7 +172,6 @@ Character.prototype.getLockBounds = function () {
 
 /**
  * Determines if the camera should lock based on boss distance.
- *
  * @param {Endboss|undefined} boss
  * @returns {boolean}
  */
@@ -213,7 +184,6 @@ Character.prototype.shouldLockCamera = function (boss) {
 
 /**
  * Locks the camera at the current camera position.
- *
  * @returns {void}
  */
 Character.prototype.lockCamera = function () {
@@ -225,7 +195,6 @@ Character.prototype.lockCamera = function () {
 
 /**
  * Makes the camera follow the character with smoothing.
- *
  * @returns {void}
  */
 Character.prototype.followCamera = function () {
@@ -238,7 +207,6 @@ Character.prototype.followCamera = function () {
 
 /**
  * Returns the desired camera anchor X position.
- *
  * @returns {number}
  */
 Character.prototype.getAnchorX = function () {
@@ -249,7 +217,6 @@ Character.prototype.getAnchorX = function () {
 
 /**
  * Applies a lerp step to the camera x position.
- *
  * @param {number} desired
  * @returns {void}
  */
@@ -263,7 +230,6 @@ Character.prototype.applyCameraLerp = function (desired) {
 
 /**
  * Returns the lerp factor for camera smoothing.
- *
  * @returns {number}
  */
 Character.prototype.getCameraLerpFactor = function () {
@@ -273,7 +239,6 @@ Character.prototype.getCameraLerpFactor = function () {
 
 /**
  * Triggers a jump and starts the jump sound.
- *
  * @returns {void}
  */
 Character.prototype.jump = function () {
@@ -285,7 +250,6 @@ Character.prototype.jump = function () {
 
 /**
  * Configures and plays the jump sound.
- *
  * @returns {void}
  */
 Character.prototype.setupJumpSound = function () {
@@ -299,7 +263,6 @@ Character.prototype.setupJumpSound = function () {
 
 /**
  * Handles jump input with coyote time and jump buffering.
- *
  * @param {number} now
  * @returns {void}
  */
@@ -314,7 +277,6 @@ Character.prototype.handleJumpInput = function (now) {
 
 /**
  * Returns the current space key state.
- *
  * @returns {boolean}
  */
 Character.prototype.getSpaceState = function () {
@@ -324,7 +286,6 @@ Character.prototype.getSpaceState = function () {
 
 /**
  * Tracks jump press timings for buffered jump logic.
- *
  * @param {boolean} space
  * @param {number} now
  * @returns {void}
@@ -337,7 +298,6 @@ Character.prototype.trackJumpPress = function (space, now) {
 
 /**
  * Updates grounded state and stores last grounded timestamp.
- *
  * @param {number} now
  * @returns {boolean}
  */
@@ -350,7 +310,6 @@ Character.prototype.updateGroundedState = function (now) {
 
 /**
  * Determines whether a buffered jump should trigger.
- *
  * @param {number} now
  * @returns {boolean}
  */
@@ -363,7 +322,6 @@ Character.prototype.shouldTriggerBufferedJump = function (now) {
 
 /**
  * Triggers the buffered jump action.
- *
  * @returns {void}
  */
 Character.prototype.triggerBufferedJump = function () {
@@ -375,7 +333,6 @@ Character.prototype.triggerBufferedJump = function () {
 
 /**
  * Determines whether jumping flag should be reset.
- *
  * @param {boolean} grounded
  * @returns {boolean}
  */
@@ -386,7 +343,6 @@ Character.prototype.shouldResetJumping = function (grounded) {
 
 /**
  * Resets jumping flag.
- *
  * @returns {void}
  */
 Character.prototype.resetJumping = function () {

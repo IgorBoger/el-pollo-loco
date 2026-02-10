@@ -1,7 +1,7 @@
 /**
  * Turns at patrol boundaries based on direction and position.
  */
-Endboss.prototype.turnAtPatrolEdges = function() {
+Endboss.prototype.turnAtPatrolEdges = function () {
     if (this.shouldTurnLeftEdge()) return this.turnToRight();
     if (this.shouldTurnRightEdge()) return this.turnToLeft();
 };
@@ -11,7 +11,7 @@ Endboss.prototype.turnAtPatrolEdges = function() {
  * Checks if the endboss should turn at the left patrol edge.
  * @returns {boolean}
  */
-Endboss.prototype.shouldTurnLeftEdge = function() {
+Endboss.prototype.shouldTurnLeftEdge = function () {
     return this.patrolDir < 0 && this.x <= this.patrolLeft;
 };
 
@@ -20,7 +20,7 @@ Endboss.prototype.shouldTurnLeftEdge = function() {
  * Checks if the endboss should turn at the right patrol edge.
  * @returns {boolean}
  */
-Endboss.prototype.shouldTurnRightEdge = function() {
+Endboss.prototype.shouldTurnRightEdge = function () {
     return this.patrolDir > 0 && this.x >= this.patrolRight;
 };
 
@@ -28,7 +28,7 @@ Endboss.prototype.shouldTurnRightEdge = function() {
 /**
  * Turns movement to the right and dampens speed.
  */
-Endboss.prototype.turnToRight = function() {
+Endboss.prototype.turnToRight = function () {
     this.x = this.patrolLeft;
     this.patrolDir = 1;
     this.currentSpeed = Math.abs(this.currentSpeed) * 0.85;
@@ -38,7 +38,7 @@ Endboss.prototype.turnToRight = function() {
 /**
  * Turns movement to the left and dampens speed.
  */
-Endboss.prototype.turnToLeft = function() {
+Endboss.prototype.turnToLeft = function () {
     this.x = this.patrolRight;
     this.patrolDir = -1;
     this.currentSpeed = -Math.abs(this.currentSpeed) * 0.85;
@@ -50,12 +50,73 @@ Endboss.prototype.turnToLeft = function() {
  * @param {number} now
  * @param {number} pepeX
  */
-Endboss.prototype.updateChaseMovement = function(now, pepeX) {
+Endboss.prototype.updateChaseMovement = function (now, pepeX) {
     if (!this.isChasing || this.isAttackAnim()) return;
-    const dir = pepeX > this.x ? 1 : -1;
+    const dir = this.getChaseDirection(pepeX);
+    this.setLastChaseDir(dir);
+    this.applyChaseTargetSpeed(dir);
+    this.applyChaseFacing(dir);
+    this.lerpCurrentSpeedToTarget(0.18);
+};
+
+
+/**
+ * Returns horizontal delta between pepe center and endboss center.
+ * @param {number} pepeX
+ * @returns {number}
+ */
+Endboss.prototype.getChaseDeltaX = function (pepeX) {
+    const bossX = this.getCenterX(this);
+    return pepeX - bossX;
+};
+
+
+/**
+ * Returns chase direction with a deadzone to prevent flicker near center.
+ * @param {number} pepeX
+ * @returns {number}
+ */
+Endboss.prototype.getChaseDirection = function (pepeX) {
+    const deadzonePx = 10;
+    const dx = this.getChaseDeltaX(pepeX);
+    if (Math.abs(dx) <= deadzonePx) return this.lastChaseDir || (this.otherDirection ? 1 : -1);
+    return dx > 0 ? 1 : -1;
+};
+
+
+/**
+ * Stores the last chase direction.
+ * @param {number} dir
+ */
+Endboss.prototype.setLastChaseDir = function (dir) {
+    this.lastChaseDir = dir;
+};
+
+
+/**
+ * Applies chase target speed for a given direction.
+ * @param {number} dir
+ */
+Endboss.prototype.applyChaseTargetSpeed = function (dir) {
     this.targetSpeed = this.chaseSpeed * dir;
-    this.otherDirection = pepeX > this.x;
-    this.currentSpeed += (this.targetSpeed - this.currentSpeed) * 0.18;
+};
+
+
+/**
+ * Applies chase facing flags for a given direction.
+ * @param {number} dir
+ */
+Endboss.prototype.applyChaseFacing = function (dir) {
+    this.otherDirection = dir > 0;
+};
+
+
+/**
+ * Smoothly lerps current speed towards target speed.
+ * @param {number} factor
+ */
+Endboss.prototype.lerpCurrentSpeedToTarget = function (factor) {
+    this.currentSpeed += (this.targetSpeed - this.currentSpeed) * factor;
 };
 
 
@@ -65,7 +126,7 @@ Endboss.prototype.updateChaseMovement = function(now, pepeX) {
  * @param {number} pepeX
  * @param {number} dist
  */
-Endboss.prototype.updateChaseTransitions = function(now, pepeX, dist) {
+Endboss.prototype.updateChaseTransitions = function (now, pepeX, dist) {
     if (!this.isChasing || this.isAttackAnim()) return;
     if (dist <= this.attackRange) { this.startAttack(now, pepeX); return; }
     if (dist <= this.alertRange) return;
@@ -79,11 +140,12 @@ Endboss.prototype.updateChaseTransitions = function(now, pepeX, dist) {
  * @param {number} now
  * @param {number} pepeX
  */
-Endboss.prototype.startAttack = function(now, pepeX) {
+Endboss.prototype.startAttack = function (now, pepeX) {
     if (this.shouldSkipAttackStart(now)) return;
     this.prepareAttackStart(now);
     const dir = this.getAttackDirection(pepeX);
-    this.applyAttackDirection(pepeX, dir);
+    // this.applyAttackDirection(pepeX, dir);
+    this.applyAttackDirection(dir);
     this.setupAttackSpeeds(dir);
     this.setupAttackHitWindow(now);
     this.resetAttackHitFlag();
@@ -95,7 +157,7 @@ Endboss.prototype.startAttack = function(now, pepeX) {
  * @param {number} now
  * @returns {boolean}
  */
-Endboss.prototype.shouldSkipAttackStart = function(now) {
+Endboss.prototype.shouldSkipAttackStart = function (now) {
     if (this.isAttackAnim()) return true;
     if (this.isInRecovery(now)) return true;
     if (now < this.postAlertCooldownUntil) return true;
@@ -108,7 +170,7 @@ Endboss.prototype.shouldSkipAttackStart = function(now) {
  * Prepares attack state and sets attack end time.
  * @param {number} now
  */
-Endboss.prototype.prepareAttackStart = function(now) {
+Endboss.prototype.prepareAttackStart = function (now) {
     this.stopChaseState();
     const changedToAttack = this.setAnimation('attackPrep');
     if (changedToAttack) this.playEndbossAttackSound();
@@ -117,23 +179,23 @@ Endboss.prototype.prepareAttackStart = function(now) {
 
 
 /**
- * Determines attack direction relative to the character.
+ * Determines attack direction from current facing.
+ * Facing is aligned via applyAlertFacing first.
  * @param {number} pepeX
  * @returns {number}
  */
-Endboss.prototype.getAttackDirection = function(pepeX) {
-    return pepeX > this.x ? 1 : -1;
+Endboss.prototype.getAttackDirection = function (pepeX) {
+    this.applyAlertFacing(pepeX);
+    return this.otherDirection ? 1 : -1;
 };
 
 
 /**
  * Applies attack direction flags.
- * @param {number} pepeX
  * @param {number} dir
  */
-Endboss.prototype.applyAttackDirection = function(pepeX, dir) {
+Endboss.prototype.applyAttackDirection = function (dir) {
     this.attackDir = dir;
-    this.otherDirection = pepeX > this.x;
 };
 
 
@@ -141,7 +203,7 @@ Endboss.prototype.applyAttackDirection = function(pepeX, dir) {
  * Sets up initial attack speed values.
  * @param {number} dir
  */
-Endboss.prototype.setupAttackSpeeds = function(dir) {
+Endboss.prototype.setupAttackSpeeds = function (dir) {
     this.currentSpeed = 0;
     this.targetSpeed = this.attackDashSpeed * dir;
 };
@@ -151,7 +213,7 @@ Endboss.prototype.setupAttackSpeeds = function(dir) {
  * Sets up the time window when attack damage is allowed.
  * @param {number} now
  */
-Endboss.prototype.setupAttackHitWindow = function(now) {
+Endboss.prototype.setupAttackHitWindow = function (now) {
     this.attackHitAllowedAt = now + this.attackHitDelayMs;
 };
 
@@ -159,7 +221,7 @@ Endboss.prototype.setupAttackHitWindow = function(now) {
 /**
  * Resets the hit flag for the current attack.
  */
-Endboss.prototype.resetAttackHitFlag = function() {
+Endboss.prototype.resetAttackHitFlag = function () {
     this.hasHitInCurrentAttack = false;
 };
 
@@ -170,7 +232,7 @@ Endboss.prototype.resetAttackHitFlag = function() {
  * @param {number} pepeX
  * @param {number} dist
  */
-Endboss.prototype.tryStartAlert = function(now, pepeX, dist) {
+Endboss.prototype.tryStartAlert = function (now, pepeX, dist) {
     const inCd = this.isInRecovery(now) || now < this.postAlertCooldownUntil;
     if (inCd || this.isHurt?.() || this.isChasing) return;
     if (this.currentAnimation === 'alert' || this.isAttackAnim()) return;
@@ -190,8 +252,8 @@ Endboss.prototype.tryStartAlert = function(now, pepeX, dist) {
  * Faces the character and aligns patrol direction.
  * @param {number} pepeX
  */
-Endboss.prototype.facePepe = function(pepeX) {
-    this.otherDirection = pepeX > this.x;
+Endboss.prototype.facePepe = function (pepeX) {
+    this.applyAlertFacing(pepeX);
     this.syncPatrolDirToFacing();
 };
 
@@ -199,7 +261,7 @@ Endboss.prototype.facePepe = function(pepeX) {
 /**
  * Syncs patrol direction based on facing direction.
  */
-Endboss.prototype.syncPatrolDirToFacing = function() {
+Endboss.prototype.syncPatrolDirToFacing = function () {
     this.patrolDir = this.otherDirection ? 1 : -1;
 };
 
@@ -207,7 +269,7 @@ Endboss.prototype.syncPatrolDirToFacing = function() {
 /**
  * Freezes movement for the alert animation.
  */
-Endboss.prototype.freezeForAlert = function() {
+Endboss.prototype.freezeForAlert = function () {
     this.targetSpeed = 0;
     this.currentSpeed = 0;
     this.facing = this.otherDirection ? 1 : -1;
@@ -218,7 +280,7 @@ Endboss.prototype.freezeForAlert = function() {
  * Handles alert-related sound effects.
  * @param {number} now
  */
-Endboss.prototype.handleAlertSounds = function(now) {
+Endboss.prototype.handleAlertSounds = function (now) {
     const isFirstEncounter = !this.appearSoundPlayed;
     if (isFirstEncounter) {
         this.playEndbossAppearSound();
@@ -232,7 +294,7 @@ Endboss.prototype.handleAlertSounds = function(now) {
 /**
  * Plays the appear sound once.
  */
-Endboss.prototype.playEndbossAppearSound = function() {
+Endboss.prototype.playEndbossAppearSound = function () {
     if (this.appearSoundPlayed) return;
     const endbossAppear = this.world?.sounds?.endbossAppear;
     if (!endbossAppear) return;
@@ -247,7 +309,7 @@ Endboss.prototype.playEndbossAppearSound = function() {
  * Plays the alert sound with a cooldown.
  * @param {number} now
  */
-Endboss.prototype.playEndbossAlertSound = function(now) {
+Endboss.prototype.playEndbossAlertSound = function (now) {
     if (now < this.alertSoundCooldownUntil) return;
     const endbossAlert = this.world?.sounds?.endbossAlert;
     if (!endbossAlert) return;
@@ -262,7 +324,7 @@ Endboss.prototype.playEndbossAlertSound = function(now) {
  * Schedules playing the alert sound after the appear sound.
  * @param {number} now
  */
-Endboss.prototype.scheduleEndbossAlertSound = function(now) {
+Endboss.prototype.scheduleEndbossAlertSound = function (now) {
     this.scheduledAlertSoundAt = now + this.appearToAlertDelayMs;
 };
 
@@ -271,7 +333,7 @@ Endboss.prototype.scheduleEndbossAlertSound = function(now) {
  * Plays a scheduled alert sound if its time has come.
  * @param {number} now
  */
-Endboss.prototype.tryPlayScheduledEndbossAlertSound = function(now) {
+Endboss.prototype.tryPlayScheduledEndbossAlertSound = function (now) {
     if (!this.scheduledAlertSoundAt) return;
     if (now < this.scheduledAlertSoundAt) return;
     this.scheduledAlertSoundAt = 0;
@@ -282,7 +344,7 @@ Endboss.prototype.tryPlayScheduledEndbossAlertSound = function(now) {
 /**
  * Plays the attack sound effect.
  */
-Endboss.prototype.playEndbossAttackSound = function() {
+Endboss.prototype.playEndbossAttackSound = function () {
     const endbossAttack = this.world?.sounds?.endbossAttack;
     if (!endbossAttack) return;
     endbossAttack.loop = false;
@@ -294,7 +356,7 @@ Endboss.prototype.playEndbossAttackSound = function() {
 /**
  * Stops all loops and clears scheduled sound triggers.
  */
-Endboss.prototype.stop = function() {
+Endboss.prototype.stop = function () {
     if (this.aiInterval) clearInterval(this.aiInterval);
     if (this.animationInterval) clearInterval(this.animationInterval);
     this.aiInterval = null;
@@ -309,7 +371,7 @@ Endboss.prototype.stop = function() {
  * @param {number} pepeX
  * @param {number} dist
  */
-Endboss.prototype.updateAlertState = function(now, pepeX, dist) {
+Endboss.prototype.updateAlertState = function (now, pepeX, dist) {
     if (!this.isInAlertAnimation()) return;
     this.applyAlertFacing(pepeX);
     this.stopAlertMotion();

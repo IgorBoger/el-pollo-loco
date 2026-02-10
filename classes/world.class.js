@@ -37,6 +37,8 @@ class World {
     camera_x = 0;
     lastBottleThrow = 0;
     lastDrawLogTime = 0;
+    debugHitboxes = true;
+    cooldownMs = 4000;
 
 
     /**
@@ -66,6 +68,7 @@ class World {
         this.keyBaord = keyBaord;
         this.stopped = false;
         this.backgroundObjects = [];
+        window.debugHitboxes = this.debugHitboxes;
     }
 
 

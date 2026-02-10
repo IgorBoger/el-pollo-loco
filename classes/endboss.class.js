@@ -1,5 +1,5 @@
 class Endboss extends MovableObject {
-    x = 2 * 720;
+    x = 2 * 720 - 140;
     y = 40;
     height = 400;
     width = 360;
@@ -89,7 +89,7 @@ class Endboss extends MovableObject {
     appearToAlertDelayMs = 950;
     deadSoundPlayed = false;
 
-    
+
     /**
      * Creates the endboss, loads all animation images and starts the AI/animation loops.
      */

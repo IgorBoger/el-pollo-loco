@@ -1,6 +1,5 @@
 /**
  * Starts the animation loop.
- *
  * @returns {void}
  */
 Character.prototype.startAnimationLoop = function () {
@@ -10,7 +9,6 @@ Character.prototype.startAnimationLoop = function () {
 
 /**
  * Runs one animation tick and selects the correct animation state.
- *
  * @returns {void}
  */
 Character.prototype.tickAnimation = function () {
@@ -26,7 +24,6 @@ Character.prototype.tickAnimation = function () {
 
 /**
  * Handles the dead animation state.
- *
  * @param {number} now
  * @returns {boolean} True if handled.
  */
@@ -42,7 +39,6 @@ Character.prototype.handleDeadAnimation = function (now) {
 
 /**
  * Handles the hurt animation state.
- *
  * @param {number} now
  * @returns {boolean} True if handled.
  */
@@ -57,11 +53,11 @@ Character.prototype.handleHurtAnimation = function (now) {
 
 /**
  * Handles in-air animation state.
- *
  * @param {number} now
  * @returns {boolean} True if handled.
  */
-Character.prototype.handleAirAnimation = function () {
+Character.prototype.handleAirAnimation = function (now) {
+    if (this.isAirAnimationSuppressed(now)) return false;
     if (!this.isAboveGround()) return false;
     this.currentAnimation = 'jump';
     this.updateJumpAnimation();
@@ -71,8 +67,27 @@ Character.prototype.handleAirAnimation = function () {
 
 
 /**
+ * Suppresses air/jump animation for a short time window.
+ * @param {number} now
+ * @returns {boolean}
+ */
+Character.prototype.isAirAnimationSuppressed = function (now) {
+    return now < (this.airAnimationSuppressedUntil || 0);
+};
+
+
+/**
+ * Suppresses air/jump animation for ms.
+ * @param {number} ms
+ * @returns {void}
+ */
+Character.prototype.suppressAirAnimation = function (ms) {
+    this.airAnimationSuppressedUntil = performance.now() + ms;
+};
+
+
+/**
  * Updates jump animation frame based on vertical speed.
- *
  * @returns {void}
  */
 Character.prototype.updateJumpAnimation = function () {
@@ -87,7 +102,6 @@ Character.prototype.updateJumpAnimation = function () {
 
 /**
  * Resets jump flag once the character is no longer in jump animation.
- *
  * @returns {void}
  */
 Character.prototype.handleJumpReset = function () {
@@ -99,7 +113,6 @@ Character.prototype.handleJumpReset = function () {
 
 /**
  * Handles walk animation or idle/sleep animation depending on input.
- *
  * @param {number} now
  * @returns {void}
  */
@@ -117,7 +130,6 @@ Character.prototype.handleWalkOrIdle = function (now) {
 
 /**
  * Ensures the animation state is set and resets frame timer when changed.
- *
  * @param {string} name
  * @returns {void}
  */
@@ -131,7 +143,6 @@ Character.prototype.ensureAnimationState = function (name) {
 
 /**
  * Configures the walking sound loop and base volume.
- *
  * @returns {void}
  */
 Character.prototype.setupWalkSound = function () {
@@ -144,7 +155,6 @@ Character.prototype.setupWalkSound = function () {
 
 /**
  * Plays or pauses the walking sound depending on movement input.
- *
  * @returns {void}
  */
 Character.prototype.handleWalkSound = function () {
@@ -160,7 +170,6 @@ Character.prototype.handleWalkSound = function () {
 
 /**
  * Plays the hurt sound once when entering hurt state.
- *
  * @returns {void}
  */
 Character.prototype.setHurtSound = function () {
@@ -176,7 +185,6 @@ Character.prototype.setHurtSound = function () {
 
 /**
  * Plays the dead sound once when entering dead state.
- *
  * @returns {void}
  */
 Character.prototype.setDeadSound = function () {
@@ -192,7 +200,6 @@ Character.prototype.setDeadSound = function () {
 
 /**
  * Decides whether the character is sleeping or idling based on inactivity time.
- *
  * @param {number} now
  * @returns {void}
  */
@@ -205,7 +212,6 @@ Character.prototype.pepeIsSleeping = function (now) {
 
 /**
  * Executes sleeping animation and plays snoring sound when needed.
- *
  * @param {number} now
  * @returns {void}
  */
@@ -223,7 +229,6 @@ Character.prototype.sleeping = function (now) {
 
 /**
  * Executes idle animation and plays calm breathing sound when needed.
- *
  * @param {number} now
  * @returns {void}
  */
@@ -240,7 +245,6 @@ Character.prototype.idle = function (now) {
 
 /**
  * Advances the animation frames when the configured frame time is reached.
- *
  * @param {string[]} images
  * @param {number} now
  * @param {number} frameMs
@@ -256,7 +260,6 @@ Character.prototype.maybeAdvance = function (images, now, frameMs) {
 
 /**
  * Initializes the jump frame timer field.
- *
  * @returns {void}
  */
 Character.prototype.initJumpFrameTimer = function () {
@@ -266,7 +269,6 @@ Character.prototype.initJumpFrameTimer = function () {
 
 /**
  * Checks whether jump frame updates are throttled.
- *
  * @param {number} now
  * @returns {boolean}
  */
@@ -277,7 +279,6 @@ Character.prototype.isJumpFrameThrottled = function (now) {
 
 /**
  * Calculates the jump frame index based on vertical velocity.
- *
  * @param {number} vy
  * @returns {number}
  */
@@ -296,7 +297,6 @@ Character.prototype.getJumpFrameIndex = function (vy) {
 
 /**
  * Sets the current jump frame image by index.
- *
  * @param {number} idx
  * @returns {void}
  */
@@ -308,7 +308,6 @@ Character.prototype.setJumpFrameImage = function (idx) {
 
 /**
  * Plays the snoring sound while sleeping (if allowed).
- *
  * @returns {void}
  */
 Character.prototype.playPepeSnoring = function () {
@@ -323,7 +322,6 @@ Character.prototype.playPepeSnoring = function () {
 
 /**
  * Stops the snoring sound.
- *
  * @returns {void}
  */
 Character.prototype.stopPepeSnoring = function () {
@@ -336,7 +334,6 @@ Character.prototype.stopPepeSnoring = function () {
 
 /**
  * Plays calm breathing sound during idle (if allowed).
- *
  * @returns {void}
  */
 Character.prototype.playPepeCalmBreating = function () {
@@ -350,7 +347,6 @@ Character.prototype.playPepeCalmBreating = function () {
 
 /**
  * Stops calm breathing sound.
- *
  * @returns {void}
  */
 Character.prototype.stopPepeCalmBreathing = function () {

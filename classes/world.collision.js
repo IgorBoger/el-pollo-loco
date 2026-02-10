@@ -1,7 +1,7 @@
 /**
  * Checks all collision types.
  */
-World.prototype.checkCollisions = function() {
+World.prototype.checkCollisions = function () {
     this.collisionWithChicken();
     this.collisionWithCollectable(this.coins, 'coin', this.updateCoinStatusBar);
     this.collisionWithCollectable(this.bottles, 'bottle', this.updateBottleStatusBar);
@@ -12,7 +12,7 @@ World.prototype.checkCollisions = function() {
 /**
  * Checks collisions between the character and enemies.
  */
-World.prototype.collisionWithChicken = function() {
+World.prototype.collisionWithChicken = function () {
     this.level.enemies.forEach(enemy => this.handleEnemyCollision(enemy));
 }
 
@@ -21,14 +21,149 @@ World.prototype.collisionWithChicken = function() {
  * Handles collision logic with a specific enemy.
  * @param {*} enemy
  */
-World.prototype.handleEnemyCollision = function(enemy) {
+World.prototype.handleEnemyCollision = function (enemy) {
     if (this.shouldSkipEnemyCollision(enemy)) return;
     if (!this.isEndbossAwareCollision(this.character, enemy)) return;
     if (this.handleEndbossAttackCollision(enemy)) return;
+    if (this.handleEndbossBodyCollision(enemy)) return;
     if (this.handleStompCollision(enemy)) return;
     if (this.isEndbossBodyHitBlocked(enemy)) return;
-    this.applyCharacterHit(enemy, 4000);
+    this.applyCharacterHit(enemy, this.cooldownMs);
 }
+
+
+/**
+ * Handles endboss body collision (not attack).
+ * Pushes character back and blocks right movement shortly.
+ * @param {*} enemy
+ * @returns {boolean}
+ */
+World.prototype.handleEndbossBodyCollision = function (enemy) {
+    if (!this.isEndboss(enemy)) return false;
+    if (this.isEndbossInAttack(enemy)) return false;
+    this.applyEndbossBodyBarrier(enemy);
+    if (this.isEndbossBodyHitBlocked(enemy)) return true;
+    this.applyCharacterHit(enemy, this.cooldownMs);
+    return true;
+};
+
+
+/**
+ * Checks whether enemy is an endboss.
+ * @param {*} enemy
+ * @returns {boolean}
+ */
+World.prototype.isEndboss = function (enemy) {
+    return enemy instanceof Endboss;
+};
+
+
+/**
+ * Checks whether endboss is currently attacking (then attack handler should manage it).
+ * @param {Endboss} enemy
+ * @returns {boolean}
+ */
+World.prototype.isEndbossInAttack = function (enemy) {
+    return !!enemy.isAttackAnim?.();
+};
+
+
+/**
+ * Applies body barrier behavior: pushback + optional right block + small hop.
+ * @param {Endboss} enemy
+ * @returns {void}
+ */
+World.prototype.applyEndbossBodyBarrier = function (enemy) {
+    const pushLeft = this.shouldPushLeftOnBarrier(enemy);
+    this.pushCharacterBackBy(pushLeft, 10);
+    this.character.suppressAirAnimation(400);
+    this.blockRightOnBarrier(this.cooldownMs);
+    this.applySmallBarrierHop(10);
+    this.keepCharacterInsideBounds();
+};
+
+
+/**
+ * Decides push direction based on current input (more reliable than enemy-side checks).
+ * @param {Endboss} enemy
+ * @returns {boolean} True = push left, false = push right
+ */
+World.prototype.shouldPushLeftOnBarrier = function (enemy) {
+    if (this.isRightPressedOnly()) return true;
+    if (this.isLeftPressedOnly()) return false;
+    return this.isCharacterLeftOfBossX(enemy);
+};
+
+
+/**
+ * Checks if only RIGHT is pressed.
+ * @returns {boolean}
+ */
+World.prototype.isRightPressedOnly = function () {
+    return !!this.character?.world?.keyBaord?.RIGHT && !this.character?.world?.keyBaord?.LEFT;
+};
+
+
+/**
+ * Checks if only LEFT is pressed.
+ * @returns {boolean}
+ */
+World.prototype.isLeftPressedOnly = function () {
+    return !!this.character?.world?.keyBaord?.LEFT && !this.character?.world?.keyBaord?.RIGHT;
+};
+
+
+/**
+ * Fallback: compares x positions when no direction key is pressed.
+ * @param {Endboss} enemy
+ * @returns {boolean}
+ */
+World.prototype.isCharacterLeftOfBossX = function (enemy) {
+    return this.character.x < enemy.x;
+};
+
+
+/**
+ * Pushes the character back on x-axis.
+ * @param {boolean} pushLeft
+ * @param {number} px
+ * @returns {void}
+ */
+World.prototype.pushCharacterBackBy = function (pushLeft, px) {
+    this.character.x += pushLeft ? -px : px;
+};
+
+
+/**
+ * Locks RIGHT input for a short time after endboss body contact.
+ * RIGHT stays false until the user presses again after the lock expires.
+ * @param {number} ms
+ * @returns {void}
+ */
+World.prototype.blockRightOnBarrier = function (ms) {
+    this.lockRightInput(ms);
+};
+
+
+/**
+ * Sets RIGHT to false and stores a lock timestamp on the keyboard.
+ * @param {number} ms
+ * @returns {void}
+ */
+World.prototype.lockRightInput = function (ms) {
+    this.keyBaord.RIGHT = false;
+    this.keyBaord.rightLockedUntil = performance.now() + ms;
+};
+
+
+/**
+ * Applies a small hop for feedback (optional).
+ * @param {number} speedY
+ * @returns {void}
+ */
+World.prototype.applySmallBarrierHop = function (speedY) {
+    this.character.speedY = Math.max(this.character.speedY, speedY);
+};
 
 
 /**
@@ -36,7 +171,7 @@ World.prototype.handleEnemyCollision = function(enemy) {
  * @param {*} enemy
  * @returns {boolean}
  */
-World.prototype.shouldSkipEnemyCollision = function(enemy) {
+World.prototype.shouldSkipEnemyCollision = function (enemy) {
     return enemy.isDead() || this.character.isDead();
 }
 
@@ -46,13 +181,15 @@ World.prototype.shouldSkipEnemyCollision = function(enemy) {
  * @param {*} enemy
  * @returns {boolean}
  */
-World.prototype.handleEndbossAttackCollision = function(enemy) {
+World.prototype.handleEndbossAttackCollision = function (enemy) {
     if (!(enemy instanceof Endboss)) return false;
     if (!enemy.isAttackAnim()) return false;
     if (enemy.hasHitInCurrentAttack) return true;
     const nowPerf = performance.now();
     if (nowPerf < (enemy.attackHitAllowedAt || 0)) return true;
     this.applyAttackKnockback(enemy);
+    this.character.suppressAirAnimation(600);
+    this.lockRightInput(600);
     this.applyCharacterHit(enemy, 600);
     this.adjustEndbossAtLeftEdge(enemy);
     enemy.resolveAttackContact?.(this.character);
@@ -64,7 +201,7 @@ World.prototype.handleEndbossAttackCollision = function(enemy) {
 /**
  * Applies knockback to the character after attack.
  */
-World.prototype.applyAttackKnockback = function() {
+World.prototype.applyAttackKnockback = function () {
     this.character.speedY = 15;
     this.keepCharacterInsideBounds();
 }
@@ -75,7 +212,7 @@ World.prototype.applyAttackKnockback = function() {
  * @param {*} enemy
  * @returns {boolean}
  */
-World.prototype.handleStompCollision = function(enemy) {
+World.prototype.handleStompCollision = function (enemy) {
     if (!this.isChickenEnemy(enemy)) return false;
     if (!this.character.isCollidingFromTop(enemy)) return false;
     this.killChicken(enemy);
@@ -88,7 +225,7 @@ World.prototype.handleStompCollision = function(enemy) {
  * @param {*} enemy
  * @returns {boolean}
  */
-World.prototype.isChickenEnemy = function(enemy) {
+World.prototype.isChickenEnemy = function (enemy) {
     return enemy instanceof Chicken || enemy instanceof SmallChicken;
 }
 
@@ -97,7 +234,7 @@ World.prototype.isChickenEnemy = function(enemy) {
  * Kills a chicken enemy.
  * @param {*} enemy
  */
-World.prototype.killChicken = function(enemy) {
+World.prototype.killChicken = function (enemy) {
     enemy.energy = 0;
     enemy.lastHit = Date.now();
     this.playEffectSound(this.sounds.chickenDead);
@@ -109,7 +246,7 @@ World.prototype.killChicken = function(enemy) {
  * @param {*} enemy
  * @returns {boolean}
  */
-World.prototype.isEndbossBodyHitBlocked = function(enemy) {
+World.prototype.isEndbossBodyHitBlocked = function (enemy) {
     if (!(enemy instanceof Endboss)) return false;
     return performance.now() < (enemy.postAlertCooldownUntil || 0);
 }
@@ -120,7 +257,7 @@ World.prototype.isEndbossBodyHitBlocked = function(enemy) {
  * @param {*} enemy
  * @param {number} cooldownMs
  */
-World.prototype.applyCharacterHit = function(enemy, cooldownMs) {
+World.prototype.applyCharacterHit = function (enemy, cooldownMs) {
     const now = Date.now();
     if (enemy.lastHitOnCharacter && now - enemy.lastHitOnCharacter <= cooldownMs) return;
     this.character.hit(enemy);
@@ -132,7 +269,7 @@ World.prototype.applyCharacterHit = function(enemy, cooldownMs) {
 /**
  * Ensures the character stays within level bounds.
  */
-World.prototype.keepCharacterInsideBounds = function() {
+World.prototype.keepCharacterInsideBounds = function () {
     const c = this.character;
     if (!c) return;
     const minX = typeof c.minX === 'number' ? c.minX : -Infinity;
@@ -147,7 +284,7 @@ World.prototype.keepCharacterInsideBounds = function() {
  * Adjusts endboss position when colliding at left edge.
  * @param {*} enemy
  */
-World.prototype.adjustEndbossAtLeftEdge = function(enemy) {
+World.prototype.adjustEndbossAtLeftEdge = function (enemy) {
     const char = this.character;
     if (!char || !(enemy instanceof Endboss)) return;
     const charRight = char.x + (char.frameWidth || char.width);
@@ -163,7 +300,7 @@ World.prototype.adjustEndbossAtLeftEdge = function(enemy) {
  * @param {string} propertyName
  * @param {Function} updateStatusBarCallback
  */
-World.prototype.collisionWithCollectable = function(array, propertyName, updateStatusBarCallback) {
+World.prototype.collisionWithCollectable = function (array, propertyName, updateStatusBarCallback) {
     const index = array.findIndex(item => this.character.isColliding(item));
     if (index !== -1) {
         this.character[propertyName] += 20;
@@ -179,7 +316,7 @@ World.prototype.collisionWithCollectable = function(array, propertyName, updateS
 /**
  * Checks collisions between bottles and enemies.
  */
-World.prototype.checkBottleHitsEnemies = function() {
+World.prototype.checkBottleHitsEnemies = function () {
     const now = new Date().getTime();
     this.level.enemies.forEach(enemy => {
         if (enemy.isDead()) return;
@@ -199,7 +336,7 @@ World.prototype.checkBottleHitsEnemies = function() {
  * @param {*} bottle
  * @param {number} now
  */
-World.prototype.hitEndbossWithBottle = function(enemy, bottle, now) {
+World.prototype.hitEndbossWithBottle = function (enemy, bottle, now) {
     this.stopEndbossActionSounds();
     const cd = 250;
     enemy.stun(700);
@@ -218,7 +355,7 @@ World.prototype.hitEndbossWithBottle = function(enemy, bottle, now) {
  * @param {*} enemy
  * @param {*} bottle
  */
-World.prototype.killChickenWithBottle = function(enemy, bottle) {
+World.prototype.killChickenWithBottle = function (enemy, bottle) {
     enemy.energy = 0;
     enemy.lastHit = new Date().getTime();
     this.playEffectSound(this.sounds.chickenDead);
@@ -229,7 +366,7 @@ World.prototype.killChickenWithBottle = function(enemy, bottle) {
 /**
  * Checks bottles hitting the ground.
  */
-World.prototype.checkBottleOnGround = function() {
+World.prototype.checkBottleOnGround = function () {
     this.throwableObject.forEach((bottle) => {
         if (!bottle.isSplashed && bottle.isOnGround()) {
             bottle.splash();
@@ -244,7 +381,7 @@ World.prototype.checkBottleOnGround = function() {
  * @param {*} b
  * @returns {boolean}
  */
-World.prototype.isEndbossAwareCollision = function(a, b) {
+World.prototype.isEndbossAwareCollision = function (a, b) {
     if (a instanceof Endboss) return a.isColliding(b);
     if (b instanceof Endboss) return b.isColliding(a);
     return a.isColliding(b);
