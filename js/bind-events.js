@@ -10,6 +10,7 @@ bootstrapUi();
 function onWindowLoad() {
     initUiOnLoad();
     bindKeyboardEvents();
+    bindUiFocusGuards();
     bindBaseGameUiEvents();
     bindBurgerUiEvents();
     bindAudioToggleEvents();
@@ -34,6 +35,107 @@ function initUiOnLoad() {
     handleViewportChange();
     addMobileButtonsFunction();
     setAudioIcons();
+}
+
+
+/**
+ * Installs global focus guards so SPACE/ENTER cannot re-trigger the last focused button.
+ *
+ * @returns {void}
+ */
+function bindUiFocusGuards() {
+    bindBlurButtonsOnClick();
+    bindPreventButtonActivationKeys();
+}
+
+
+/**
+ * Blurs clicked buttons so they don't stay focused.
+ *
+ * @returns {void}
+ */
+function bindBlurButtonsOnClick() {
+    document.addEventListener('click', onAnyButtonClick, true);
+}
+
+
+/**
+ * Handles clicks and blurs the nearest button.
+ *
+ * @param {MouseEvent} event
+ * @returns {void}
+ */
+function onAnyButtonClick(event) {
+    const button = getClosestButton(event.target);
+    if (!button) return;
+    blurElement(button);
+}
+
+
+/**
+ * Prevents SPACE/ENTER from activating a focused button.
+ *
+ * @returns {void}
+ */
+function bindPreventButtonActivationKeys() {
+    document.addEventListener('keydown', onPreventButtonActivationKeys, true);
+}
+
+
+/**
+ * Stops browser default activation for SPACE/ENTER on focused buttons.
+ *
+ * @param {KeyboardEvent} event
+ * @returns {void}
+ */
+function onPreventButtonActivationKeys(event) {
+    if (!isActivationKey(event)) return;
+    if (!isButtonFocused()) return;
+    event.preventDefault();
+}
+
+
+/**
+ * Checks if the current key is an activation key (Space/Enter).
+ *
+ * @param {KeyboardEvent} event
+ * @returns {boolean}
+ */
+function isActivationKey(event) {
+    return event.code === 'Space' || event.key === ' ' || event.key === 'Enter';
+}
+
+
+/**
+ * Checks whether the currently focused element is a button.
+ *
+ * @returns {boolean}
+ */
+function isButtonFocused() {
+    return document.activeElement?.tagName === 'BUTTON';
+}
+
+
+/**
+ * Returns the closest button for a given target.
+ *
+ * @param {EventTarget|null} target
+ * @returns {HTMLButtonElement|null}
+ */
+function getClosestButton(target) {
+    if (!(target instanceof Element)) return null;
+    return target.closest('button');
+}
+
+
+/**
+ * Safely blurs an element.
+ *
+ * @param {HTMLElement} element
+ * @returns {void}
+ */
+function blurElement(element) {
+    element.blur?.();
 }
 
 
