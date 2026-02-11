@@ -151,6 +151,7 @@ World.prototype.blockRightOnBarrier = function (ms) {
  * @returns {void}
  */
 World.prototype.lockRightInput = function (ms) {
+    if (this.keyBaord.LEFT) return;
     this.keyBaord.RIGHT = false;
     this.keyBaord.rightLockedUntil = performance.now() + ms;
 };

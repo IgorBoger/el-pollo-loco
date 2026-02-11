@@ -166,11 +166,23 @@ class MovableObject extends DrawableObject {
      * @param {number} now - Current timestamp.
      */
     updateGravity(now) {
+        if (this.shouldPausePhysics()) return;
         const delta = this.getDelta(now);
         this.lastGravityTime = now;
         if (this.shouldStopGravity()) return;
         this.applyGravityStep(delta);
         this.snapToGround();
+    }
+
+
+    /**
+ * Checks whether physics updates should be paused.
+ *
+ * @returns {boolean}
+ */
+    shouldPausePhysics() {
+        if (window.isGamePaused) return true;
+        return !!this.world?.stopped;
     }
 
 

@@ -13,6 +13,7 @@ Character.prototype.startMovementLoop = function () {
  */
 Character.prototype.tickMovement = function () {
     if (window.isGamePaused || this.world.stopped) return;
+    if (this.world.isControlsLocked()) return;
     this.setupWalkSound();
     this.handleWalkSound();
     this.handleHorizontalMovement();
@@ -27,15 +28,62 @@ Character.prototype.tickMovement = function () {
  * Applies horizontal movement based on keyboard input.
  * @returns {void}
  */
+
 Character.prototype.handleHorizontalMovement = function () {
-    if (this.world.keyBaord.RIGHT && this.x < this.world.level.level_end_x) {
-        this.moveRight();
-        this.otherDirection = false;
-    }
-    if (this.world.keyBaord.LEFT && this.x > this.minX) {
-        this.moveLeft();
-        this.otherDirection = true;
-    }
+    if (this.shouldMoveRight()) this.moveCharacterRight();
+    if (this.shouldMoveLeft()) this.moveCharacterLeft();
+};
+
+
+/**
+ * Determines whether the character is allowed to move right.
+ * @returns {boolean}
+ */
+Character.prototype.shouldMoveRight = function () {
+    if (!this.world.keyBaord.RIGHT) return false;
+    if (this.isRightLocked()) return false;
+    return this.x < this.world.level.level_end_x;
+};
+
+
+/**
+ * Determines whether right movement is temporarily locked.
+ * @returns {boolean}
+ */
+Character.prototype.isRightLocked = function () {
+    const until = this.world.keyBaord.rightLockedUntil || 0;
+    return performance.now() < until;
+};
+
+
+/**
+ * Moves the character to the right and sets facing.
+ * @returns {void}
+ */
+Character.prototype.moveCharacterRight = function () {
+    this.moveRight();
+    this.otherDirection = false;
+};
+
+
+/**
+ * Determines whether the character is allowed to move left.
+ * @returns {boolean}
+ */
+Character.prototype.shouldMoveLeft = function () {
+    if (!this.world.keyBaord.LEFT) return false;
+    this.world.keyBaord.rightLockedUntil = 0;
+    return this.x > this.minX;
+};
+
+
+/**
+ * Moves the character to the left and sets facing.
+ * @returns {void}
+ */
+Character.prototype.moveCharacterLeft = function () {
+    this.moveLeft();
+    this.otherDirection = true;
 };
 
 
@@ -66,6 +114,7 @@ Character.prototype.isDoingSomething = function () {
  * @returns {boolean}
  */
 Character.prototype.isAnyKeyPressed = function () {
+    if (this.world?.isControlsLocked?.()) return false;
     return this.world.keyBaord.RIGHT ||
         this.world.keyBaord.LEFT ||
         this.world.keyBaord.SPACE ||

@@ -48,10 +48,101 @@ World.prototype.updateEndbossStatusBar = function (endboss) {
  * Schedules game over when character is dead.
  */
 World.prototype.scheduleGameOverIfDead = function () {
-    if (!this.character.isDead()) return;
+    // if (!this.character.isDead()) return;
+    if (!this.character || !this.character.isDead()) return;
     if (this.gameOverScheduled) return;
     this.gameOverScheduled = true;
+    this.freezeGameOverStart();
     this.scheduleGameOverTimeout();
+}
+
+
+/**
+ * Freezes gameplay immediately and ensures it runs only once per flag.
+ * @param {string} freezeFlagProp
+ * @returns {void}
+ */
+World.prototype.freezeGameplayOnce = function (freezeFlagProp) {
+    if (this[freezeFlagProp]) return;
+    this[freezeFlagProp] = true;
+    // this.setGamePaused(true);
+    this.setControlsLocked(true);
+    this.clearKeyboardInput();
+    this.stopCharacterMotion();
+}
+
+
+/**
+ * Sets the controls lock state.
+ * @param {boolean} isLocked
+ * @returns {void}
+ */
+World.prototype.setControlsLocked = function (isLocked) {
+    this.controlsLocked = !!isLocked;
+}
+
+
+/**
+ * Returns whether controls are currently locked.
+ * @returns {boolean}
+ */
+World.prototype.isControlsLocked = function () {
+    return !!this.controlsLocked;
+}
+
+
+/**
+ * Freezes gameplay when game over starts.
+ * @returns {void}
+ */
+World.prototype.freezeGameOverStart = function () {
+    this.freezeGameplayOnce('isGameOverFrozen');
+}
+
+
+/**
+ * Freezes gameplay when win starts.
+ * @returns {void}
+ */
+World.prototype.freezeWinStart = function () {
+    this.freezeGameplayOnce('isWinFrozen');
+}
+
+
+/**
+ * Sets the global pause state.
+ * @param {boolean} isPaused
+ * @returns {void}
+ */
+World.prototype.setGamePaused = function (isPaused) {
+    window.isGamePaused = !!isPaused;
+    isGamePaused = !!isPaused;
+}
+
+
+/**
+ * Clears all keyboard inputs to prevent further movement/actions.
+ * @returns {void}
+ */
+World.prototype.clearKeyboardInput = function () {
+    if (!this.keyBaord) return;
+    this.keyBaord.LEFT = false;
+    this.keyBaord.RIGHT = false;
+    this.keyBaord.UP = false;
+    this.keyBaord.DOWN = false;
+    this.keyBaord.SPACE = false;
+    this.keyBaord.THROW = false;
+}
+
+
+/**
+ * Stops the character motion instantly (no sliding after death).
+ * @returns {void}
+ */
+World.prototype.stopCharacterMotion = function () {
+    if (!this.character) return;
+    this.character.speedY = 0;
+    this.character.lastJumpPressedAt = -Infinity;
 }
 
 
@@ -63,15 +154,20 @@ World.prototype.scheduleGameOverTimeout = function () {
     const restBoss = (boss?.currentAnimation === 'attack')
         ? Math.max(0, (boss.attackUntil || 0) - performance.now())
         : 0;
-    setTimeout(() => this.finishGameOver(), Math.min(1200, restBoss + 500));
+    const deadDuration = this.character?.IMAGES_DEAD?.length * this.character.deadFrameMs || 0;
+    const extraWaitMs = 500;
+    const delay = Math.max(deadDuration + extraWaitMs, restBoss + 500);
+    setTimeout(() => this.finishGameOver(), delay);
 }
 
 
-/**
- * Finalizes game over.
- */
+// /**
+//  * Finalizes game over.
+//  */
 World.prototype.finishGameOver = function () {
     this.stopped = true;
+    this.hideCharacter = true;
+    this.drawStaticFrame();
     this.endscreen.show();
     this.callOnGameOverIfExists();
 }
@@ -99,14 +195,19 @@ World.prototype.requestNextFrame = function () {
 
 /**
  * Checks win condition.
+ *
+ * @returns {void}
  */
 World.prototype.checkWinCondition = function () {
     const boss = this.getEndboss();
-    if (!boss || !boss.isDead?.() || !boss.isDeadAnimFinished?.()) return;
-    if (this.winScheduled || this.gameOverScheduled) return;
+    if (!boss || this.gameOverScheduled) return;
+    if (boss.isDead?.()) this.freezeWinStart();
+    if (!boss.isDead?.() || !boss.isDeadAnimFinished?.()) return;
+    if (this.winScheduled) return;
     this.winScheduled = true;
     setTimeout(() => this.showWin(), 1200);
 }
+
 
 
 /**
@@ -168,6 +269,11 @@ World.prototype.hideScreens = function () {
 World.prototype.resetEndStates = function () {
     this.winScheduled = false;
     this.gameOverScheduled = false;
+    this.hideCharacter = false;
+    this.isGameOverFrozen = false;
+    this.isWinFrozen = false;
+    this.setGamePaused(false);
+    this.setControlsLocked(false);
 }
 
 
@@ -197,7 +303,6 @@ World.prototype.stopAllEnemies = function () {
 World.prototype.updateWorldAnimations = function (now) {
     this.updateCoinAnimations(now);
 }
-
 
 
 /**

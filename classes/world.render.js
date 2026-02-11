@@ -63,11 +63,20 @@ World.prototype.drawWorldObjectsWithCamera = function () {
 World.prototype.drawWorldObjects = function () {
     this.addObjectsToMap(this.level.backgroundObjects);
     this.addObjectsToMap(this.level.clouds);
-    this.addToMap(this.character);
+    if (!this.shouldHideCharacter()) this.addToMap(this.character);
     this.addObjectsToMap(this.coins);
     this.addObjectsToMap(this.bottles);
     this.addObjectsToMap(this.level.enemies);
     this.addObjectsToMap(this.throwableObject);
+}
+
+
+/**
+ * Returns whether the character should be hidden (e.g. for endscreen capture).
+ * @returns {boolean}
+ */
+World.prototype.shouldHideCharacter = function () {
+    return !!this.hideCharacter || !this.character;
 }
 
 
@@ -93,12 +102,16 @@ World.prototype.drawStatusBars = function () {
 
 
 /**
- * Draws a static frame without game loop.
+ * Draws a static frame without scheduling the next render frame.
  */
 World.prototype.drawStaticFrame = function () {
+    const prevStopped = this.stopped;
+    const prevRequest = this.requestNextFrame;
+    this.requestNextFrame = function () { };
     this.stopped = false;
     this.draw();
-    this.stopped = true;
+    this.requestNextFrame = prevRequest;
+    this.stopped = prevStopped;
 }
 
 

@@ -13,6 +13,7 @@ Character.prototype.startAnimationLoop = function () {
  */
 Character.prototype.tickAnimation = function () {
     if (isGamePaused || this.world.stopped) return;
+    if (this.world?.isControlsLocked?.()) this.stopWalkSoundIfPlaying();
     const now = performance.now();
     if (this.handleDeadAnimation(now)) return;
     if (this.handleHurtAnimation(now)) return;
@@ -23,17 +24,60 @@ Character.prototype.tickAnimation = function () {
 
 
 /**
+ * Stops the walking sound immediately (used for control lock on win).
+ * @returns {void}
+ */
+Character.prototype.stopWalkSoundIfPlaying = function () {
+    const walkSound = this.world?.sounds?.pepeWalk;
+    if (!walkSound) return;
+    walkSound.pause();
+};
+
+
+/**
  * Handles the dead animation state.
  * @param {number} now
  * @returns {boolean} True if handled.
  */
 Character.prototype.handleDeadAnimation = function (now) {
     if (!this.isDead()) return false;
+    const changed = this.currentAnimation !== 'dead';
     this.ensureAnimationState('dead');
-    this.maybeAdvance(this.IMAGES_DEAD, now, this.deadFrameMs);
-    this.img = this.imageCache[this.IMAGES_DEAD[this.IMAGES_DEAD.length - 1]];
+    if (changed) this.initDeadAnimTimer();
+    this.maybeAdvanceOnce(this.IMAGES_DEAD, now, this.deadFrameMs);
     this.setDeadSound();
     return true;
+};
+
+
+/**
+ * Initializes the timestamp when the dead animation is considered finished.
+ * @returns {void}
+ */
+Character.prototype.initDeadAnimTimer = function () {
+    if (this.deadAnimEndAt) return;
+    const now = performance.now();
+    this.deadAnimEndAt = now + this.getDeadAnimDuration();
+};
+
+
+/**
+ * Calculates the duration of the dead animation in ms.
+ * @returns {number}
+ */
+Character.prototype.getDeadAnimDuration = function () {
+    const frames = this.IMAGES_DEAD?.length || 0;
+    return frames * this.deadFrameMs + 80;
+};
+
+
+/**
+ * Checks whether the dead animation duration has elapsed.
+ * @returns {boolean}
+ */
+Character.prototype.isDeadAnimFinished = function () {
+    if (!this.deadAnimEndAt) return false;
+    return performance.now() >= this.deadAnimEndAt;
 };
 
 
@@ -142,63 +186,6 @@ Character.prototype.ensureAnimationState = function (name) {
 
 
 /**
- * Configures the walking sound loop and base volume.
- * @returns {void}
- */
-Character.prototype.setupWalkSound = function () {
-    const walkSound = this.world.sounds.pepeWalk;
-    if (!walkSound) return;
-    walkSound.loop = true;
-    walkSound.volume = 0.7;
-};
-
-
-/**
- * Plays or pauses the walking sound depending on movement input.
- * @returns {void}
- */
-Character.prototype.handleWalkSound = function () {
-    const walkSound = this.world.sounds.pepeWalk;
-    if (!walkSound) return;
-    if (this.world.keyBaord.RIGHT || this.world.keyBaord.LEFT) {
-        if (walkSound.paused) this.world.playEffectSound(walkSound);
-    } else {
-        walkSound.pause();
-    }
-};
-
-
-/**
- * Plays the hurt sound once when entering hurt state.
- * @returns {void}
- */
-Character.prototype.setHurtSound = function () {
-    if (this.hurtSoundPlayed) return;
-    const hurtSound = this.world?.sounds?.pepeHurt;
-    if (!hurtSound) return;
-    hurtSound.loop = false;
-    hurtSound.volume = 0.2;
-    this.world.playEffectSound(hurtSound);
-    this.hurtSoundPlayed = true;
-};
-
-
-/**
- * Plays the dead sound once when entering dead state.
- * @returns {void}
- */
-Character.prototype.setDeadSound = function () {
-    if (this.deadSoundPlayed) return;
-    const deadSound = this.world?.sounds?.pepeDead;
-    if (!deadSound) return;
-    deadSound.loop = false;
-    deadSound.volume = 0.3;
-    this.world.playEffectSound(deadSound);
-    this.deadSoundPlayed = true;
-};
-
-
-/**
  * Decides whether the character is sleeping or idling based on inactivity time.
  * @param {number} now
  * @returns {void}
@@ -259,6 +246,35 @@ Character.prototype.maybeAdvance = function (images, now, frameMs) {
 
 
 /**
+ * Plays an animation once and keeps the last frame.
+ * @param {string[]} images
+ * @returns {void}
+ */
+Character.prototype.playAnimationOnce = function (images) {
+    const lastIdx = images.length - 1;
+    const idx = Math.min(this.currentImage, lastIdx);
+    const path = images[idx];
+    this.img = this.imageCache[path];
+
+    if (this.currentImage < lastIdx) this.currentImage++;
+};
+
+
+/**
+ * Advances an animation only once (stops on last frame).
+ * @param {string[]} images
+ * @param {number} now
+ * @param {number} frameMs
+ * @returns {void}
+ */
+Character.prototype.maybeAdvanceOnce = function (images, now, frameMs) {
+    if ((now - this.lastAnimAt) < frameMs) return;
+    this.playAnimationOnce(images);
+    this.lastAnimAt = now;
+};
+
+
+/**
  * Initializes the jump frame timer field.
  * @returns {void}
  */
@@ -303,55 +319,4 @@ Character.prototype.getJumpFrameIndex = function (vy) {
 Character.prototype.setJumpFrameImage = function (idx) {
     const path = this.IMAGES_JUMPING[idx];
     this.img = this.imageCache[path];
-};
-
-
-/**
- * Plays the snoring sound while sleeping (if allowed).
- * @returns {void}
- */
-Character.prototype.playPepeSnoring = function () {
-    const pepeSnoring = this.world?.sounds?.pepeSnoring;
-    if (!pepeSnoring || isSoundMuted || isGamePaused || this.world?.stopped) return;
-    pepeSnoring.loop = true;
-    pepeSnoring.volume = 0.8;
-    pepeSnoring.currentTime = 0;
-    this.world.playEffectSound(pepeSnoring);
-};
-
-
-/**
- * Stops the snoring sound.
- * @returns {void}
- */
-Character.prototype.stopPepeSnoring = function () {
-    const pepeSnoring = this.world?.sounds?.pepeSnoring;
-    if (!pepeSnoring) return;
-    pepeSnoring.pause();
-    pepeSnoring.currentTime = 0;
-};
-
-
-/**
- * Plays calm breathing sound during idle (if allowed).
- * @returns {void}
- */
-Character.prototype.playPepeCalmBreating = function () {
-    const calmBreathing = this.world?.sounds?.pepeCalmBreathing;
-    if (!calmBreathing || !calmBreathing.paused || isSoundMuted) return;
-    calmBreathing.loop = true;
-    calmBreathing.volume = 0.4;
-    this.world.playEffectSound(calmBreathing);
-};
-
-
-/**
- * Stops calm breathing sound.
- * @returns {void}
- */
-Character.prototype.stopPepeCalmBreathing = function () {
-    const calmBreathing = this.world?.sounds?.pepeCalmBreathing;
-    if (!calmBreathing) return;
-    calmBreathing.pause();
-    calmBreathing.currentTime = 0;
 };
