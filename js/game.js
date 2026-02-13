@@ -15,7 +15,11 @@ var isGamePaused = false;
 window.isGamePaused = isGamePaused;
 let gameStartAt = 0;
 const LEADERBOARD_KEY = 'leaderboard';
-let currentLevelDefinition = level1;
+// let currentLevelDefinition = level1;
+const levels = [level1, level2, level3];
+let currentLevelIndex = 0;
+let currentLevelDefinition = levels[currentLevelIndex];
+
 
 
 /**
