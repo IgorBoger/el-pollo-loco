@@ -1,5 +1,5 @@
 class Endboss extends MovableObject {
-    x = 2 * 720 - 140;
+    x = 0;
     y = 40;
     height = 400;
     width = 360;
@@ -129,5 +129,16 @@ class Endboss extends MovableObject {
     animate() {
         this.startAiLoop();
         this.startAnimationLoop();
+    }
+
+
+    /**
+ * Sets the initial endboss position based on level width.
+ */
+    setInitialPosition() {
+        if (!this.world?.level) return;
+        this.x = this.world.level.level_end_x - 140;
+        this.patrolLeft = this.x - 100;
+        this.patrolRight = this.x + 100;
     }
 }

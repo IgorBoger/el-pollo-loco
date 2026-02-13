@@ -7,7 +7,7 @@ class Level {
     backgroundObjects;
     layers;
     altLayers;
-    level_end_x = 2 * 720;
+    level_end_x = 3 * 720;
 
 
     /**

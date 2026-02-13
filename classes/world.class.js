@@ -125,14 +125,199 @@ class World {
 
 
     /**
-     * Assigns world references to all relevant objects.
-     */
+ * Assigns world references to all relevant objects and prepares enemies.
+ */
     setWorld() {
         this.character.world = this;
         this.throwableObject.world = this;
-        this.level.enemies.forEach(enemy => {
-            enemy.world = this;
-            enemy.animate?.();
-        });
+
+        this.level.enemies.forEach(enemy => this.initEnemy(enemy));
+    }
+
+
+    /**
+     * Initializes one enemy: world ref, position, and loops.
+     * @param {*} enemy
+     * @returns {void}
+     */
+    initEnemy(enemy) {
+        enemy.world = this;
+        this.applyEnemySpawnPosition(enemy);
+        enemy.animate?.();
+    }
+
+
+    /**
+     * Applies spawn position rules for enemies.
+     * @param {*} enemy
+     * @returns {void}
+     */
+    applyEnemySpawnPosition(enemy) {
+        if (enemy instanceof Endboss) return enemy.setInitialPosition?.();
+        if (enemy instanceof Chicken || enemy instanceof SmallChicken) {
+            return this.placeEnemyWithMinDistance(enemy, 220, 350, 120);
+        }
+    }
+
+
+    /**
+ * Places an enemy across the level with a minimum x-distance to other enemies.
+ * @param {*} enemy
+ * @param {number} minDistance
+ * @param {number} minPadding
+ * @param {number} maxPadding
+ * @returns {void}
+ */
+    placeEnemyWithMinDistance(enemy, minDistance, minPadding, maxPadding) {
+        const minX = minPadding;
+        const maxX = this.getLevelMaxSpawnX(maxPadding);
+        enemy.x = this.findValidEnemyX(minX, maxX, minDistance);
+    }
+
+
+    /**
+     * Finds a valid x-position that keeps distance to other chicken-type enemies.
+     * @param {number} minX
+     * @param {number} maxX
+     * @param {number} minDistance
+     * @returns {number}
+     */
+    findValidEnemyX(minX, maxX, minDistance) {
+        const tries = 40;
+        for (let i = 0; i < tries; i++) {
+            const candidate = this.getRandomXBetween(minX, maxX);
+            if (this.isEnemyXFarEnough(candidate, minDistance)) return candidate;
+        }
+        return this.getFallbackEnemyX(minX, maxX, minDistance);
+    }
+
+
+    /**
+     * Checks whether an x-position is far enough from existing chicken-type enemies.
+     * @param {number} candidateX
+     * @param {number} minDistance
+     * @returns {boolean}
+     */
+    isEnemyXFarEnough(candidateX, minDistance) {
+        const enemies = this.level?.enemies || [];
+        return enemies.every(e => this.isSpacingOkForEnemy(e, candidateX, minDistance));
+    }
+
+
+    /**
+     * Checks spacing only against chicken-like enemies with already assigned x.
+     * @param {*} enemy
+     * @param {number} candidateX
+     * @param {number} minDistance
+     * @returns {boolean}
+     */
+    isSpacingOkForEnemy(enemy, candidateX, minDistance) {
+        if (!(enemy instanceof Chicken || enemy instanceof SmallChicken)) return true;
+        if (typeof enemy.x !== 'number') return true;
+        return Math.abs(enemy.x - candidateX) >= minDistance;
+    }
+
+
+    /**
+     * Fallback: places enemy into a "slot" to guarantee distance when random fails.
+     * @param {number} minX
+     * @param {number} maxX
+     * @param {number} minDistance
+     * @returns {number}
+     */
+    getFallbackEnemyX(minX, maxX, minDistance) {
+        const used = this.getUsedEnemyXs();
+        const slots = this.buildSpawnSlots(minX, maxX, minDistance);
+        const slotX = this.pickFirstFreeSlot(slots, used, minDistance);
+        return this.applySlotJitter(slotX, minDistance);
+    }
+
+
+    /**
+     * Returns x-positions of already placed chicken-type enemies.
+     * @returns {number[]}
+     */
+    getUsedEnemyXs() {
+        const enemies = this.level?.enemies || [];
+        return enemies
+            .filter(e => e instanceof Chicken || e instanceof SmallChicken)
+            .map(e => e.x)
+            .filter(x => typeof x === 'number');
+    }
+
+
+    /**
+     * Builds evenly spaced spawn slots.
+     * @param {number} minX
+     * @param {number} maxX
+     * @param {number} step
+     * @returns {number[]}
+     */
+    buildSpawnSlots(minX, maxX, step) {
+        const slots = [];
+        for (let x = minX; x <= maxX; x += step) slots.push(x);
+        return slots;
+    }
+
+
+    /**
+     * Picks the first free slot that keeps minDistance to used positions.
+     * @param {number[]} slots
+     * @param {number[]} used
+     * @param {number} minDistance
+     * @returns {number}
+     */
+    pickFirstFreeSlot(slots, used, minDistance) {
+        for (let i = 0; i < slots.length; i++) {
+            if (this.isSlotFree(slots[i], used, minDistance)) return slots[i];
+        }
+        return slots[Math.floor(Math.random() * slots.length)] || 0;
+    }
+
+
+    /**
+     * Checks if a slot is free.
+     * @param {number} slotX
+     * @param {number[]} used
+     * @param {number} minDistance
+     * @returns {boolean}
+     */
+    isSlotFree(slotX, used, minDistance) {
+        return used.every(x => Math.abs(x - slotX) >= minDistance);
+    }
+
+
+    /**
+     * Applies small random jitter inside a slot range.
+     * @param {number} baseX
+     * @param {number} minDistance
+     * @returns {number}
+     */
+    applySlotJitter(baseX, minDistance) {
+        const jitter = minDistance * 0.3;
+        return baseX + (Math.random() * jitter * 2 - jitter);
+    }
+
+
+    /**
+     * Returns the maximum x-value allowed for spawning.
+     * @param {number} paddingRight
+     * @returns {number}
+     */
+    getLevelMaxSpawnX(paddingRight) {
+        const endX = this.level?.level_end_x ?? 0;
+        return Math.max(0, endX - paddingRight);
+    }
+
+
+    /**
+     * Returns a random number between min and max.
+     * @param {number} min
+     * @param {number} max
+     * @returns {number}
+     */
+    getRandomXBetween(min, max) {
+        if (max <= min) return min;
+        return min + Math.random() * (max - min);
     }
 }
