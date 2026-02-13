@@ -1,3 +1,24 @@
+.level-indicator {
+    position: absolute;
+    top: 12px;
+    right: 50%;
+    z-index: 50;
+    padding: 6px 10px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 14px;
+    background: rgba(0, 0, 0, 0.55);
+    color: white;
+    opacity: 0;
+    transition: opacity 180ms ease ease-in-out;
+}
+
+
+.level-indicator.is-visible {
+    opacity: 1;
+}
+
+
 .burger-btn {
     position: absolute;
     top: 12px;

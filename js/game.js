@@ -47,6 +47,7 @@ function startGame() {
     updatePauseButtonUi();
     document.getElementById('startScreen').classList.add('d-none');
     init();
+    updateLevelIndicator();
     playBackgroundIfAllowed();
 }
 
@@ -69,6 +70,7 @@ function setGamePausedState(state) {
  * @returns {void}
  */
 function restartGame() {
+    hideLevelIndicator();
     closeBurgerMenu();
     document.getElementById('pauseBtn')?.classList.add('d-none');
     destroyWorldIfExists();
@@ -195,6 +197,7 @@ function quickRestartGame() {
     destroyWorldIfExists();
     ensureCanvasReady();
     createNewWorld();
+    updateLevelIndicator();
     playBackgroundIfAllowed();
     handleViewportChange?.();
 }
@@ -261,6 +264,7 @@ function createNewWorld() {
  * @returns {void}
  */
 function onGameOver(worldInstance) {
+    hideLevelIndicator();
     setGamePausedState(true);
     const pauseBtn = document.getElementById('pauseBtn');
     pauseBtn?.classList.add('d-none');
@@ -277,10 +281,56 @@ function onGameOver(worldInstance) {
  * @returns {void}
  */
 function onWin(worldInstance) {
+    hideLevelIndicator();
     setGamePausedState(true);
     const pauseBtn = document.getElementById('pauseBtn');
     pauseBtn?.classList.add('d-none');
     worldInstance?.pauseAllSounds?.();
     addLeaderboardEntry(worldInstance, 'win');
     openWinOverlay();
+}
+
+
+/**
+ * Updates the level indicator UI.
+ * @returns {void}
+ */
+function updateLevelIndicator() {
+    const el = document.getElementById('levelIndicator');
+    if (!el) return;
+    showLevelIndicator();
+    el.textContent = getLevelIndicatorText();
+}
+
+
+/**
+ * Shows the level indicator with a fade-in transition.
+ * @returns {void}
+ */
+function showLevelIndicator() {
+    const el = document.getElementById('levelIndicator');
+    if (!el) return;
+    el.classList.remove('d-none');
+    requestAnimationFrame(() => el.classList.add('is-visible'));
+}
+
+
+/**
+ * Hides the level indicator with a fade-out transition.
+ * @returns {void}
+ */
+function hideLevelIndicator() {
+    const el = document.getElementById('levelIndicator');
+    if (!el) return;
+    el.classList.remove('is-visible');
+    setTimeout(() => el.classList.add('d-none'), 200);
+}
+
+
+/**
+ * Returns the current level label.
+ * @returns {string}
+ */
+function getLevelIndicatorText() {
+    return `Level ${currentLevelIndex + 1}`;
 }

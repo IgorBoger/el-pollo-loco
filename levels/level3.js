@@ -45,4 +45,4 @@ const level3 = new Level(
     ]
 );
 
-level2.level_end_x = 5 * 720;
+level3.level_end_x = 5 * 720;
