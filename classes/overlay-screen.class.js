@@ -194,6 +194,36 @@ class OverlayScreen {
 
 
     /**
+ * Ensures the captured base frame matches the current canvas pixel size.
+ * @returns {void}
+ */
+    ensureBaseFrameMatchesCanvas() {
+        if (!this.baseFrame) return;
+        const w = this.canvas.width;
+        const h = this.canvas.height;
+        if (this.baseFrame.width === w && this.baseFrame.height === h) return;
+        this.baseFrame = this.scaleCanvasToSize(this.baseFrame, w, h);
+    }
+
+
+    /**
+     * Scales a source canvas to a new size and returns the resized canvas.
+     * @param {HTMLCanvasElement} source
+     * @param {number} w
+     * @param {number} h
+     * @returns {HTMLCanvasElement}
+     */
+    scaleCanvasToSize(source, w, h) {
+        const c = document.createElement('canvas');
+        c.width = w;
+        c.height = h;
+        const ctx = c.getContext('2d');
+        ctx.drawImage(source, 0, 0, w, h);
+        return c;
+    }
+
+
+    /**
      * Prepares the canvas for drawing.
      */
     prepareDraw() {

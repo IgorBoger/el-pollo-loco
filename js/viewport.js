@@ -8,10 +8,12 @@ function fitCanvasToCssSize() {
     if (!canvasData) return;
     const metrics = getCanvasMetrics(canvasData.c);
     if (!metrics) return;
-    syncCanvasPixelSize(canvasData.c, metrics.pxW, metrics.pxH);
+    const didResize = syncCanvasPixelSize(canvasData.c, metrics.pxW, metrics.pxH);
     const transform = calcViewportTransform(metrics.pxW, metrics.pxH);
     applyViewportTransform(canvasData.ctx, transform);
+    redrawAfterCanvasResize(didResize);
 }
+
 
 
 /**
@@ -48,13 +50,17 @@ function getCanvasMetrics(c) {
  * @param {HTMLCanvasElement} c
  * @param {number} pxW
  * @param {number} pxH
- * @returns {void}
+ * @returns {boolean} True if the canvas size changed.
  */
 function syncCanvasPixelSize(c, pxW, pxH) {
-    if (c.width !== pxW || c.height !== pxH) {
-        c.width = pxW;
-        c.height = pxH;
-    }
+    const EPS = 2;
+    const wDiff = Math.abs(c.width - pxW);
+    const hDiff = Math.abs(c.height - pxH);
+    const didChange = (wDiff >= EPS) || (hDiff >= EPS);
+    if (!didChange) return false;
+    c.width = pxW;
+    c.height = pxH;
+    return true;
 }
 
 
@@ -85,6 +91,19 @@ function applyViewportTransform(ctx, t) {
     window.viewOffsetX = t.offX / t.scale;
     ctx.setTransform(t.scale, 0, 0, t.scale, t.offX, t.offY);
     ctx.imageSmoothingEnabled = true;
+}
+
+
+/**
+ * Redraws the current world state immediately after a canvas resize to prevent black flicker.
+ *
+ * @param {boolean} didResize
+ * @returns {void}
+ */
+function redrawAfterCanvasResize(didResize) {
+    if (!didResize) return;
+    if (!world || !world.drawStaticFrame) return;
+    world.drawStaticFrame();
 }
 
 
@@ -129,43 +148,34 @@ function scheduleViewportRaf() {
  */
 function runViewportRafTasks() {
     fitCanvasToCssSize();
-    drawEndscreenIfNeeded();
+    refreshVisibleScreens();
     updateMobileControlsVisibility();
     checkOrientation();
 }
 
 
 /**
- * Draws the endscreen frame if required.
+ * Refreshes all visible overlay screens after viewport changes.
  *
  * @returns {void}
  */
-function drawEndscreenIfNeeded() {
-    if (!shouldDrawEndscreen()) return;
-    drawEndscreenFrame();
+function refreshVisibleScreens() {
+    if (!world) return;
+    refreshScreenIfVisible(world.endscreen);
+    refreshScreenIfVisible(world.winscreen);
 }
 
 
 /**
- * Determines whether the endscreen should be drawn.
+ * Refreshes a single overlay screen if it is visible.
  *
- * @returns {boolean}
- */
-function shouldDrawEndscreen() {
-    return Boolean(world
-        && world.character?.isDead?.()
-        && world.endscreen?.visible);
-}
-
-
-/**
- * Draws a single endscreen frame.
- *
+ * @param {OverlayScreen} screen
  * @returns {void}
  */
-function drawEndscreenFrame() {
-    world.drawStaticFrame?.();
-    world.endscreen.draw();
+function refreshScreenIfVisible(screen) {
+    if (!screen?.visible) return;
+    screen.ensureBaseFrameMatchesCanvas?.();
+    screen.draw?.();
 }
 
 
