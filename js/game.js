@@ -15,8 +15,7 @@ var isGamePaused = false;
 window.isGamePaused = isGamePaused;
 let gameStartAt = 0;
 const LEADERBOARD_KEY = 'leaderboard';
-// // window.debugHitboxes = false;
-// window.debugHitboxes = true;
+let currentLevelDefinition = level1;
 
 
 /**
@@ -27,7 +26,7 @@ const LEADERBOARD_KEY = 'leaderboard';
 function init() {
     canvas = document.getElementById('canvas');
     setupHiDPICanvas();
-    world = new World(canvas, keyBaord);
+    world = new World(canvas, keyBaord, currentLevelDefinition);
 }
 
 
@@ -247,7 +246,7 @@ function ensureCanvasReady() {
  * @returns {void}
  */
 function createNewWorld() {
-    world = new World(canvas, keyBaord);
+    world = new World(canvas, keyBaord, currentLevelDefinition);
 }
 
 

@@ -41,13 +41,29 @@ class World {
     cooldownMs = 4000;
 
 
+    // /**
+    //  * Creates a new game world instance.
+    //  * @param {HTMLCanvasElement} canvas - The canvas element.
+    //  * @param {KeyBaord} keyBaord - Keyboard input handler.
+    //  */
+    // constructor(canvas, keyBaord) {
+    //     this.initWorldCore(canvas, keyBaord);
+    //     this.initWorldBackground();
+    //     this.initWorldGameLoop();
+    //     this.initWorldCollectables();
+    //     this.initWorldScreens();
+    //     this.winScheduled = false;
+    // }
+
+
     /**
-     * Creates a new game world instance.
-     * @param {HTMLCanvasElement} canvas - The canvas element.
-     * @param {KeyBaord} keyBaord - Keyboard input handler.
-     */
-    constructor(canvas, keyBaord) {
-        this.initWorldCore(canvas, keyBaord);
+ * Creates a new game world instance.
+ * @param {HTMLCanvasElement} canvas - The canvas element.
+ * @param {KeyBaord} keyBaord - Keyboard input handler.
+ * @param {Level} levelDefinition - Level definition (e.g. level1, level2).
+ */
+    constructor(canvas, keyBaord, levelDefinition) {
+        this.initWorldCore(canvas, keyBaord, levelDefinition);
         this.initWorldBackground();
         this.initWorldGameLoop();
         this.initWorldCollectables();
@@ -63,6 +79,23 @@ class World {
      */
     initWorldCore(canvas, keyBaord) {
         this.level = this.cloneLevel(level1);
+        this.ctx = canvas.getContext("2d");
+        this.canvas = canvas;
+        this.keyBaord = keyBaord;
+        this.stopped = false;
+        this.backgroundObjects = [];
+        window.debugHitboxes = this.debugHitboxes;
+    }
+
+
+    /**
+ * Initializes core world references and state.
+ * @param {HTMLCanvasElement} canvas
+ * @param {KeyBaord} keyBaord
+ * @param {Level} levelDefinition
+ */
+    initWorldCore(canvas, keyBaord, levelDefinition) {
+        this.level = this.cloneLevel(levelDefinition || level1);
         this.ctx = canvas.getContext("2d");
         this.canvas = canvas;
         this.keyBaord = keyBaord;

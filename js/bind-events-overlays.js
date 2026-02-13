@@ -110,7 +110,22 @@ function bindWinButtons() {
  * @returns {void}
  */
 function onNextLevelClick() {
+    setNextLevelDefinition();
     closeEndOverlayThen('winOverlay', quickRestartGame);
+}
+
+
+/**
+ * Switches the current level definition to the next level.
+ *
+ * @returns {void}
+ */
+function setNextLevelDefinition() {
+    console.log(currentLevelDefinition);
+    if (typeof level2 === 'undefined') return;
+    currentLevelDefinition = level2;
+    console.log(currentLevelDefinition);
+
 }
 
 
