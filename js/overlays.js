@@ -284,3 +284,65 @@ function getCanvasScreenForOverlay(overlayId) {
     if (overlayId === 'gameOverOverlay') return world.endscreen;
     return null;
 }
+
+
+/**
+ * Opens the start screen using the overlay pattern (fade-in + d-flex).
+ * @returns {void}
+ */
+function openStartScreen() {
+    const screen = getStartScreenEl();
+    if (!screen) return;
+    setStartScreenVisible(screen, true);
+    requestAnimationFrame(() => screen.classList.remove('is-closed'));
+}
+
+
+/**
+ * Closes the start screen using the overlay pattern (fade-out).
+ * @param {Function} done
+ * @returns {void}
+ */
+function closeStartScreen(done) {
+    const screen = getStartScreenEl();
+    if (!screen) return done?.();
+    // screen.classList.remove('is-open');
+    requestAnimationFrame(() => screen.classList.add('is-closed'));
+    hideStartScreenAfterFade(screen, done);
+}
+
+
+/**
+ * Hides the start screen after the fade-out transition finishes.
+ * @param {HTMLElement} screen
+ * @param {Function} done
+ * @returns {void}
+ */
+function hideStartScreenAfterFade(screen, done) {
+    setTimeout(() => {
+        setStartScreenVisible(screen, false);
+        done?.();
+    }, 190);
+}
+
+
+/**
+ * Sets the start screen display state via d-none/d-flex.
+ *
+ * @param {HTMLElement} screen
+ * @param {boolean} isVisible
+ * @returns {void}
+ */
+function setStartScreenVisible(screen, isVisible) {
+    screen.classList.toggle('d-none', !isVisible);
+    screen.classList.toggle('d-flex', isVisible);
+}
+
+
+/**
+ * Returns the start screen element.
+ * @returns {HTMLElement|null}
+ */
+function getStartScreenEl() {
+    return document.getElementById('startScreen');
+}

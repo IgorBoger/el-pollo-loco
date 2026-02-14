@@ -20,10 +20,8 @@ let currentLevelIndex = 0;
 let currentLevelDefinition = levels[currentLevelIndex];
 
 
-
 /**
  * Initializes the game canvas and creates a new world instance.
- *
  * @returns {void}
  */
 function init() {
@@ -35,25 +33,48 @@ function init() {
 
 /**
  * Starts the game and initializes runtime state.
- *
  * @returns {void}
  */
 function startGame() {
     setGamePausedState(false);
     gameStartAt = Date.now();
-    const pauseBtn = document.getElementById('pauseBtn');
-    pauseBtn.classList.remove('d-none');
+    showPauseButton();
     updatePauseButtonUi();
-    document.getElementById('startScreen').classList.add('d-none');
     init();
-    updateLevelIndicator();
+    startAfterFirstFrame();
+}
+
+
+/**
+ * Starts the game after the first render frame to avoid a black canvas flash.
+ * @returns {void}
+ */
+function startAfterFirstFrame() {
+    requestAnimationFrame(() => scheduleStartScreenClose());
+}
+
+
+/**
+ * Schedules start screen close to reduce black canvas flash.
+ * @returns {void}
+ */
+function scheduleStartScreenClose() {
+    setTimeout(() => closeStartScreen(onStartScreenClosed), 140);
+}
+
+
+/**
+ * Continues startup after the start screen is fully closed.
+ * @returns {void}
+ */
+function onStartScreenClosed() {
     playBackgroundIfAllowed();
+    updateLevelIndicator();
 }
 
 
 /**
  * Sets the global paused state of the game.
- *
  * @param {boolean} state
  * @returns {void}
  */
@@ -65,7 +86,6 @@ function setGamePausedState(state) {
 
 /**
  * Restarts the game and returns to the start screen.
- *
  * @returns {void}
  */
 function restartGame() {
@@ -73,34 +93,22 @@ function restartGame() {
     closeBurgerMenu();
     document.getElementById('pauseBtn')?.classList.add('d-none');
     destroyWorldIfExists();
-    showStartScreen();
-}
-
-
-/**
- * Displays the start screen.
- *
- * @returns {void}
- */
-function showStartScreen() {
-    document.getElementById('startScreen')?.classList.remove('d-none');
+    openStartScreen();
 }
 
 
 /**
  * Restarts the game core without UI resets.
- *
  * @returns {void}
  */
 function restartGameCore() {
     if (world && typeof world.destroy === "function") world.destroy();
-    document.getElementById('startScreen').classList.remove('d-none');
+    openStartScreen();
 }
 
 
 /**
  * Handles language option click events.
- *
  * @param {MouseEvent} e
  * @returns {void}
  */
@@ -114,7 +122,6 @@ function onLangOptionClick(e) {
 
 /**
  * Extracts the language code from a language option click.
- *
  * @param {MouseEvent} e
  * @returns {string|undefined}
  */
@@ -126,7 +133,6 @@ function getLangFromClick(e) {
 
 /**
  * Applies a language change using the available language handler.
- *
  * @param {string} lang
  * @returns {void}
  */
@@ -138,7 +144,6 @@ function applyLanguageChange(lang) {
 
 /**
  * Applies a fallback language change.
- *
  * @param {string} lang
  * @returns {void}
  */
@@ -151,7 +156,6 @@ function setLanguageFallback(lang) {
 
 /**
  * Toggles the paused state of the game.
- *
  * @returns {void}
  */
 function togglePause() {
@@ -170,7 +174,6 @@ function togglePause() {
 
 /**
  * Updates the pause button icon based on game state.
- *
  * @returns {void}
  */
 function updatePauseButtonUi() {
@@ -185,14 +188,13 @@ function updatePauseButtonUi() {
 
 /**
  * Quickly restarts the game without returning to the start screen.
- *
  * @returns {void}
  */
 function quickRestartGame() {
     setGamePausedState(false);
     showPauseButton();
     updatePauseButtonUi();
-    hideStartScreen();
+    closeStartScreen();
     destroyWorldIfExists();
     ensureCanvasReady();
     createNewWorld();
@@ -204,7 +206,6 @@ function quickRestartGame() {
 
 /**
  * Shows the pause button.
- *
  * @returns {void}
  */
 function showPauseButton() {
@@ -214,18 +215,7 @@ function showPauseButton() {
 
 
 /**
- * Hides the start screen.
- *
- * @returns {void}
- */
-function hideStartScreen() {
-    document.getElementById('startScreen')?.classList.add('d-none');
-}
-
-
-/**
  * Destroys the current world instance if it exists.
- *
  * @returns {void}
  */
 function destroyWorldIfExists() {
@@ -236,7 +226,6 @@ function destroyWorldIfExists() {
 
 /**
  * Ensures the canvas element is available and ready.
- *
  * @returns {void}
  */
 function ensureCanvasReady() {
@@ -248,7 +237,6 @@ function ensureCanvasReady() {
 
 /**
  * Creates a new world instance.
- *
  * @returns {void}
  */
 function createNewWorld() {
@@ -258,7 +246,6 @@ function createNewWorld() {
 
 /**
  * Handles game over logic.
- *
  * @param {World} worldInstance
  * @returns {void}
  */
@@ -275,7 +262,6 @@ function onGameOver(worldInstance) {
 
 /**
  * Handles win logic.
- *
  * @param {World} worldInstance
  * @returns {void}
  */
@@ -286,7 +272,6 @@ function onWin(worldInstance) {
     pauseBtn?.classList.add('d-none');
     worldInstance?.pauseAllSounds?.();
     addLeaderboardEntry(worldInstance, 'win');
-    // prepareWinOverlayUi();
     prepareWinOverlayMode();
     openWinOverlay();
 }

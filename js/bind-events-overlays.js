@@ -1,6 +1,5 @@
 /**
  * Binds all overlay open/close related events.
- *
  * @returns {void}
  */
 function bindOverlayOpenCloseEvents() {
@@ -15,7 +14,6 @@ function bindOverlayOpenCloseEvents() {
 
 /**
  * Binds "click outside to close" behavior for overlays.
- *
  * @returns {void}
  */
 function bindOverlayOutsideCloseEvents() {
@@ -29,7 +27,6 @@ function bindOverlayOutsideCloseEvents() {
 
 /**
  * Binds delegated click handling for language option buttons inside the language overlay.
- *
  * @returns {void}
  */
 function bindOverlayContentDelegation() {
@@ -41,7 +38,6 @@ function bindOverlayContentDelegation() {
 
 /**
  * Handles delegated clicks inside the language modal content.
- *
  * @param {MouseEvent} e
  * @returns {void}
  */
@@ -53,7 +49,6 @@ function onLangModalContentClick(e) {
 
 /**
  * Binds endscreen-related button events (game over and win screens).
- *
  * @returns {void}
  */
 function bindEndscreenButtons() {
@@ -64,7 +59,6 @@ function bindEndscreenButtons() {
 
 /**
  * Binds button events for the game over overlay.
- *
  * @returns {void}
  */
 function bindGameOverButtons() {
@@ -75,7 +69,6 @@ function bindGameOverButtons() {
 
 /**
  * Handles the game over restart action (close overlay then quick restart).
- *
  * @returns {void}
  */
 function onGameOverRestartClick() {
@@ -85,7 +78,6 @@ function onGameOverRestartClick() {
 
 /**
  * Handles the game over home action (close overlay then return to start screen).
- *
  * @returns {void}
  */
 function onGameOverHomeClick() {
@@ -95,7 +87,6 @@ function onGameOverHomeClick() {
 
 /**
  * Binds button events for the win overlay.
- *
  * @returns {void}
  */
 function bindWinButtons() {
@@ -169,7 +160,6 @@ function getFinishHomeText() {
 
 /**
  * Switches the current level definition to the next level in the list.
- *
  * @returns {void}
  */
 function setNextLevelDefinition() {
@@ -211,7 +201,6 @@ function applyCurrentLevelDefinition() {
 
 /**
  * Handles the win home action (close overlay then return to start screen).
- *
  * @returns {void}
  */
 function onWinHomeClick() {
@@ -222,7 +211,6 @@ function onWinHomeClick() {
 
 /**
  * Installs a global click handler for closing UI panels when clicking outside.
- *
  * @returns {void}
  */
 function bindGlobalOutsideClose() {
@@ -232,7 +220,6 @@ function bindGlobalOutsideClose() {
 
 /**
  * Binds events for opening and closing the language modal overlay.
- *
  * @returns {void}
  */
 function bindLangModalOverlayEvents() {
@@ -243,7 +230,6 @@ function bindLangModalOverlayEvents() {
 
 /**
  * Binds events for opening and closing the story overlay.
- *
  * @returns {void}
  */
 function bindStoryOverlayEvents() {
@@ -254,7 +240,6 @@ function bindStoryOverlayEvents() {
 
 /**
  * Binds events for opening and closing the key help overlay.
- *
  * @returns {void}
  */
 function bindKeyHelpOverlayEvents() {
@@ -265,7 +250,6 @@ function bindKeyHelpOverlayEvents() {
 
 /**
  * Binds events for opening and closing the impressum overlay.
- *
  * @returns {void}
  */
 function bindImpressumOverlayEvents() {
@@ -276,7 +260,6 @@ function bindImpressumOverlayEvents() {
 
 /**
  * Binds events for opening and closing the ranking overlay.
- *
  * @returns {void}
  */
 function bindRankingOverlayEvents() {
@@ -287,7 +270,6 @@ function bindRankingOverlayEvents() {
 
 /**
  * Binds events for ranking clear confirmation overlay actions.
- *
  * @returns {void}
  */
 function bindRankingClearOverlayEvents() {
@@ -300,7 +282,6 @@ function bindRankingClearOverlayEvents() {
 
 /**
  * Handles global outside clicks to close the settings or burger menu when appropriate.
- *
  * @param {MouseEvent} e - The click event.
  * @returns {void}
  */
@@ -316,7 +297,6 @@ function outsideCloseHandler(e) {
 
 /**
  * Checks whether outside close handling should be ignored because an overlay is open.
- *
  * @returns {boolean} True if outside close should be ignored.
  */
 function shouldIgnoreOutsideClose() {
@@ -330,7 +310,6 @@ function shouldIgnoreOutsideClose() {
 
 /**
  * Checks whether an overlay is currently open (not hidden via "d-none").
- *
  * @param {string} id - The overlay element id.
  * @returns {boolean} True if the overlay is open.
  */
@@ -342,7 +321,6 @@ function isOverlayOpen(id) {
 
 /**
  * Determines whether the settings overlay should close due to an outside click.
- *
  * @param {MouseEvent} e - The click event.
  * @returns {boolean} True if settings should close.
  */
@@ -358,7 +336,6 @@ function shouldCloseSettingsByOutsideClick(e) {
 
 /**
  * Determines whether the burger menu should close due to an outside click.
- *
  * @param {MouseEvent} e - The click event.
  * @returns {boolean} True if burger menu should close.
  */
