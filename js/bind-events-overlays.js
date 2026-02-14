@@ -105,27 +105,107 @@ function bindWinButtons() {
 
 
 /**
- * Handles the next level action (close overlay then quick restart).
- *
+ * Handles the next level button click.
  * @returns {void}
  */
 function onNextLevelClick() {
+    if (isLastLevelReached()) return closeEndOverlayThen('winOverlay', backToStartAfterFinish);
     setNextLevelDefinition();
     closeEndOverlayThen('winOverlay', quickRestartGame);
 }
 
 
 /**
- * Switches the current level definition to the next level.
+ * Returns to start after finishing the last level.
+ * @returns {void}
+ */
+function backToStartAfterFinish() {
+    resetToFirstLevel();
+    restartGame();
+}
+
+
+
+/**
+ * Sets the win overlay UI for the finish state.
+ * @returns {void}
+ */
+function setWinOverlayModeFinish() {
+    setText('winQuestion', getFinishQuestionText());
+    setText('winHome', getFinishHomeText());
+    document.getElementById('nextLevelBtn')?.classList.add('d-none');
+}
+
+
+/**
+ * Sets the win overlay UI for the normal next level state.
+ * @returns {void}
+ */
+function setWinOverlayModeNextLevel() {
+    applyTranslations?.();
+    document.getElementById('nextLevelBtn')?.classList.remove('d-none');
+}
+
+
+/**
+ * Returns the translated finish question text.
+ * @returns {string}
+ */
+function getFinishQuestionText() {
+    const t = getMergedPack?.(currentLanguage) || {};
+    return t.winFinishQuestion || 'You finished the game!';
+}
+
+
+/**
+ * Returns the translated finish home button text.
+ * @returns {string}
+ */
+function getFinishHomeText() {
+    const t = getMergedPack?.(currentLanguage) || {};
+    return t.winFinishHome || 'Back to Start';
+}
+
+
+/**
+ * Switches the current level definition to the next level in the list.
  *
  * @returns {void}
  */
 function setNextLevelDefinition() {
-    console.log(currentLevelDefinition);
-    if (typeof level2 === 'undefined') return;
-    currentLevelDefinition = level2;
-    console.log(currentLevelDefinition);
+    if (!canSwitchToNextLevel()) return;
+    advanceLevelIndex();
+    applyCurrentLevelDefinition();
+}
 
+
+/**
+ * Checks whether level switching is possible.
+ * @returns {boolean}
+ */
+function canSwitchToNextLevel() {
+    return Array.isArray(levels) && levels.length > 0;
+}
+
+
+/**
+ * Advances the level index (wraps around).
+ * @returns {void}
+ */
+function advanceLevelIndex() {
+    // currentLevelIndex = (currentLevelIndex + 1) % levels.length;
+
+    if (currentLevelIndex >= levels.length - 1) return;
+    currentLevelIndex++;
+}
+
+
+/**
+ * Applies the current level definition from the index.
+ * @returns {void}
+ */
+function applyCurrentLevelDefinition() {
+    currentLevelDefinition = levels[currentLevelIndex];
 }
 
 
@@ -135,6 +215,7 @@ function setNextLevelDefinition() {
  * @returns {void}
  */
 function onWinHomeClick() {
+    resetToFirstLevel();
     closeEndOverlayThen('winOverlay', restartGame);
 }
 

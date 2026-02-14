@@ -15,7 +15,6 @@ var isGamePaused = false;
 window.isGamePaused = isGamePaused;
 let gameStartAt = 0;
 const LEADERBOARD_KEY = 'leaderboard';
-// let currentLevelDefinition = level1;
 const levels = [level1, level2, level3];
 let currentLevelIndex = 0;
 let currentLevelDefinition = levels[currentLevelIndex];
@@ -287,7 +286,38 @@ function onWin(worldInstance) {
     pauseBtn?.classList.add('d-none');
     worldInstance?.pauseAllSounds?.();
     addLeaderboardEntry(worldInstance, 'win');
+    // prepareWinOverlayUi();
+    prepareWinOverlayMode();
     openWinOverlay();
+}
+
+
+/**
+ * Prepares win overlay UI based on level progression.
+ * @returns {void}
+ */
+function prepareWinOverlayMode() {
+    if (isLastLevelReached()) return setWinOverlayModeFinish();
+    setWinOverlayModeNextLevel();
+}
+
+
+/**
+ * Returns true if the current level index is the last one.
+ * @returns {boolean}
+ */
+function isLastLevelReached() {
+    return currentLevelIndex >= levels.length - 1;
+}
+
+
+/**
+ * Resets the game to the first level.
+ * @returns {void}
+ */
+function resetToFirstLevel() {
+    currentLevelIndex = 0;
+    currentLevelDefinition = levels[currentLevelIndex];
 }
 
 
