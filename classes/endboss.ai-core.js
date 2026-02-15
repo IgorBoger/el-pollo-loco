@@ -1,7 +1,7 @@
 /**
  * Starts the 60 FPS AI loop interval.
  */
-Endboss.prototype.startAiLoop = function() {
+Endboss.prototype.startAiLoop = function () {
     this.aiInterval = setInterval(() => this.tickAi(), 1000 / 60);
 };
 
@@ -9,7 +9,7 @@ Endboss.prototype.startAiLoop = function() {
 /**
  * AI tick: updates state, movement and decisions if not paused/stopped.
  */
-Endboss.prototype.tickAi = function() {
+Endboss.prototype.tickAi = function () {
     if (window.isGamePaused || this.world?.stopped) return;
     if (this.handleDeath() || !this.world?.character) return;
     const now = performance.now();
@@ -28,7 +28,7 @@ Endboss.prototype.tickAi = function() {
  * @param {number} pepeX
  * @param {number} dist
  */
-Endboss.prototype.updateRecoveryOrAi = function(now, pepeX, dist) {
+Endboss.prototype.updateRecoveryOrAi = function (now, pepeX, dist) {
     if (this.isInRecovery(now)) {
         this.applyRecovery();
         return;
@@ -40,7 +40,7 @@ Endboss.prototype.updateRecoveryOrAi = function(now, pepeX, dist) {
 /**
  * Starts the animation loop interval.
  */
-Endboss.prototype.startAnimationLoop = function() {
+Endboss.prototype.startAnimationLoop = function () {
     this.animationInterval = setInterval(() => this.tickAnimation(), 50);
 };
 
@@ -48,7 +48,7 @@ Endboss.prototype.startAnimationLoop = function() {
 /**
  * Animation tick: advances animation frames if not paused/stopped.
  */
-Endboss.prototype.tickAnimation = function() {
+Endboss.prototype.tickAnimation = function () {
     if (window.isGamePaused || this.world?.stopped) return;
     this.updateFrames();
 };
@@ -59,7 +59,7 @@ Endboss.prototype.tickAnimation = function() {
  * @param {object} obj
  * @returns {number}
  */
-Endboss.prototype.getCenterX = function(obj) {
+Endboss.prototype.getCenterX = function (obj) {
     const w = obj.width || 0;
     return obj.x + w / 2;
 };
@@ -71,7 +71,7 @@ Endboss.prototype.getCenterX = function(obj) {
  * @param {object} b
  * @returns {number}
  */
-Endboss.prototype.getHorizontalGap = function(a, b) {
+Endboss.prototype.getHorizontalGap = function (a, b) {
     const aLeft = a.x;
     const aRight = a.x + (a.width || 0);
     const bLeft = b.x;
@@ -86,7 +86,7 @@ Endboss.prototype.getHorizontalGap = function(a, b) {
  * Handles death state and schedules removal.
  * @returns {boolean} True if the endboss is dead.
  */
-Endboss.prototype.handleDeath = function() {
+Endboss.prototype.handleDeath = function () {
     if (!this.isDead()) return false;
     const changedToDead = this.setAnimation('dead');
     this.handleDeadStateChange(changedToDead);
@@ -100,7 +100,7 @@ Endboss.prototype.handleDeath = function() {
  * Runs one-time actions when switching to the dead animation.
  * @param {boolean} changedToDead
  */
-Endboss.prototype.handleDeadStateChange = function(changedToDead) {
+Endboss.prototype.handleDeadStateChange = function (changedToDead) {
     if (!changedToDead) return;
     this.playEndbossDeadSound();
     this.initDeadAnimTimer();
@@ -110,7 +110,7 @@ Endboss.prototype.handleDeadStateChange = function(changedToDead) {
 /**
  * Schedules removing the dead endboss from the world.
  */
-Endboss.prototype.scheduleRemovalAfterDeath = function() {
+Endboss.prototype.scheduleRemovalAfterDeath = function () {
     setTimeout(() => this.removeDeadEndboss(), 2000);
 };
 
@@ -118,7 +118,7 @@ Endboss.prototype.scheduleRemovalAfterDeath = function() {
 /**
  * Removes the dead endboss and stops its loops.
  */
-Endboss.prototype.removeDeadEndboss = function() {
+Endboss.prototype.removeDeadEndboss = function () {
     this.removeFromEnemyList();
     this.stopEndbossIntervals();
 };
@@ -127,7 +127,7 @@ Endboss.prototype.removeDeadEndboss = function() {
 /**
  * Removes this endboss from the world's enemy list.
  */
-Endboss.prototype.removeFromEnemyList = function() {
+Endboss.prototype.removeFromEnemyList = function () {
     if (!this.world) return;
     this.world.level.enemies = this.world.level.enemies.filter(e => e !== this);
 };
@@ -136,7 +136,7 @@ Endboss.prototype.removeFromEnemyList = function() {
 /**
  * Stops AI and animation intervals.
  */
-Endboss.prototype.stopEndbossIntervals = function() {
+Endboss.prototype.stopEndbossIntervals = function () {
     clearInterval(this.aiInterval);
     clearInterval(this.animationInterval);
 };
@@ -145,7 +145,7 @@ Endboss.prototype.stopEndbossIntervals = function() {
 /**
  * Initializes the timestamp when the dead animation is considered finished.
  */
-Endboss.prototype.initDeadAnimTimer = function() {
+Endboss.prototype.initDeadAnimTimer = function () {
     if (this.deadAnimEndAt) return;
     const now = performance.now();
     this.deadAnimEndAt = now + this.getDeadAnimDuration();
@@ -156,7 +156,7 @@ Endboss.prototype.initDeadAnimTimer = function() {
  * Calculates the duration of the dead animation in milliseconds.
  * @returns {number}
  */
-Endboss.prototype.getDeadAnimDuration = function() {
+Endboss.prototype.getDeadAnimDuration = function () {
     const frames = this.IMAGES_DEAD?.length || 0;
     return frames * this.deadFrameMs + 80;
 };
@@ -166,7 +166,7 @@ Endboss.prototype.getDeadAnimDuration = function() {
  * Checks whether the dead animation duration has elapsed.
  * @returns {boolean}
  */
-Endboss.prototype.isDeadAnimFinished = function() {
+Endboss.prototype.isDeadAnimFinished = function () {
     if (!this.deadAnimEndAt) return false;
     return performance.now() >= this.deadAnimEndAt;
 };
@@ -177,7 +177,7 @@ Endboss.prototype.isDeadAnimFinished = function() {
  * @param {number} now
  * @returns {boolean}
  */
-Endboss.prototype.isInRecovery = function(now) {
+Endboss.prototype.isInRecovery = function (now) {
     return now < this.recoverUntil;
 };
 
@@ -185,7 +185,7 @@ Endboss.prototype.isInRecovery = function(now) {
 /**
  * Applies recovery behavior (stops movement and ensures hurt animation if needed).
  */
-Endboss.prototype.applyRecovery = function() {
+Endboss.prototype.applyRecovery = function () {
     if (this.recoveryType === 'hurt') this.ensureHurtAnimation();
     this.stopMovementSoft();
 };
@@ -194,7 +194,7 @@ Endboss.prototype.applyRecovery = function() {
 /**
  * Ensures the hurt animation is active while recovering from hurt.
  */
-Endboss.prototype.ensureHurtAnimation = function() {
+Endboss.prototype.ensureHurtAnimation = function () {
     if (this.currentAnimation !== 'hurt') this.setAnimation('hurt');
 };
 
@@ -202,7 +202,7 @@ Endboss.prototype.ensureHurtAnimation = function() {
 /**
  * Softly reduces speed towards zero.
  */
-Endboss.prototype.stopMovementSoft = function() {
+Endboss.prototype.stopMovementSoft = function () {
     this.targetSpeed = 0;
     this.currentSpeed += (0 - this.currentSpeed) * 0.25;
 };
@@ -214,7 +214,7 @@ Endboss.prototype.stopMovementSoft = function() {
  * @param {number} pepeX
  * @param {number} dist
  */
-Endboss.prototype.updateAI = function(now, pepeX, dist) {
+Endboss.prototype.updateAI = function (now, pepeX, dist) {
     if (this.exitRecoveryToAlert(now)) return;
     this.tryPlayScheduledEndbossAlertSound(now);
     this.updateAggro(dist);
@@ -232,7 +232,7 @@ Endboss.prototype.updateAI = function(now, pepeX, dist) {
  * @param {number} now
  * @returns {boolean}
  */
-Endboss.prototype.exitRecoveryToAlert = function(now) {
+Endboss.prototype.exitRecoveryToAlert = function (now) {
     if (this.isInRecovery(now)) return false;
     if (this.recoveryType !== 'hurt') return false;
     this.recoveryType = null;
@@ -246,7 +246,7 @@ Endboss.prototype.exitRecoveryToAlert = function(now) {
  * Updates aggro state and clears it if the target is too far.
  * @param {number} dist
  */
-Endboss.prototype.updateAggro = function(dist) {
+Endboss.prototype.updateAggro = function (dist) {
     if (!this.aggro) return;
     if (this.shouldLoseAggro(dist)) this.clearAggroState();
 };
@@ -257,7 +257,7 @@ Endboss.prototype.updateAggro = function(dist) {
  * @param {number} dist
  * @returns {boolean}
  */
-Endboss.prototype.shouldLoseAggro = function(dist) {
+Endboss.prototype.shouldLoseAggro = function (dist) {
     return dist > this.aggroKeepRange;
 };
 
@@ -265,7 +265,7 @@ Endboss.prototype.shouldLoseAggro = function(dist) {
 /**
  * Clears aggro and returns to patrol state.
  */
-Endboss.prototype.clearAggroState = function() {
+Endboss.prototype.clearAggroState = function () {
     this.aggro = false;
     this.stopChaseState();
     this.enterPatrolState(performance.now());
@@ -276,7 +276,7 @@ Endboss.prototype.clearAggroState = function() {
  * Enters patrol state after alert/chase and applies patrol speed.
  * @param {number} now
  */
-Endboss.prototype.enterPatrolState = function(now) {
+Endboss.prototype.enterPatrolState = function (now) {
     this.setAnimation('walk');
     this.postAlertCooldownUntil = now + 300;
     this.applyPatrolSpeedNow();
@@ -286,7 +286,7 @@ Endboss.prototype.enterPatrolState = function(now) {
 /**
  * Applies patrol speed immediately.
  */
-Endboss.prototype.applyPatrolSpeedNow = function() {
+Endboss.prototype.applyPatrolSpeedNow = function () {
     this.targetSpeed = this.baseWalkSpeed * this.patrolDir;
     this.snapSpeedToTarget();
 };
@@ -295,7 +295,7 @@ Endboss.prototype.applyPatrolSpeedNow = function() {
 /**
  * Snaps current speed to the target speed.
  */
-Endboss.prototype.snapSpeedToTarget = function() {
+Endboss.prototype.snapSpeedToTarget = function () {
     this.currentSpeed = this.targetSpeed;
 };
 
@@ -303,11 +303,60 @@ Endboss.prototype.snapSpeedToTarget = function() {
 /**
  * Updates patrol movement and turns at patrol edges when applicable.
  */
-Endboss.prototype.updatePatrol = function() {
+Endboss.prototype.updatePatrol = function () {
     if (this.isChasing || this.aggro ||
         this.currentAnimation === 'alert' ||
         this.isAttackAnim()) return;
     this.targetSpeed = this.baseWalkSpeed * this.patrolDir;
     this.currentSpeed += (this.targetSpeed - this.currentSpeed) * 0.12;
     this.turnAtPatrolEdges();
+};
+
+
+/**
+ * Stops all loops and clears scheduled sound triggers and action states.
+ * @returns {void}
+ */
+Endboss.prototype.stop = function () {
+    this.stopEndbossLoops();
+    this.resetEndbossActionState();
+    this.stopEndbossActionSounds();
+};
+
+
+/**
+ * Stops AI and animation intervals.
+ * @returns {void}
+ */
+Endboss.prototype.stopEndbossLoops = function () {
+    if (this.aiInterval) clearInterval(this.aiInterval);
+    if (this.animationInterval) clearInterval(this.animationInterval);
+    this.aiInterval = null;
+    this.animationInterval = null;
+};
+
+
+/**
+ * Resets all action-related state (prevents pending alert/attack leftovers).
+ * @returns {void}
+ */
+Endboss.prototype.resetEndbossActionState = function () {
+    this.scheduledAlertSoundAt = 0;
+    this.alertUntil = 0;
+    this.forceAlertUntil = 0;
+    this.attackUntil = 0;
+    this.attackHitAllowedAt = 0;
+    this.isChasing = false;
+    this.currentSpeed = 0;
+    this.targetSpeed = 0;
+    this.currentAnimation = 'walk';
+};
+
+
+/**
+ * Stops endboss action sounds via world helper if available.
+ * @returns {void}
+ */
+Endboss.prototype.stopEndbossActionSounds = function () {
+    this.world?.stopEndbossActionSounds?.();
 };

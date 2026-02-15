@@ -96,7 +96,19 @@ World.prototype.isControlsLocked = function () {
  * @returns {void}
  */
 World.prototype.freezeGameOverStart = function () {
+    this.stopped = true;
     this.freezeGameplayOnce('isGameOverFrozen');
+    this.stopEndbossActionSounds?.();
+    this.stopEnemiesForGameOver();
+}
+
+
+/**
+ * Stops all enemy loops immediately for game over (no more attack/patrol).
+ * @returns {void}
+ */
+World.prototype.stopEnemiesForGameOver = function () {
+    this.level?.enemies?.forEach(enemy => enemy.stop?.());
 }
 
 
@@ -314,3 +326,14 @@ World.prototype.updateCoinAnimations = function (now) {
     if (!this.coins?.length) return;
     this.coins.forEach(c => c.updateAnimation?.(now));
 }
+
+
+/**
+ * Freezes gameplay immediately when the character dies to prevent enemy "after ticks".
+ * @returns {void}
+ */
+World.prototype.freezeOnDeathImmediate = function () {
+    if (!this.character?.isDead?.()) return;
+    this.freezeGameOverStart?.();
+    this.stopEndbossActionSounds?.();
+};

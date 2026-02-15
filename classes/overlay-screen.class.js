@@ -194,9 +194,9 @@ class OverlayScreen {
 
 
     /**
- * Ensures the captured base frame matches the current canvas pixel size.
- * @returns {void}
- */
+    * Ensures the captured base frame matches the current canvas pixel size.
+    * @returns {void}
+    */
     ensureBaseFrameMatchesCanvas() {
         if (!this.baseFrame) return;
         const w = this.canvas.width;

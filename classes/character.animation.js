@@ -161,12 +161,57 @@ Character.prototype.handleJumpReset = function () {
  * @returns {void}
  */
 Character.prototype.handleWalkOrIdle = function (now) {
-    if (this.world.keyBaord.RIGHT || this.world.keyBaord.LEFT) {
-        this.ensureAnimationState('walk');
-        this.maybeAdvance(this.IMAGES_WALKING, now, this.walkFrameMs);
-        this.hurtSoundPlayed = false;
-        return;
-    }
+    if (this.shouldForceIdle()) return this.playLockedIdle();
+    if (this.isMovementPressed()) return this.playWalkAnimation(now);
+    this.playIdleOrSleep(now);
+};
+
+
+/**
+ * Returns whether the character should be forced into idle (win/lose freeze).
+ * @returns {boolean}
+ */
+Character.prototype.shouldForceIdle = function () {
+    return !!this.world?.isControlsLocked?.();
+};
+
+
+/**
+ * Plays idle animation for locked controls.
+ * @returns {void}
+ */
+Character.prototype.playLockedIdle = function () {
+    this.playAnimation(this.IMAGES_IDLE);
+};
+
+
+/**
+ * Checks whether left/right movement input is currently pressed.
+ * @returns {boolean}
+ */
+Character.prototype.isMovementPressed = function () {
+    return !!(this.world?.keyBaord?.RIGHT || this.world?.keyBaord?.LEFT);
+};
+
+
+/**
+ * Plays walking animation and resets hurt sound flag.
+ * @param {number} now
+ * @returns {void}
+ */
+Character.prototype.playWalkAnimation = function (now) {
+    this.ensureAnimationState('walk');
+    this.maybeAdvance(this.IMAGES_WALKING, now, this.walkFrameMs);
+    this.hurtSoundPlayed = false;
+};
+
+
+/**
+ * Plays idle/sleep behavior and resets hurt sound flag.
+ * @param {number} now
+ * @returns {void}
+ */
+Character.prototype.playIdleOrSleep = function (now) {
     this.pepeIsSleeping(now);
     this.hurtSoundPlayed = false;
 };

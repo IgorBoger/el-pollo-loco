@@ -199,6 +199,8 @@ function touchPress(el, actionKey, e) {
  * @returns {void}
  */
 function setKey(actionKey, state) {
+    if (window.isGamePaused) return;
+    if (world?.isControlsLocked?.()) return;
     keyBaord[actionKey] = state;
 }
 

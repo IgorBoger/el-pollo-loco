@@ -16,8 +16,24 @@ function bindKeyboardEvents() {
  * @returns {void}
  */
 function handleKeyUp(event) {
+    if (shouldIgnoreGameInput(event)) return;
     releaseMovementKeys(event);
     releaseActionKeys(event);
+}
+
+
+/**
+ * Blocks gameplay input when the game is paused or controls are locked.
+ * ESC is still allowed for closing overlays.
+ *
+ * @param {KeyboardEvent} event
+ * @returns {boolean}
+ */
+function shouldIgnoreGameInput(event) {
+    if (event.key === "Escape") return false;
+    if (window.isGamePaused) return true;
+    if (world?.isControlsLocked?.()) return true;
+    return false;
 }
 
 
@@ -53,6 +69,7 @@ function releaseActionKeys(event) {
  * @returns {void}
  */
 function handleKeyDown(event) {
+    if (shouldIgnoreGameInput(event)) return;
     handleMovementKeys(event);
     handleActionKeys(event);
     overlayClosingWithESC(event);

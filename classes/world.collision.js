@@ -260,11 +260,24 @@ World.prototype.isEndbossBodyHitBlocked = function (enemy) {
  */
 World.prototype.applyCharacterHit = function (enemy, cooldownMs) {
     const now = Date.now();
-    if (enemy.lastHitOnCharacter && now - enemy.lastHitOnCharacter <= cooldownMs) return;
+    if (this.isHitCooldownActive(enemy, now, cooldownMs)) return;
     this.character.hit(enemy);
     enemy.lastHitOnCharacter = now;
     this.updateHealthStatusBar();
+    this.freezeOnDeathImmediate();
 }
+
+
+/**
+ * Checks whether hit cooldown is still active.
+ * @param {*} enemy
+ * @param {number} now
+ * @param {number} cooldownMs
+ * @returns {boolean}
+ */
+World.prototype.isHitCooldownActive = function (enemy, now, cooldownMs) {
+    return !!(enemy.lastHitOnCharacter && now - enemy.lastHitOnCharacter <= cooldownMs);
+};
 
 
 /**
@@ -369,9 +382,7 @@ World.prototype.killChickenWithBottle = function (enemy, bottle) {
  */
 World.prototype.checkBottleOnGround = function () {
     this.throwableObject.forEach((bottle) => {
-        if (!bottle.isSplashed && bottle.isOnGround()) {
-            bottle.splash();
-        }
+        if (!bottle.isSplashed && bottle.isOnGround()) bottle.splash();
     });
 }
 

@@ -28,7 +28,6 @@ Character.prototype.tickMovement = function () {
  * Applies horizontal movement based on keyboard input.
  * @returns {void}
  */
-
 Character.prototype.handleHorizontalMovement = function () {
     if (this.shouldMoveRight()) this.moveCharacterRight();
     if (this.shouldMoveLeft()) this.moveCharacterLeft();
@@ -115,12 +114,9 @@ Character.prototype.isDoingSomething = function () {
  */
 Character.prototype.isAnyKeyPressed = function () {
     if (this.world?.isControlsLocked?.()) return false;
-    return this.world.keyBaord.RIGHT ||
-        this.world.keyBaord.LEFT ||
-        this.world.keyBaord.SPACE ||
-        this.world.keyBaord.UP ||
-        this.world.keyBaord.DOWN ||
-        this.world.keyBaord.THROW;
+    return this.world.keyBaord.RIGHT || this.world.keyBaord.LEFT ||
+        this.world.keyBaord.SPACE || this.world.keyBaord.UP ||
+        this.world.keyBaord.DOWN || this.world.keyBaord.THROW;
 };
 
 
@@ -129,105 +125,7 @@ Character.prototype.isAnyKeyPressed = function () {
  * @returns {void}
  */
 Character.prototype.updateCamera = function () {
-    const boss = this.getEndboss();
-    if (this.isCameraLocked()) return this.updateLockedCamera(boss);
-    if (this.shouldLockCamera(boss)) return this.lockCamera();
     this.followCamera();
-};
-
-
-/**
- * Returns the endboss instance from the current level.
- * @returns {Endboss|undefined}
- */
-Character.prototype.getEndboss = function () {
-    return this.world.level.enemies.find(e => e instanceof Endboss);
-};
-
-
-/**
- * Checks whether camera is currently locked.
- * @returns {boolean}
- */
-Character.prototype.isCameraLocked = function () {
-    return !!this.cameraLocked;
-};
-
-
-/**
- * Updates the camera while locked and decides when to unlock again.
- * @param {Endboss|undefined} boss
- * @returns {void}
- */
-Character.prototype.updateLockedCamera = function (boss) {
-    this.world.camera_x = this.cameraLockX;
-    if (!boss) return this.unlockCamera();
-    if (!this.shouldUnlockCamera(boss)) return;
-    // if (!this.isAtLockEdge()) return;
-    this.unlockCamera();
-};
-
-
-/**
- * Unlocks the camera and updates the anchor direction.
- * @returns {void}
- */
-Character.prototype.unlockCamera = function () {
-    this.cameraLocked = false;
-    this.cameraLockX = null;
-    this.cameraAnchor = this.lockDir === 'right' ? 'right' : 'left';
-};
-
-
-/**
- * Unlocks camera when the character retreats far enough from the boss.
- * @param {Endboss} boss
- * @returns {boolean}
- */
-Character.prototype.shouldUnlockCamera = function (boss) {
-    return this.getBossDistance(boss) > 220;
-};
-
-
-/**
- * Returns current horizontal distance between character center and boss center.
- * @param {Endboss} boss
- * @returns {number}
- */
-Character.prototype.getBossDistance = function (boss) {
-    const c = this.x + this.width / 2;
-    const b = boss.x + boss.width / 2;
-    return Math.abs(c - b);
-};
-
-
-/**
- * Returns the current view offset X from the global viewport transform.
- * @returns {number}
- */
-Character.prototype.getViewOffsetX = function () {
-    return window.viewOffsetX || 0;
-};
-
-
-/**
- * Returns camera lock bounds.
- * @returns {{left: number, right: number}}
- */
-Character.prototype.getLockBounds = function () {
-    return { left: 120, right: 500 };
-};
-
-
-/**
- * Determines if the camera should lock based on boss distance.
- * @param {Endboss|undefined} boss
- * @returns {boolean}
- */
-Character.prototype.shouldLockCamera = function (boss) {
-    if (!boss) return false;
-    const dist = Math.abs((this.x + this.width / 2) - (boss.x + boss.width / 2));
-    return dist < 140;
 };
 
 
@@ -243,24 +141,23 @@ Character.prototype.lockCamera = function () {
 
 
 /**
- * Makes the camera follow the character with smoothing.
+ * Follows the character with a fixed left anchor (no right-stick).
  * @returns {void}
  */
 Character.prototype.followCamera = function () {
     const vx = this.getViewOffsetX();
-    const anchor = this.getAnchorX();
+    const anchor = 100;
     const desired = -this.x + (anchor - vx);
     this.applyCameraLerp(desired);
 };
 
 
 /**
- * Returns the desired camera anchor X position.
+ * Returns the current view offset X from the global viewport transform.
  * @returns {number}
  */
-Character.prototype.getAnchorX = function () {
-    const b = this.getLockBounds();
-    return this.cameraAnchor === 'right' ? b.right : 100;
+Character.prototype.getViewOffsetX = function () {
+    return window.viewOffsetX || 0;
 };
 
 

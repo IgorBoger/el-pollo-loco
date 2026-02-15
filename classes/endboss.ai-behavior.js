@@ -354,18 +354,6 @@ Endboss.prototype.playEndbossAttackSound = function () {
 
 
 /**
- * Stops all loops and clears scheduled sound triggers.
- */
-Endboss.prototype.stop = function () {
-    if (this.aiInterval) clearInterval(this.aiInterval);
-    if (this.animationInterval) clearInterval(this.animationInterval);
-    this.aiInterval = null;
-    this.animationInterval = null;
-    this.scheduledAlertSoundAt = 0;
-};
-
-
-/**
  * Updates alert state and transitions to chase/attack when appropriate.
  * @param {number} now
  * @param {number} pepeX
