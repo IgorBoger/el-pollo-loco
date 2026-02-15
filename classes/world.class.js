@@ -37,7 +37,7 @@ class World {
     camera_x = 0;
     lastBottleThrow = 0;
     lastDrawLogTime = 0;
-    debugHitboxes = true;
+    debugHitboxes = false;
     cooldownMs = 4000;
 
 
