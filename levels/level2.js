@@ -8,10 +8,15 @@ const level2 = new Level(
         new SmallChicken(),
         new SmallChicken(),
         new SmallChicken(),
+        new SmallChicken(),
+        new SmallChicken(),
         new Endboss()
     ],
 
     [
+        new Cloud(),
+        new Cloud(),
+        new Cloud(),
         new Cloud(),
         new Cloud()
     ],
