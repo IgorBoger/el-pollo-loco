@@ -16,7 +16,7 @@ window.isGamePaused = isGamePaused;
 let gameStartAt = 0;
 const LEADERBOARD_KEY = 'leaderboard';
 const levels = [level1, level2, level3];
-let currentLevelIndex = 0;
+let currentLevelIndex = getInitialLevelIndex();
 let currentLevelDefinition = levels[currentLevelIndex];
 
 
@@ -303,6 +303,19 @@ function isLastLevelReached() {
 function resetToFirstLevel() {
     currentLevelIndex = 0;
     currentLevelDefinition = levels[currentLevelIndex];
+    setCurrentLevelIndex?.(currentLevelIndex);
+}
+
+
+/**
+ * Returns the initial level index based on stored settings.
+ * Falls no valid stored index exists, 0 is returned.
+ * @returns {number} A valid level index within bounds.
+ */
+function getInitialLevelIndex() {
+    const stored = Number(getCurrentLevelIndex?.());
+    if (!Number.isFinite(stored)) return 0;
+    return Math.max(0, Math.min(levels.length - 1, stored));
 }
 
 
@@ -343,9 +356,11 @@ function hideLevelIndicator() {
 
 
 /**
- * Returns the current level label.
- * @returns {string}
+ * Returns the localized level indicator text.
+ * @returns {string} Example: "Level 2" / "Nivel 2"
  */
 function getLevelIndicatorText() {
-    return `Level ${currentLevelIndex + 1}`;
+    const t = getMergedPack?.(currentLanguage) || {};
+    const label = t.levelLabel || 'Level';
+    return `${label} ${currentLevelIndex + 1}`;
 }

@@ -196,6 +196,7 @@ function advanceLevelIndex() {
  */
 function applyCurrentLevelDefinition() {
     currentLevelDefinition = levels[currentLevelIndex];
+    setCurrentLevelIndex?.(currentLevelIndex);
 }
 
 

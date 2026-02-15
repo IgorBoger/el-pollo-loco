@@ -113,3 +113,23 @@ function setMusicMutedSetting(value) {
 function setSoundMutedSetting(value) {
     setSetting('isSoundMuted', value);
 }
+
+
+/**
+ * Persists the current level index in settings storage.
+ * @param {number} value - The current level index.
+ * @returns {void}
+ */
+function setCurrentLevelIndex(value) {
+    setSetting('currentLevelIndex', value);
+}
+
+
+/**
+ * Returns the persisted current level index from settings storage.
+ *
+ * @returns {number|undefined} The stored level index or undefined if not set.
+ */
+function getCurrentLevelIndex() {
+    return getSetting('currentLevelIndex');
+}
