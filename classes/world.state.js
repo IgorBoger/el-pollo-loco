@@ -96,7 +96,6 @@ World.prototype.isControlsLocked = function () {
  * @returns {void}
  */
 World.prototype.freezeGameOverStart = function () {
-    this.stopped = true;
     this.freezeGameplayOnce('isGameOverFrozen');
     this.stopEndbossActionSounds?.();
     this.stopEnemiesForGameOver();
@@ -334,6 +333,5 @@ World.prototype.updateCoinAnimations = function (now) {
  */
 World.prototype.freezeOnDeathImmediate = function () {
     if (!this.character?.isDead?.()) return;
-    this.freezeGameOverStart?.();
-    this.stopEndbossActionSounds?.();
+    this.scheduleGameOverIfDead?.();
 };
