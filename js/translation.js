@@ -1,24 +1,5 @@
 /**
- * Checks the current screen orientation and toggles the orientation warning.
- *
- * @returns {void}
- */
-function checkOrientation() {
-    const warning = document.getElementById('orientationWarning');
-    if (!warning) return;
-    if (window.innerHeight > window.innerWidth) {
-        warning.classList.remove('d-none');
-        warning.classList.add('d-flex');
-    } else {
-        warning.classList.remove('d-flex');
-        warning.classList.add('d-none');
-    }
-}
-
-
-/**
  * Applies translations to all UI sections based on the current language.
- *
  * @returns {void}
  */
 function applyTranslations() {
@@ -39,7 +20,6 @@ function applyTranslations() {
 
 /**
  * Applies translations for the start screen.
- *
  * @param {Function} setText
  * @param {Object} t
  * @returns {void}
@@ -53,7 +33,6 @@ function applyStartScreenTranslations(setText, t) {
 
 /**
  * Applies translations for the burger menu.
- *
  * @param {Object} t
  * @returns {void}
  */
@@ -69,7 +48,6 @@ function applyBurgerMenuTranslations(t) {
 
 /**
  * Applies translations for the story overlay.
- *
  * @param {Object} t
  * @returns {void}
  */
@@ -87,7 +65,6 @@ function applyStoryTranslations(t) {
 
 /**
  * Applies translations for the key help overlay.
- *
  * @param {Object} t
  * @returns {void}
  */
@@ -100,7 +77,6 @@ function applyKeyHelpTranslations(t) {
 
 /**
  * Applies translations for the ranking list.
- *
  * @param {Object} t
  * @returns {void}
  */
@@ -117,7 +93,6 @@ function applyRankingListTranslation(t) {
 
 /**
  * Applies translated headers for the key help overlay.
- *
  * @param {Object} t
  * @returns {void}
  */
@@ -130,7 +105,6 @@ function applyKeyHelpHeaders(t) {
 
 /**
  * Applies translated action labels for the key help overlay.
- *
  * @param {Object} t
  * @returns {void}
  */
@@ -148,7 +122,6 @@ function applyKeyHelpActions(t) {
 
 /**
  * Applies the translated hint text for the key help overlay.
- *
  * @param {Object} t
  * @returns {void}
  */
@@ -161,7 +134,6 @@ function applyKeyHelpHint(t) {
 
 /**
  * Applies translations for the impressum overlay.
- *
  * @param {Object} t
  * @returns {void}
  */
@@ -179,7 +151,6 @@ function applyImpressumTranslations(t) {
 
 /**
  * Applies translations for the settings overlay.
- *
  * @param {Object} t
  * @returns {void}
  */
@@ -207,7 +178,6 @@ function applyLanguageUiTranslations(t) {
 
 /**
  * Applies translations for the game over and win overlays.
- *
  * @param {Object} t
  * @returns {void}
  */
@@ -222,7 +192,6 @@ function applyGameOverWinOverlayTranslations(t) {
 
 /**
  * Updates the language option button states.
- *
  * @returns {void}
  */
 function updateLanguageUiState() {
@@ -233,7 +202,6 @@ function updateLanguageUiState() {
 
 /**
  * Returns all language option buttons.
- *
  * @returns {HTMLElement[]}
  */
 function getLangOptionButtons() {
@@ -243,7 +211,6 @@ function getLangOptionButtons() {
 
 /**
  * Updates the active state of a single language option button.
- *
  * @param {HTMLElement} btn
  * @returns {void}
  */
@@ -257,7 +224,6 @@ function setLangButtonState(btn) {
 
 /**
  * Toggles the "is-active" class on an element.
- *
  * @param {HTMLElement} el
  * @param {boolean} isActive
  * @returns {void}
@@ -269,7 +235,6 @@ function toggleActiveClass(el, isActive) {
 
 /**
  * Sets the textContent of an element by id.
- *
  * @param {string} id
  * @param {string} text
  * @returns {void}
@@ -283,7 +248,6 @@ function setText(id, text) {
 
 /**
  * Sets the current language and persists it, then applies translations.
- *
  * @param {string} lang
  * @returns {void}
  */
@@ -300,7 +264,6 @@ let i18nRemote = {};
 
 /**
  * Initializes translations by applying local texts and then loading remote i18n.
- *
  * @returns {void}
  */
 function initTranslations() {
@@ -311,7 +274,6 @@ function initTranslations() {
 
 /**
  * Returns a merged translation pack for a language, combining local and remote packs.
- *
  * @param {string} lang
  * @returns {Object}
  */
@@ -324,7 +286,6 @@ function getMergedPack(lang) {
 
 /**
  * Returns the local translation pack for a language.
- *
  * @param {string} lang
  * @returns {Object}
  */
@@ -335,7 +296,6 @@ function getLocalPack(lang) {
 
 /**
  * Returns the remote translation pack for a language.
- *
  * @param {string} lang
  * @returns {Object}
  */
@@ -346,7 +306,6 @@ function getRemotePack(lang) {
 
 /**
  * Loads remote translation data for a language into cache if possible.
- *
  * @param {string} lang
  * @returns {Promise<void>}
  */
@@ -360,7 +319,6 @@ async function loadRemoteLanguage(lang) {
 
 /**
  * Checks whether remote i18n loading is available.
- *
  * @returns {boolean}
  */
 function canLoadRemoteI18n() {
@@ -370,7 +328,6 @@ function canLoadRemoteI18n() {
 
 /**
  * Checks whether a language is already cached.
- *
  * @param {string} lang
  * @returns {boolean}
  */
@@ -381,7 +338,6 @@ function isLangCached(lang) {
 
 /**
  * Loads a language document into the remote cache via Firestore.
- *
  * @param {string} lang
  * @returns {Promise<void>}
  */

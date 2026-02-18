@@ -1,6 +1,5 @@
 /**
  * Fits the canvas pixel size to its CSS size and applies viewport transform.
- *
  * @returns {void}
  */
 function fitCanvasToCssSize() {
@@ -15,10 +14,8 @@ function fitCanvasToCssSize() {
 }
 
 
-
 /**
  * Returns canvas element and its 2D context.
- *
  * @returns {{c: HTMLCanvasElement, ctx: CanvasRenderingContext2D}|null}
  */
 function getCanvasData() {
@@ -31,7 +28,6 @@ function getCanvasData() {
 
 /**
  * Calculates canvas pixel metrics based on CSS size and device pixel ratio.
- *
  * @param {HTMLCanvasElement} c
  * @returns {{pxW: number, pxH: number}|null}
  */
@@ -46,7 +42,6 @@ function getCanvasMetrics(c) {
 
 /**
  * Synchronizes the canvas internal pixel size.
- *
  * @param {HTMLCanvasElement} c
  * @param {number} pxW
  * @param {number} pxH
@@ -66,7 +61,6 @@ function syncCanvasPixelSize(c, pxW, pxH) {
 
 /**
  * Calculates scale and offsets for the viewport transform.
- *
  * @param {number} pxW
  * @param {number} pxH
  * @returns {{scale: number, offX: number, offY: number}}
@@ -82,7 +76,6 @@ function calcViewportTransform(pxW, pxH) {
 
 /**
  * Applies the viewport transform to the canvas context.
- *
  * @param {CanvasRenderingContext2D} ctx
  * @param {{scale: number, offX: number, offY: number}} t
  * @returns {void}
@@ -96,7 +89,6 @@ function applyViewportTransform(ctx, t) {
 
 /**
  * Redraws the current world state immediately after a canvas resize to prevent black flicker.
- *
  * @param {boolean} didResize
  * @returns {void}
  */
@@ -109,7 +101,6 @@ function redrawAfterCanvasResize(didResize) {
 
 /**
  * Handles viewport change events using requestAnimationFrame throttling.
- *
  * @returns {void}
  */
 function handleViewportChange() {
@@ -120,7 +111,6 @@ function handleViewportChange() {
 
 /**
  * Checks whether a viewport RAF task is already scheduled.
- *
  * @returns {boolean}
  */
 function isViewportRafRunning() {
@@ -130,7 +120,6 @@ function isViewportRafRunning() {
 
 /**
  * Schedules a viewport update via requestAnimationFrame.
- *
  * @returns {void}
  */
 function scheduleViewportRaf() {
@@ -143,7 +132,6 @@ function scheduleViewportRaf() {
 
 /**
  * Executes all viewport-related update tasks.
- *
  * @returns {void}
  */
 function runViewportRafTasks() {
@@ -156,7 +144,6 @@ function runViewportRafTasks() {
 
 /**
  * Refreshes all visible overlay screens after viewport changes.
- *
  * @returns {void}
  */
 function refreshVisibleScreens() {
@@ -168,7 +155,6 @@ function refreshVisibleScreens() {
 
 /**
  * Refreshes a single overlay screen if it is visible.
- *
  * @param {OverlayScreen} screen
  * @returns {void}
  */
@@ -181,7 +167,6 @@ function refreshScreenIfVisible(screen) {
 
 /**
  * Clears the viewport RAF state.
- *
  * @returns {void}
  */
 function clearViewportRaf() {
@@ -191,9 +176,77 @@ function clearViewportRaf() {
 
 /**
  * Initializes the HiDPI canvas setup.
- *
  * @returns {void}
  */
 function setupHiDPICanvas() {
     fitCanvasToCssSize();
+}
+
+
+/**
+ * Checks orientation and toggles the warning overlay (touch devices only).
+ * @returns {void}
+ */
+function checkOrientation() {
+    const warning = getOrientationWarningEl();
+    if (!warning) return;
+    if (!shouldShowOrientationWarning()) return setOrientationWarningVisible(warning, false);
+    setOrientationWarningVisible(warning, isPortraitOrientation());
+}
+
+
+/**
+ * Returns the orientation warning element.
+ * @returns {HTMLElement|null}
+ */
+function getOrientationWarningEl() {
+    return document.getElementById('orientationWarning');
+}
+
+
+/**
+ * Returns true if the device is currently in portrait orientation.
+ * @returns {boolean}
+ */
+function isPortraitOrientation() {
+    return window.innerHeight > window.innerWidth;
+}
+
+
+/**
+ * Returns true if the orientation warning should be shown (touch/coarse pointer only).
+ * @returns {boolean}
+ */
+function shouldShowOrientationWarning() {
+    return hasCoarsePointer() || hasTouchPoints();
+}
+
+
+/**
+ * Returns true if the primary pointer is coarse (mobile/tablet typical).
+ * @returns {boolean}
+ */
+function hasCoarsePointer() {
+    return window.matchMedia?.('(pointer: coarse)')?.matches || false;
+}
+
+
+/**
+ * Returns true if the device reports touch points.
+ * @returns {boolean}
+ */
+function hasTouchPoints() {
+    return (navigator.maxTouchPoints || 0) > 0 || ('ontouchstart' in window);
+}
+
+
+/**
+ * Sets the orientation warning visibility via d-none/d-flex.
+ * @param {HTMLElement} warning
+ * @param {boolean} isVisible
+ * @returns {void}
+ */
+function setOrientationWarningVisible(warning, isVisible) {
+    warning.classList.toggle('d-none', !isVisible);
+    warning.classList.toggle('d-flex', isVisible);
 }
