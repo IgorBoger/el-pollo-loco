@@ -114,6 +114,12 @@
 }
 
 
+.orientation-overlay {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+
 .orientation-card {
     background: rgba(255, 186, 0, 0.9);
     color: #000;
