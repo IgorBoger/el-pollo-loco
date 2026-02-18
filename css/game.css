@@ -106,15 +106,6 @@
 }
 
 
-.game-over-btn img,
-.win-btn img,
-#startButton img {
-    width: 36px;
-    height: 36px;
-    pointer-events: none;
-}
-
-
 .orientation-overlay {
     color: #fff;
     text-align: center;
@@ -152,6 +143,7 @@ canvas {
     padding: 6px 12px;
     font-size: 1.2em;
     z-index: 20;
+    display: flex;
 }
 
 
@@ -184,7 +176,7 @@ canvas {
 #pauseBtn {
     position: absolute;
     bottom: 12px;
-    right: 160px;
+    right: 175px;
     z-index: 20;
 }
 
@@ -214,7 +206,7 @@ canvas {
 
 
 .attack {
-    margin: 0 64px 0 64px;
+    margin: 0 80px 0 64px;
 }
 
 
@@ -252,7 +244,6 @@ canvas {
     justify-content: center;
     width: 16px;
     height: 16px;
-
     pointer-events: none;
 }
 
