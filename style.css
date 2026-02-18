@@ -5,12 +5,13 @@ body {
     align-items: center;
     justify-content: flex-start;
     min-height: 100vh;
-    font-family: "Bungee Spice", sans-serif;
     text-transform: uppercase;
     background-image: url('img/game-bg.jpg');
     background-position: center;
     letter-spacing: 1.5px;
     text-shadow: 0 0 2px black;
+    font-family: "Bungee Spice", "Bungee", system-ui, -apple-system, sans-serif;
+    text-transform: uppercase;
 }
 
 
@@ -37,11 +38,11 @@ textarea {
 .btn-style {
     background-color: rgb(255, 186, 0);
     border: 1px solid #fff;
-    color: #fff;
     cursor: pointer;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
     transition: background 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
     border-radius: 8px;
+    color: #ff3b00;
 }
 
 
@@ -61,6 +62,11 @@ textarea {
 h2 {
     font-size: 20px;
     margin: 0;
+}
+
+
+.settings-header {
+    color: #ff3b00;
 }
 
 
@@ -94,4 +100,22 @@ h1 {
         0 0 20px #ff0000;
 
     filter: hue-rotate(0deg) brightness(1.1) contrast(1.1);
+}
+
+
+@supports (-webkit-touch-callout: none) {
+    body {
+        text-shadow: none;
+    }
+
+    button,
+    p,
+    span,
+    li,
+    td,
+    th,
+    h1,
+    h2 {
+        font-family: "Bungee Spice", "Bungee", system-ui, -apple-system, sans-serif;
+    }
 }

@@ -165,6 +165,10 @@
 }
 
 
+.setting-row span {
+    color: #ff3b00;
+}
+
 .toggle-btn {
     display: flex;
     align-items: center;
@@ -233,6 +237,7 @@
 
 .modal-title {
     font-size: 18px;
+    color: #ff3b00;
 }
 
 
