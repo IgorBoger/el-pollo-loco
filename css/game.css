@@ -207,7 +207,6 @@ canvas {
 
 .control-btn {
     padding: 6px 12px;
-    font-size: 20px;
     background-color: rgba(0, 0, 0, 0.2);
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -281,8 +280,16 @@ canvas {
 
 
 .audio-hud-btn {
-    padding: 8px 10px;
+    /* padding: 8px 10px; */
+    padding: 6px 12px;
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+
+.audio-hud-btn img {
+    width: 16px;
+    height: 16px;
+    pointer-events: none;
 }

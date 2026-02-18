@@ -27,6 +27,8 @@
     padding: 8px 10px;
     font-size: 1.2em;
     display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 
@@ -38,6 +40,8 @@
     font-size: 1.2em;
     z-index: 20;
     display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 
