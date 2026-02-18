@@ -100,6 +100,17 @@
 
         </canvas>
 
+        <div id="audioHud" class="audio-hud d-none">
+            <button id="musicToggleHud" class="btn-style audio-hud-btn text-shadow-none" aria-label="Musik umschalten">
+                <img class="icon-img" id="musicIconHud" src="img/speaker.png" alt="Musik">
+            </button>
+
+            <button id="soundToggleHud" class="btn-style audio-hud-btn text-shadow-none" aria-label="Ton umschalten">
+                <img class="icon-img" id="soundIconHud" src="img/speaker.png" alt="Ton">
+            </button>
+        </div>
+
+
         <div id="levelIndicator" class="level-indicator d-none"></div>
 
         <button id="burgerBtn" class="burger-btn btn-style text-shadow-none" aria-label="Menü">
@@ -385,7 +396,7 @@
         </div>
 
 
-        <button id="fullscreenBtn" class="btn-style text-shadow-none">
+        <button id="fullscreenBtn" class="fullscreen-btn btn-style text-shadow-none">
             <img class="icon-img" src="img/fullscreen.png" alt="">
         </button>
 
@@ -439,7 +450,7 @@
 
 
             <button id="homeBtn" class="game-over-btn btn-style">
-                <img src="img/home.png" alt="">
+                <img class="icon-img" src="img/home.png" alt="">
                 <span id="gameOverHome">Hauptmenü</span>
             </button>
         </div>
@@ -457,7 +468,7 @@
             </div>
 
             <button id="winHomeBtn" class="win-btn btn-style">
-                <img src="img/home.png" alt="">
+                <img class="icon-img" src="img/home.png" alt="">
                 <span id="winHome">Hauptmenü</span>
             </button>
         </div>

@@ -24,8 +24,19 @@
     top: 12px;
     right: 12px;
     z-index: 30;
-    padding: 10px 14px;
+    padding: 8px 10px;
     font-size: 1.2em;
+    display: flex;
+}
+
+
+.fullscreen-btn {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    padding: 8px 10px;
+    font-size: 1.2em;
+    z-index: 20;
     display: flex;
 }
 

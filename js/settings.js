@@ -33,7 +33,7 @@ function loadSettings() {
  * @returns {Object}
  */
 function getDefaultSettings() {
-    return { language: 'ES', isMusicMuted: false, isSoundMuted: false };
+    return { language: 'EN', isMusicMuted: false, isSoundMuted: false };
 }
 
 

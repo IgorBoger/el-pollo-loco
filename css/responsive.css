@@ -7,12 +7,16 @@
     #startButton,
     .burger-btn,
     .control-btn,
-    #fullscreenBtn,
+    .fullscreen-btn,
     .game-over-btn,
     .next-level-text,
     .win-btn {
         padding: 6px 10px;
         font-size: 16px;
+    }
+
+    .audio-hud {
+        top: 66px;
     }
 
     .attack {

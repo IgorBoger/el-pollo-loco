@@ -10,7 +10,7 @@ const buttons = [
 let _viewportRaf = null;
 let isMusicMuted = !!getSetting('isMusicMuted');
 let isSoundMuted = !!getSetting('isSoundMuted');
-let currentLanguage = getSetting('language') || 'ES';
+window.currentLanguage = getSetting('language') || 'EN';
 var isGamePaused = false;
 window.isGamePaused = isGamePaused;
 let gameStartAt = 0;
@@ -41,6 +41,7 @@ function startGame() {
     showPauseButton();
     updatePauseButtonUi();
     init();
+    initAudioHud();
     startAfterFirstFrame();
 }
 
@@ -91,9 +92,43 @@ function setGamePausedState(state) {
 function restartGame() {
     hideLevelIndicator();
     closeBurgerMenu();
-    document.getElementById('pauseBtn')?.classList.add('d-none');
+    hideAudioHud();
+    hidePauseButton();
     destroyWorldIfExists();
     openStartScreen();
+}
+
+
+/**
+ * Hides the level indicator with a fade-out transition.
+ * @returns {void}
+ */
+function hideLevelIndicator() {
+    const el = document.getElementById('levelIndicator');
+    if (!el) return;
+    el.classList.remove('is-visible');
+    setTimeout(() => el.classList.add('d-none'), 200);
+}
+
+
+/**
+ * Returns the localized level indicator text.
+ * @returns {string} Example: "Level 2" / "Nivel 2"
+ */
+function getLevelIndicatorText() {
+    const t = getMergedPack?.(currentLanguage) || {};
+    const label = t.levelLabel || 'Level';
+    return `${label} ${currentLevelIndex + 1}`;
+}
+
+
+/**
+ * Hides the pause button.
+ *
+ * @returns {void}
+ */
+function hidePauseButton() {
+    document.getElementById('pauseBtn')?.classList.add('d-none');
 }
 
 
@@ -104,53 +139,6 @@ function restartGame() {
 function restartGameCore() {
     if (world && typeof world.destroy === "function") world.destroy();
     openStartScreen();
-}
-
-
-/**
- * Handles language option click events.
- * @param {MouseEvent} e
- * @returns {void}
- */
-function onLangOptionClick(e) {
-    const lang = getLangFromClick(e);
-    if (!lang) return;
-    applyLanguageChange(lang);
-    closeLangModal();
-}
-
-
-/**
- * Extracts the language code from a language option click.
- * @param {MouseEvent} e
- * @returns {string|undefined}
- */
-function getLangFromClick(e) {
-    const btn = e.target.closest('.lang-opt');
-    return btn?.getAttribute('data-lang');
-}
-
-
-/**
- * Applies a language change using the available language handler.
- * @param {string} lang
- * @returns {void}
- */
-function applyLanguageChange(lang) {
-    if (typeof setLanguage === 'function') return setLanguage(lang);
-    setLanguageFallback(lang);
-}
-
-
-/**
- * Applies a fallback language change.
- * @param {string} lang
- * @returns {void}
- */
-function setLanguageFallback(lang) {
-    currentLanguage = lang;
-    localStorage.setItem('language', currentLanguage);
-    applyTranslations?.();
 }
 
 
@@ -340,27 +328,4 @@ function showLevelIndicator() {
     if (!el) return;
     el.classList.remove('d-none');
     requestAnimationFrame(() => el.classList.add('is-visible'));
-}
-
-
-/**
- * Hides the level indicator with a fade-out transition.
- * @returns {void}
- */
-function hideLevelIndicator() {
-    const el = document.getElementById('levelIndicator');
-    if (!el) return;
-    el.classList.remove('is-visible');
-    setTimeout(() => el.classList.add('d-none'), 200);
-}
-
-
-/**
- * Returns the localized level indicator text.
- * @returns {string} Example: "Level 2" / "Nivel 2"
- */
-function getLevelIndicatorText() {
-    const t = getMergedPack?.(currentLanguage) || {};
-    const label = t.levelLabel || 'Level';
-    return `${label} ${currentLevelIndex + 1}`;
 }

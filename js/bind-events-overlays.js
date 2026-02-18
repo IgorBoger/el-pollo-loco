@@ -348,3 +348,50 @@ function shouldCloseBurgerByOutsideClick(e) {
         && !burger.contains(e.target)
         && !burgerBtn?.contains(e.target);
 }
+
+
+/**
+ * Handles language option click events.
+ * @param {MouseEvent} e
+ * @returns {void}
+ */
+function onLangOptionClick(e) {
+    const lang = getLangFromClick(e);
+    if (!lang) return;
+    applyLanguageChange(lang);
+    closeLangModal();
+}
+
+
+/**
+ * Extracts the language code from a language option click.
+ * @param {MouseEvent} e
+ * @returns {string|undefined}
+ */
+function getLangFromClick(e) {
+    const btn = e.target.closest('.lang-opt');
+    return btn?.getAttribute('data-lang');
+}
+
+
+/**
+ * Applies a language change using the available language handler.
+ * @param {string} lang
+ * @returns {void}
+ */
+function applyLanguageChange(lang) {
+    if (typeof setLanguage === 'function') return setLanguage(lang);
+    setLanguageFallback(lang);
+}
+
+
+/**
+ * Applies a fallback language change.
+ * @param {string} lang
+ * @returns {void}
+ */
+function setLanguageFallback(lang) {
+    currentLanguage = lang;
+    localStorage.setItem('language', currentLanguage);
+    applyTranslations?.();
+}
