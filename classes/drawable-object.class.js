@@ -18,7 +18,7 @@ class DrawableObject {
      */
     draw(ctx) {
         if (!this.img) return;
-        ctx.drawImage(this.img, Math.round(0), Math.round(0), this.width, this.height);
+        ctx.drawImage(this.img, 0, 0, this.width, this.height);
     }
 
 
@@ -108,5 +108,5 @@ class DrawableObject {
             img.src = pathImagesWalking;
             this.imageCache[pathImagesWalking] = img;
         })
-    };
+    }
 }

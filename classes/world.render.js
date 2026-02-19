@@ -50,10 +50,41 @@ World.prototype.clearWorldCanvas = function () {
  * Draws world objects with camera translation.
  */
 World.prototype.drawWorldObjectsWithCamera = function () {
-    this.ctx.translate(this.camera_x, 0);
+    const camX = this.getSnappedCameraX();
+    this.ctx.translate(camX, 0);
     this.drawWorldObjects();
     this.tryAddNextBackgroundTile();
-    this.ctx.translate(-this.camera_x, 0);
+    this.ctx.translate(-camX, 0);
+}
+
+
+/**
+ * Returns a pixel-snapped camera x to prevent 1px seams between 720px tiles.
+ * @returns {number}
+ */
+World.prototype.getSnappedCameraX = function () {
+    return snapWorldXToDevicePixel(this.camera_x);
+}
+
+
+/**
+ * Snaps a world-x coordinate to device pixels using the current viewport scale.
+ * Prevents 1px hairline seams on Firefox/Android.
+ * @param {number} worldX
+ * @returns {number}
+ */
+function snapWorldXToDevicePixel(worldX) {
+    const scale = getViewportScale();
+    return Math.round(worldX * scale) / scale;
+}
+
+
+/**
+ * Returns the current viewport scale (fallback 1).
+ * @returns {number}
+ */
+function getViewportScale() {
+    return window.viewScale || 1;
 }
 
 
@@ -141,11 +172,24 @@ World.prototype.addObjectsToMap = function (objects) {
  */
 World.prototype.addToMap = function (mo) {
     this.ctx.save();
+    this.applyBackgroundSnap(mo);
     if (mo.otherDirection) this.flipImage(mo);
     if (!mo.otherDirection) this.flipImageBack(mo);
     mo.draw(this.ctx);
     mo.drawFrame(this.ctx);
     this.ctx.restore();
+}
+
+
+/**
+ * Snaps the drawing context to full pixels for background objects to prevent seams.
+ * @param {*} mo
+ */
+World.prototype.applyBackgroundSnap = function (mo) {
+    if (!(mo instanceof BackgroundObject)) return;
+    const x = Math.round(mo.x);
+    const y = Math.round(mo.y);
+    this.ctx.translate(x - mo.x, y - mo.y);
 }
 
 
