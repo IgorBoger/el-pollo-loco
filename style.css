@@ -104,8 +104,11 @@ h1 {
 
 
 @supports (-webkit-touch-callout: none) {
+
     body {
-        text-shadow: none;
+        font-family: "Bungee", system-ui, -apple-system, sans-serif;
+        color: #ff3b00;
+        /* text-shadow: 0 0 1px rgba(0, 0, 0, 0.55); */
     }
 
     button,
@@ -115,7 +118,40 @@ h1 {
     td,
     th,
     h1,
-    h2 {
-        font-family: "Bungee Spice", "Bungee", system-ui, -apple-system, sans-serif;
+    h2,
+    .level-indicator {
+        font-family: "Bungee", system-ui, -apple-system, sans-serif;
+    }
+
+    .impressum-card,
+    .impressum-card * {
+        font-family: system-ui, -apple-system, sans-serif !important;
+        color: #222 !important;
+        text-shadow: none !important;
+        text-transform: none;
+    }
+
+    .impressum-title {
+        color: #000 !important;
+        text-shadow: none !important;
+    }
+
+    .story-card,
+    .key-help-card,
+    .ranking-card,
+    .ranking-confirm-card,
+    .settings-overlay,
+    .burger-overlay,
+    .level-indicator,
+    .next-level-text {
+        text-shadow: 0 0 1px rgba(0, 0, 0, 0.55);
+    }
+
+    .key-help-keys-table th,
+    .key-help-keys-table td,
+    .ranking-table th,
+    .ranking-table td,
+    .key-help-hint {
+        text-shadow: 0 0 1px rgba(0, 0, 0, 0.35);
     }
 }

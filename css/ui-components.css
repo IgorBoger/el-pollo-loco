@@ -8,7 +8,6 @@
     font-weight: 700;
     font-size: 14px;
     background: rgba(0, 0, 0, 0.55);
-    color: white;
     opacity: 0;
     transition: opacity 180ms ease ease-in-out;
 }
@@ -342,7 +341,6 @@
 
 .key-help-hint {
     margin: 6px 0 0;
-    color: #666;
     font-size: .9rem;
 }
 
