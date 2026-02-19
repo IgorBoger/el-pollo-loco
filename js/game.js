@@ -112,19 +112,7 @@ function hideLevelIndicator() {
 
 
 /**
- * Returns the localized level indicator text.
- * @returns {string} Example: "Level 2" / "Nivel 2"
- */
-function getLevelIndicatorText() {
-    const t = getMergedPack?.(currentLanguage) || {};
-    const label = t.levelLabel || 'Level';
-    return `${label} ${currentLevelIndex + 1}`;
-}
-
-
-/**
  * Hides the pause button.
- *
  * @returns {void}
  */
 function hidePauseButton() {
@@ -312,10 +300,29 @@ function getInitialLevelIndex() {
  * @returns {void}
  */
 function updateLevelIndicator() {
-    const el = document.getElementById('levelIndicator');
-    if (!el) return;
+    setLevelIndicatorNumber(currentLevelIndex + 1);
     showLevelIndicator();
-    el.textContent = getLevelIndicatorText();
+}
+
+
+/**
+ * Sets the displayed level number in the indicator.
+ * @param {number} value
+ * @returns {void}
+ */
+function setLevelIndicatorNumber(value) {
+    const el = getLevelIndicatorNumberEl();
+    if (!el) return;
+    el.textContent = String(value);
+}
+
+
+/**
+ * Returns the level indicator number element.
+ * @returns {HTMLElement|null}
+ */
+function getLevelIndicatorNumberEl() {
+    return document.getElementById('levelIndicatorNumber');
 }
 
 

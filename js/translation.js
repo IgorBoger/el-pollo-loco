@@ -15,6 +15,17 @@ function applyTranslations() {
     applyLanguageUiTranslations(t);
     applyGameOverWinOverlayTranslations(t);
     updateLanguageUiState();
+    applyLevelIndicatorTranslations(t);
+}
+
+
+/**
+ * Applies translations for the level indicator label.
+ * @param {Object} t
+ * @returns {void}
+ */
+function applyLevelIndicatorTranslations(t) {
+    setText('levelIndicatorLabel', t.levelIndicatorLabel);
 }
 
 
