@@ -6,7 +6,6 @@
 
     #startButton,
     .burger-btn,
-    .control-btn,
     .fullscreen-btn,
     .game-over-btn,
     .next-level-text,
@@ -16,15 +15,15 @@
     }
 
     .audio-hud {
-        top: 66px;
+        top: 68px;
     }
 
     .attack {
-        margin: 0 70px 0 64px;
+        margin: 0 76px 0 64px;
     }
 
     #pauseBtn {
-        right: 156px;
+        right: 200px;
     }
 
     .icon-img {
@@ -133,11 +132,11 @@
     }
 
     .attack {
-        margin: 0 64px 0 64px;
+        margin: 0 70px 0 64px;
     }
 
     #pauseBtn {
-        right: 150px;
+        right: 186px;
     }
 
     .burger-overlay,
@@ -154,6 +153,25 @@
     .icon-img {
         width: 24px;
         height: 24px;
+    }
+
+    .audio-hud {
+        top: 62px;
+    }
+
+    .audio-hud-btn {
+        padding: 6px 8px;
+    }
+
+    .audio-hud-btn img,
+    .control-btn img {
+        width: 20px;
+        height: 20px;
+    }
+
+    .level-indicator {
+        right: 45%;
+        font-size: 12px;
     }
 
     .menu-btn {
@@ -240,6 +258,36 @@
     .setting-row,
     .language-btn {
         font-size: 12px;
+    }
+
+    #mobileControls {
+        gap: 0;
+    }
+
+    .direction {
+        gap: 6px;
+    }
+
+    #pauseBtn {
+        right: 152px;
+    }
+
+    .attack {
+        margin: 0 64px 0 64px;
+        gap: 6px;
+    }
+
+    .control-btn img {
+        width: 16px;
+        height: 16px;
+    }
+
+    .control-btn {
+        padding: 6px 10px;
+    }
+
+    .level-indicator {
+        right: 40%;
     }
 }
 
