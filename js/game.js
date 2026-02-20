@@ -36,6 +36,7 @@ function init() {
  * @returns {void}
  */
 function startGame() {
+    syncLevelFromStorage();
     setGamePausedState(false);
     gameStartAt = Date.now();
     showPauseButton();
@@ -43,6 +44,27 @@ function startGame() {
     init();
     initAudioHud();
     startAfterFirstFrame();
+}
+
+
+/**
+ * Syncs the current level index/definition from persisted storage before starting a new run.
+ * @returns {void}
+ */
+function syncLevelFromStorage() {
+    const index = getInitialLevelIndex();
+    applyLevelIndex(index);
+}
+
+
+/**
+ * Applies a level index to runtime variables.
+ * @param {number} index
+ * @returns {void}
+ */
+function applyLevelIndex(index) {
+    currentLevelIndex = index;
+    currentLevelDefinition = levels[currentLevelIndex];
 }
 
 

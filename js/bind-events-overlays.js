@@ -183,8 +183,6 @@ function canSwitchToNextLevel() {
  * @returns {void}
  */
 function advanceLevelIndex() {
-    // currentLevelIndex = (currentLevelIndex + 1) % levels.length;
-
     if (currentLevelIndex >= levels.length - 1) return;
     currentLevelIndex++;
 }
@@ -205,7 +203,26 @@ function applyCurrentLevelDefinition() {
  * @returns {void}
  */
 function onWinHomeClick() {
+    persistLevelProgressAfterWin();
     closeEndOverlayThen('winOverlay', goToStartScreen);
+}
+
+
+/**
+ * Persists unlocked progress after winning a level.
+ * @returns {void}
+ */
+function persistLevelProgressAfterWin() {
+    setCurrentLevelIndex?.(getUnlockedLevelIndexAfterWin());
+}
+
+
+/**
+ * Returns the unlocked level index after winning the current level.
+ * @returns {number}
+ */
+function getUnlockedLevelIndexAfterWin() {
+    return Math.min(currentLevelIndex + 1, levels.length - 1);
 }
 
 
