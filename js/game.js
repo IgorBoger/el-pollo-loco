@@ -90,6 +90,16 @@ function setGamePausedState(state) {
  * @returns {void}
  */
 function restartGame() {
+    resetToFirstLevel();
+    goToStartScreen();
+}
+
+
+/**
+ * Returns to the start screen without resetting the current level.
+ * @returns {void}
+ */
+function goToStartScreen() {
     hideLevelIndicator();
     closeBurgerMenu();
     hideAudioHud();

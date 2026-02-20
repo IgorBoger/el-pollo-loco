@@ -81,7 +81,7 @@ function onGameOverRestartClick() {
  * @returns {void}
  */
 function onGameOverHomeClick() {
-    closeEndOverlayThen('gameOverOverlay', restartGame);
+    closeEndOverlayThen('gameOverOverlay', goToStartScreen);
 }
 
 
@@ -112,7 +112,7 @@ function onNextLevelClick() {
  */
 function backToStartAfterFinish() {
     resetToFirstLevel();
-    restartGame();
+    goToStartScreen();
 }
 
 
@@ -205,8 +205,7 @@ function applyCurrentLevelDefinition() {
  * @returns {void}
  */
 function onWinHomeClick() {
-    resetToFirstLevel();
-    closeEndOverlayThen('winOverlay', restartGame);
+    closeEndOverlayThen('winOverlay', goToStartScreen);
 }
 
 
