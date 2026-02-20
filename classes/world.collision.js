@@ -264,7 +264,6 @@ World.prototype.applyCharacterHit = function (enemy, cooldownMs) {
     this.character.hit(enemy);
     enemy.lastHitOnCharacter = now;
     this.updateHealthStatusBar();
-    this.freezeOnDeathImmediate();
 }
 
 

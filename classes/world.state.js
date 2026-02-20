@@ -58,6 +58,26 @@ World.prototype.scheduleGameOverIfDead = function () {
 
 
 /**
+ * Returns whether controls are currently locked.
+ * @returns {boolean}
+ */
+World.prototype.isControlsLocked = function () {
+    return !!this.controlsLocked;
+}
+
+
+/**
+ * Freezes gameplay when game over starts.
+ * @returns {void}
+ */
+World.prototype.freezeGameOverStart = function () {
+    this.freezeGameplayOnce('isGameOverFrozen');
+    this.stopEndbossActionSounds?.();
+    this.stopEnemiesAfterEndbossAttack();
+}
+
+
+/**
  * Freezes gameplay immediately and ensures it runs only once per flag.
  * @param {string} freezeFlagProp
  * @returns {void}
@@ -65,7 +85,6 @@ World.prototype.scheduleGameOverIfDead = function () {
 World.prototype.freezeGameplayOnce = function (freezeFlagProp) {
     if (this[freezeFlagProp]) return;
     this[freezeFlagProp] = true;
-    // this.setGamePaused(true);
     this.setControlsLocked(true);
     this.clearKeyboardInput();
     this.stopCharacterMotion();
@@ -83,31 +102,14 @@ World.prototype.setControlsLocked = function (isLocked) {
 
 
 /**
- * Returns whether controls are currently locked.
- * @returns {boolean}
- */
-World.prototype.isControlsLocked = function () {
-    return !!this.controlsLocked;
-}
-
-
-/**
- * Freezes gameplay when game over starts.
+ * Stops enemies after the endboss finishes the current attack (prevents slide-through on last hit).
  * @returns {void}
  */
-World.prototype.freezeGameOverStart = function () {
-    this.freezeGameplayOnce('isGameOverFrozen');
-    this.stopEndbossActionSounds?.();
-    this.stopEnemiesForGameOver();
-}
-
-
-/**
- * Stops all enemy loops immediately for game over (no more attack/patrol).
- * @returns {void}
- */
-World.prototype.stopEnemiesForGameOver = function () {
-    this.level?.enemies?.forEach(enemy => enemy.stop?.());
+World.prototype.stopEnemiesAfterEndbossAttack = function () {
+    const boss = this.getEndboss?.();
+    const restBoss = (boss?.currentAnimation === 'attack')
+        ? Math.max(0, (boss.attackUntil || 0) - performance.now())
+        : 0;
 }
 
 
