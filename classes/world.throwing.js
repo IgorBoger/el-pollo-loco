@@ -20,7 +20,7 @@ World.prototype.canThrowBottle = function(now) {
     if (this.isControlsLocked()) return false;
     return this.keyBaord.THROW &&
         this.character.bottle > 0 &&
-        now - this.lastBottleThrow > 500;
+        now - this.lastBottleThrow > 800;
 }
 
 

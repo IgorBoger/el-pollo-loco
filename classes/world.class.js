@@ -38,7 +38,7 @@ class World {
     lastBottleThrow = 0;
     lastDrawLogTime = 0;
     debugHitboxes = false;
-    cooldownMs = 4000;
+    cooldownMs = 1500;
 
 
     /**

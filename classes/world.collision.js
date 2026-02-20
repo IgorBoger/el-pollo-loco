@@ -352,16 +352,47 @@ World.prototype.checkBottleHitsEnemies = function () {
  */
 World.prototype.hitEndbossWithBottle = function (enemy, bottle, now) {
     this.stopEndbossActionSounds();
-    const cd = 250;
+    if (!this.canDamageEndboss(enemy, now)) return bottle.splash();
+    this.applyEndbossBottleDamage(enemy, bottle, now);
+};
+
+
+/**
+ * Returns whether the endboss can take damage from a bottle right now.
+ * @param {*} enemy
+ * @param {number} now
+ * @returns {boolean}
+ */
+World.prototype.canDamageEndboss = function (enemy, now) {
+    const cd = this.getEndbossBottleCooldownMs();
+    return !enemy.lastHit || (now - enemy.lastHit > cd);
+};
+
+
+/**
+ * Returns the cooldown (ms) for bottle damage to the endboss.
+ * @returns {number}
+ */
+World.prototype.getEndbossBottleCooldownMs = function () {
+    return 2000;
+};
+
+
+/**
+ * Applies bottle damage + reaction to the endboss.
+ * @param {*} enemy
+ * @param {*} bottle
+ * @param {number} now
+ * @returns {void}
+ */
+World.prototype.applyEndbossBottleDamage = function (enemy, bottle, now) {
     enemy.stun(700);
-    if (!enemy.lastHit || now - enemy.lastHit > cd) {
-        enemy.hit();
-        if (!enemy.isDead()) enemy.hurtFlash();
-        enemy.lastHit = now;
-        this.updateEndbossStatusBar(enemy);
-    }
+    enemy.hit();
+    if (!enemy.isDead()) enemy.hurtFlash();
+    enemy.lastHit = now;
+    this.updateEndbossStatusBar(enemy);
     bottle.splash();
-}
+};
 
 
 /**
