@@ -1,49 +1,3 @@
-.level-indicator {
-    position: absolute;
-    top: 12px;
-    right: 50%;
-    z-index: 50;
-    padding: 6px 10px;
-    border-radius: 10px;
-    font-weight: 700;
-    font-size: 14px;
-    background: rgba(0, 0, 0, 0.55);
-    opacity: 0;
-    transition: opacity 180ms ease ease-in-out;
-}
-
-
-.level-indicator.is-visible {
-    opacity: 1;
-}
-
-
-.burger-btn {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    z-index: 30;
-    padding: 8px 10px;
-    font-size: 1.2em;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-
-.fullscreen-btn {
-    position: absolute;
-    bottom: 12px;
-    right: 12px;
-    padding: 8px 10px;
-    font-size: 1.2em;
-    z-index: 20;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-
 .burger-overlay,
 .settings-overlay {
     position: absolute;
@@ -128,12 +82,6 @@
     display: flex;
     align-items: center;
     gap: 16px;
-}
-
-
-.btn-primary {
-    background: #ff6b00;
-    color: #fff;
 }
 
 
@@ -301,21 +249,8 @@
 }
 
 
-.story-title {
-    margin: 0;
-    font-size: 20px;
-}
-
-
 .padding-overlays {
     padding: 24px;
-}
-
-
-.key-help-title {
-    margin: 0;
-    font-size: 1.25rem;
-    font-weight: 700;
 }
 
 
@@ -342,12 +277,6 @@
 .key-help-hint {
     margin: 6px 0 0;
     font-size: .9rem;
-}
-
-
-.ranking-title {
-    margin: 0;
-    font-size: 20px;
 }
 
 
@@ -411,12 +340,6 @@
 }
 
 
-.ranking-confirm-title {
-    margin: 0;
-    font-size: 22px;
-}
-
-
 .ranking-confirm-text {
     margin: 0;
     font-size: 16px;
@@ -434,13 +357,6 @@
 .impressum-card {
     font-family: system-ui, sans-serif;
     text-transform: none;
-}
-
-
-.impressum-title {
-    margin: 0;
-    font-size: 20px;
-
 }
 
 
