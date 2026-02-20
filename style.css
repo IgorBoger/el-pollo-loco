@@ -1,3 +1,12 @@
+@font-face {
+    font-family: "Bungee";
+    src: url("fonts/bungee-v17-latin-regular.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+
 body {
     margin: 0;
     display: flex;
@@ -8,9 +17,13 @@ body {
     text-transform: uppercase;
     background-image: url('img/game-bg.jpg');
     background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
     letter-spacing: 1.5px;
     text-shadow: 0 0 2px black;
-    font-family: "Bungee Spice", "Bungee", system-ui, -apple-system, sans-serif;
+    font-family: "Bungee", sans-serif;
+    color: #ff3b00;
 }
 
 
@@ -31,6 +44,7 @@ textarea {
     letter-spacing: inherit;
     font-family: inherit;
     text-transform: inherit;
+    color: inherit;
 }
 
 
@@ -41,7 +55,6 @@ textarea {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
     transition: background 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
     border-radius: 8px;
-    color: #ff3b00;
 }
 
 
@@ -61,11 +74,6 @@ textarea {
 h2 {
     font-size: 20px;
     margin: 0;
-}
-
-
-.settings-header {
-    color: #ff3b00;
 }
 
 
@@ -99,57 +107,4 @@ h1 {
         0 0 20px #ff0000;
 
     filter: hue-rotate(0deg) brightness(1.1) contrast(1.1);
-}
-
-
-@supports (-webkit-touch-callout: none) {
-
-    body {
-        font-family: "Bungee", system-ui, -apple-system, sans-serif;
-        color: #ff3b00;
-    }
-
-    button,
-    p,
-    span,
-    li,
-    td,
-    th,
-    h1,
-    h2,
-    .level-indicator {
-        font-family: "Bungee", system-ui, -apple-system, sans-serif;
-    }
-
-    .impressum-card,
-    .impressum-card * {
-        font-family: system-ui, -apple-system, sans-serif !important;
-        color: #222 !important;
-        text-shadow: none !important;
-        text-transform: none;
-    }
-
-    .impressum-title {
-        color: #000 !important;
-        text-shadow: none !important;
-    }
-
-    .story-card,
-    .key-help-card,
-    .ranking-card,
-    .ranking-confirm-card,
-    .settings-overlay,
-    .burger-overlay,
-    .level-indicator,
-    .next-level-text {
-        text-shadow: 0 0 1px rgba(0, 0, 0, 0.55);
-    }
-
-    .key-help-keys-table th,
-    .key-help-keys-table td,
-    .ranking-table th,
-    .ranking-table td,
-    .key-help-hint {
-        text-shadow: 0 0 1px rgba(0, 0, 0, 0.35);
-    }
 }

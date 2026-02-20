@@ -128,10 +128,6 @@
 }
 
 
-.setting-row span {
-    color: #ff3b00;
-}
-
 .toggle-btn {
     display: flex;
     align-items: center;
@@ -198,12 +194,6 @@
 }
 
 
-.modal-title {
-    font-size: 18px;
-    color: #ff3b00;
-}
-
-
 .modal-content {
     display: grid;
     gap: 8px;
@@ -246,6 +236,7 @@
     background: linear-gradient(270deg, #f3e5da, #f3bc88);
     border-bottom: 2px solid #ffa94d;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    text-shadow: 0 0 2px black;
 }
 
 

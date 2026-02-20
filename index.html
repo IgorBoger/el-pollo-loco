@@ -1,6 +1,4 @@
 <!DOCTYPE html>
-<!-- <html lang="en" translate="no"> -->
-<!-- <html lang="es" translate="no"> -->
 <html translate="no">
 
 <head>
@@ -12,12 +10,11 @@
 
     <link rel="icon" href="img/favicon/favicon-32x32.png" type="image/png">
 
-    <link href="https://fonts.googleapis.com/css2?family=Bungee+Spice&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Bungee&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="css/ui-components.css">
+    <link rel="stylesheet" href="style.css?v=20260220">
+    <link rel="stylesheet" href="css/ui-components.css?v=20260220">
     <link rel="stylesheet" href="css/game.css">
     <link rel="stylesheet" href="css/responsive.css">
+
     <script src="classes/world.class.js"></script>
     <script src="classes/world.level-manager.js"></script>
     <script src="classes/world.enemy-spawn.js"></script>
@@ -52,14 +49,17 @@
     <script src="classes/overlay-screen.class.js"></script>
     <script src="classes/endscreen.class.js"></script>
     <script src="classes/winscreen.class.js"></script>
+
     <script src="levels/level1.js"></script>
     <script src="levels/level2.js"></script>
     <script src="levels/level3.js"></script>
+
     <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore-compat.js"></script>
+
     <script src="js/settings.js"></script>
-    <script src="./js/i18n-local.js"></script>
-    <script src="./js/database.js"></script>
+    <script src="js/i18n-local.js"></script>
+    <script src="js/database.js"></script>
     <script src="js/viewport.js"></script>
     <script src="js/controls-keyboard.js"></script>
     <script src="js/controls-mobile.js"></script>
@@ -430,7 +430,7 @@
         <div id="langOverlay" class="modal-overlay d-none" role="dialog" aria-modal="true">
             <div class="modal-card box-shadow" role="document">
                 <div class="modal-header">
-                    <span id="langModalTitle" class="modal-title">Sprache</span>
+                    <h2 id="langModalTitle" class="modal-title">Sprache</h2>
 
                     <button id="langClose" class="close-btn btn-style" aria-label="Schließen">
                         <img src="img/arrow-back.png" alt="Close" class="icon-img">
