@@ -313,30 +313,6 @@ function outsideCloseHandler(e) {
 
 
 /**
- * Checks whether outside close handling should be ignored because an overlay is open.
- * @returns {boolean} True if outside close should be ignored.
- */
-function shouldIgnoreOutsideClose() {
-    return isOverlayOpen('langOverlay')
-        || isOverlayOpen('keyHelpOverlay')
-        || isOverlayOpen('storyOverlay')
-        || isOverlayOpen('impressumOverlay')
-        || isOverlayOpen('rankingOverlay');
-}
-
-
-/**
- * Checks whether an overlay is currently open (not hidden via "d-none").
- * @param {string} id - The overlay element id.
- * @returns {boolean} True if the overlay is open.
- */
-function isOverlayOpen(id) {
-    const el = document.getElementById(id);
-    return el && !el.classList.contains('d-none');
-}
-
-
-/**
  * Determines whether the settings overlay should close due to an outside click.
  * @param {MouseEvent} e - The click event.
  * @returns {boolean} True if settings should close.
