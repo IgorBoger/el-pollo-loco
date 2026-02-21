@@ -38,7 +38,6 @@ function playBackgroundIfAllowed() {
     const backgroundAudio = getBackgroundAudio();
     applyBackgroundSettings(backgroundAudio);
     if (!backgroundAudio || isMusicMuted || isGamePaused) return;
-    // backgroundAudio.play();
     safePlayAudio(backgroundAudio);
 }
 
@@ -82,8 +81,6 @@ function toggleMusic() {
     const bg = getBackgroundAudio();
     if (!bg) return;
     bg.muted = isMusicMuted;
-    // if (!isMusicMuted) playBackgroundIfAllowed();
-    // else bg.pause();
     if (!isMusicMuted) safePlayAudio(bg);
     else safePauseAudio(bg);
 }

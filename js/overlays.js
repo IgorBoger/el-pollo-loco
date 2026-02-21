@@ -306,7 +306,6 @@ function openStartScreen() {
 function closeStartScreen(done) {
     const screen = getStartScreenEl();
     if (!screen) return done?.();
-    // screen.classList.remove('is-open');
     requestAnimationFrame(() => screen.classList.add('is-closed'));
     hideStartScreenAfterFade(screen, done);
 }

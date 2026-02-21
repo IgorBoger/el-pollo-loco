@@ -48,7 +48,6 @@ World.prototype.updateEndbossStatusBar = function (endboss) {
  * Schedules game over when character is dead.
  */
 World.prototype.scheduleGameOverIfDead = function () {
-    // if (!this.character.isDead()) return;
     if (!this.character || !this.character.isDead()) return;
     if (this.gameOverScheduled) return;
     this.gameOverScheduled = true;
@@ -174,9 +173,9 @@ World.prototype.scheduleGameOverTimeout = function () {
 }
 
 
-// /**
-//  * Finalizes game over.
-//  */
+/**
+* Finalizes game over.
+*/
 World.prototype.finishGameOver = function () {
     this.stopped = true;
     this.hideCharacter = true;

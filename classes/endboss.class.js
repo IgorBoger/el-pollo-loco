@@ -88,6 +88,8 @@ class Endboss extends MovableObject {
     scheduledAlertSoundAt = 0;
     appearToAlertDelayMs = 950;
     deadSoundPlayed = false;
+    hitsRequiredPerBarStep = 1;
+    pendingHits = 0;
 
 
     /**
@@ -140,5 +142,141 @@ class Endboss extends MovableObject {
         this.x = this.world.level.level_end_x - 140;
         this.patrolLeft = this.x - 100;
         this.patrolRight = this.x + 100;
+    }
+
+
+    /**
+ * Initializes toughness scaling based on level index.
+ * @param {number} levelIndex
+ * @returns {void}
+ */
+    initToughness(levelIndex) {
+        this.toughnessLevelIndex = levelIndex;
+        this.hitsRequiredPerBarStep = this.getHitsRequiredPerBarStep(levelIndex);
+        this.pendingHits = 0;
+        this.applyLevelTuning(levelIndex);
+    }
+
+
+    /**
+     * Returns how many bottle hits are needed to lose one 20% step.
+     * @param {number} levelIndex
+     * @returns {number}
+     */
+    getHitsRequiredPerBarStep(levelIndex) {
+        if (levelIndex >= 2) return 3;
+        if (levelIndex >= 1) return 2;
+        return 1;
+    }
+
+
+    /**
+ * Applies gameplay tuning so the boss feels stronger per level.
+ * @param {number} levelIndex
+ * @returns {void}
+ */
+    applyLevelTuning(levelIndex) {
+        const tuning = this.getLevelTuning(levelIndex);
+        this.applyTuningValues(tuning);
+    }
+
+
+    /**
+     * Returns tuning values for a given level.
+     * @param {number} levelIndex
+     * @returns {{chaseSpeed:number, attackDashSpeed:number, recoveryAfterAttackMs:number, alertRange:number, attackRange:number, attackHitDelayMs:number, bottleStunMs:number}}
+     */
+    getLevelTuning(levelIndex) {
+        if (levelIndex >= 2) return this.getLevel3Tuning();
+        if (levelIndex >= 1) return this.getLevel2Tuning();
+        return this.getLevel1Tuning();
+    }
+
+
+    /**
+     * Level 1 tuning (baseline).
+     * @returns {{chaseSpeed:number, attackDashSpeed:number, recoveryAfterAttackMs:number, alertRange:number, attackRange:number, attackHitDelayMs:number, bottleStunMs:number}}
+     */
+    getLevel1Tuning() {
+        return {
+            chaseSpeed: 1.5,
+            attackDashSpeed: 4,
+            recoveryAfterAttackMs: 2400,
+            alertRange: 120,
+            attackRange: 60,
+            attackHitDelayMs: 300,
+            bottleStunMs: 700
+        };
+    }
+
+
+    /**
+     * Level 2 tuning (more aggressive).
+     * @returns {{chaseSpeed:number, attackDashSpeed:number, recoveryAfterAttackMs:number, alertRange:number, attackRange:number, attackHitDelayMs:number, bottleStunMs:number}}
+     */
+    getLevel2Tuning() {
+        return {
+            chaseSpeed: 1.85,
+            attackDashSpeed: 4.8,
+            recoveryAfterAttackMs: 1900,
+            alertRange: 150,
+            attackRange: 80,
+            attackHitDelayMs: 260,
+            bottleStunMs: 520
+        };
+    }
+
+
+    /**
+     * Level 3 tuning (hardest).
+     * @returns {{chaseSpeed:number, attackDashSpeed:number, recoveryAfterAttackMs:number, alertRange:number, attackRange:number, attackHitDelayMs:number, bottleStunMs:number}}
+     */
+    getLevel3Tuning() {
+        return {
+            chaseSpeed: 2.15,
+            attackDashSpeed: 5.4,
+            recoveryAfterAttackMs: 1500,
+            alertRange: 180,
+            attackRange: 105,
+            attackHitDelayMs: 220,
+            bottleStunMs: 380
+        };
+    }
+
+
+    /**
+     * Applies tuning values to the boss instance.
+     * @param {*} tuning
+     * @returns {void}
+     */
+    applyTuningValues(tuning) {
+        this.chaseSpeed = tuning.chaseSpeed;
+        this.attackDashSpeed = tuning.attackDashSpeed;
+        this.recoveryAfterAttackMs = tuning.recoveryAfterAttackMs;
+        this.alertRange = tuning.alertRange;
+        this.attackRange = tuning.attackRange;
+        this.attackHitDelayMs = tuning.attackHitDelayMs;
+        this.bottleStunMs = tuning.bottleStunMs;
+    }
+
+
+    /**
+     * Returns stun duration when hit by a bottle (scales by level).
+     * @returns {number}
+     */
+    getBottleStunMs() {
+        return this.bottleStunMs ?? 700;
+    }
+
+
+    /**
+     * Registers a bottle hit and returns true if real damage should be applied now.
+     * @returns {boolean}
+     */
+    shouldApplyDamageNow() {
+        this.pendingHits += 1;
+        if (this.pendingHits < this.hitsRequiredPerBarStep) return false;
+        this.pendingHits = 0;
+        return true;
     }
 }

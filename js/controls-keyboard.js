@@ -84,7 +84,6 @@ function handleKeyDown(event) {
  */
 function handleMovementKeys(event) {
     if (event.key === "ArrowLeft") keyBaord.LEFT = true;
-    // if (event.key === "ArrowRight") keyBaord.RIGHT = true;
     if (event.key === "ArrowRight") {
         if (isRightLocked()) return;
         keyBaord.RIGHT = true;

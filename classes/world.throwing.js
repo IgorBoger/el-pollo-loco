@@ -191,12 +191,24 @@ World.prototype.getEndbossBottleCooldownMs = function () {
  * @returns {void}
  */
 World.prototype.applyEndbossBottleDamage = function (enemy, bottle, now) {
-    enemy.stun(700);
+    enemy.stun(enemy.getBottleStunMs?.() ?? 700);
+    const didDamage = this.tryApplyStackedEndbossDamage(enemy);
+    enemy.lastHit = now;
+    if (didDamage) this.updateEndbossStatusBar(enemy);
+    bottle.splash();
+};
+
+
+/**
+ * Applies real endboss damage only when enough bottle hits were stacked.
+ * @param {Endboss} enemy
+ * @returns {boolean}
+ */
+World.prototype.tryApplyStackedEndbossDamage = function (enemy) {
+    if (!enemy.shouldApplyDamageNow?.()) return false;
     enemy.hit();
     if (!enemy.isDead()) enemy.hurtFlash();
-    enemy.lastHit = now;
-    this.updateEndbossStatusBar(enemy);
-    bottle.splash();
+    return true;
 };
 
 

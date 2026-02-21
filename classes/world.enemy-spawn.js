@@ -27,11 +27,33 @@ World.prototype.initEnemy = function (enemy, index, total) {
  * @returns {void}
  */
 World.prototype.applyEnemySpawnPosition = function (enemy, index, total) {
-    if (enemy instanceof Endboss) return enemy.setInitialPosition?.();
+    if (enemy instanceof Endboss) return this.initEndbossSpawn(enemy);
     if (!(enemy instanceof Chicken || enemy instanceof SmallChicken)) return;
     if (this.isLevel2OrHigher()) return this.placeEnemyWaveBased(enemy, index, total);
     this.placeEnemyConfigBased(enemy);
 }
+
+
+/**
+ * Initializes endboss spawn position and toughness scaling.
+ * @param {Endboss} enemy
+ * @returns {void}
+ */
+World.prototype.initEndbossSpawn = function (enemy) {
+    enemy.setInitialPosition?.();
+    enemy.initToughness?.(this.getWorldLevelIndex());
+};
+
+
+/**
+ * Returns a 0-based level index derived from level length.
+ * @returns {number}
+ */
+World.prototype.getWorldLevelIndex = function () {
+    if (this.isLevel3OrHigher()) return 2;
+    if (this.isLevel2OrHigher()) return 1;
+    return 0;
+};
 
 
 /**

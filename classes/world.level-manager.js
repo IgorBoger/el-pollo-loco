@@ -10,7 +10,9 @@ World.prototype.cloneLevel = function (level) {
     const backgroundObjects = [];
     const layers = [...level.layers];
     const altLayers = [...level.altLayers];
-    return new Level(enemies, clouds, backgroundObjects, layers, altLayers);
+    const cloned = new Level(enemies, clouds, backgroundObjects, layers, altLayers);
+    cloned.level_end_x = level.level_end_x;
+    return cloned;
 };
 
 
@@ -61,7 +63,6 @@ World.prototype.placeCloudAtIndex = function (cloud, index, total, bounds) {
  * @returns {number}
  */
 World.prototype.applyCloudJitter = function (baseX, step) {
-    // const jitter = step * 0.6;
     const jitter = step * 0.9;
     return baseX + (Math.random() * jitter - jitter / 2);
 }

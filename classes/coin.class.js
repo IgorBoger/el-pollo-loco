@@ -81,7 +81,6 @@ class Coin extends MovableObject {
      */
     initAnimState() {
         this.currentImage = 0;
-        // this.animStartAt = performance.now();
         this.animStartAt = performance.now() - this.getRandomPhaseOffset();
     }
 

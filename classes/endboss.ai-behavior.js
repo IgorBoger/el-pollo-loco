@@ -144,7 +144,6 @@ Endboss.prototype.startAttack = function (now, pepeX) {
     if (this.shouldSkipAttackStart(now)) return;
     this.prepareAttackStart(now);
     const dir = this.getAttackDirection(pepeX);
-    // this.applyAttackDirection(pepeX, dir);
     this.applyAttackDirection(dir);
     this.setupAttackSpeeds(dir);
     this.setupAttackHitWindow(now);
