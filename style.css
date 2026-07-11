@@ -15,7 +15,7 @@ body {
     justify-content: flex-start;
     min-height: 100vh;
     text-transform: uppercase;
-    background-image: url('img/game-bg.jpg');
+    background-image: url('img/game-bg-candidate.jpg');
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;

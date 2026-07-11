@@ -1,11 +1,14 @@
 #gameContainer {
     position: relative;
     overflow: hidden;
+    box-sizing: border-box;
     border-radius: 12px;
     width: 100%;
     max-width: 720px;
     aspect-ratio: 3 / 2;
     height: auto;
+    border: 3px solid rgba(35, 18, 8, 0.85);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
 }
 
 
@@ -149,6 +152,8 @@ canvas {
     max-width: none;
     max-height: none;
     aspect-ratio: unset;
+    border: 0;
+    box-shadow: none;
 }
 
 
@@ -299,6 +304,8 @@ canvas {
     max-width: none;
     max-height: none;
     border-radius: 0;
+    border: 0;
+    box-shadow: none;
     z-index: 9999;
 }
 
